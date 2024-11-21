@@ -1,5 +1,4 @@
-import 'package:quick_dev_sdk/src/widgets/general_button.dart';
-import 'package:flutter/material.dart';
+part of '../show_modal.dart';
 
 class HeaderAction extends StatelessWidget {
   const HeaderAction({

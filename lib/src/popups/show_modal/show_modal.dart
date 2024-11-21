@@ -1,10 +1,11 @@
-import 'package:quick_dev_sdk/src/popups/show_modal/widgets/header_action.dart';
+import 'package:quick_dev_sdk/quick_dev_sdk.dart';
 import 'package:quick_dev_sdk/src/popups/show_modal/widgets/modal_dialog_content.dart';
 import 'package:flutter/material.dart';
 
 part 'models.dart';
 part 'widgets/bottom_sheet_header.dart';
 part 'widgets/dialog_header.dart';
+part 'widgets/header_action.dart';
 
 class ShowModal {
   static void bottomSheet(
