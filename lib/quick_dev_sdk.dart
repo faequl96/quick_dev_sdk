@@ -1,10 +1,11 @@
 library quick_dev_sdk;
 
-export 'package:quick_dev_sdk/src/widgets/card_container.dart';
-export 'package:quick_dev_sdk/src/widgets/general_button.dart';
-export 'package:quick_dev_sdk/src/widgets/general_effects_button.dart';
-export 'package:quick_dev_sdk/src/widgets/hovered_background.dart';
-export 'package:quick_dev_sdk/src/widgets/show_overlay_button.dart';
+export 'package:quick_dev_sdk/src/widgets/basic/card_container.dart';
+export 'package:quick_dev_sdk/src/widgets/buttons/general/general_button.dart';
+export 'package:quick_dev_sdk/src/widgets/buttons/general/general_effects_button.dart';
+export 'package:quick_dev_sdk/src/widgets/basic/hovered_background.dart';
+export 'package:quick_dev_sdk/src/widgets/buttons/popup/overlay_menu_button.dart';
+export 'package:quick_dev_sdk/src/widgets/buttons/popup/overlay_popup_button.dart';
 
 export 'package:quick_dev_sdk/src/popups/show_modal/show_modal.dart';
 export 'package:quick_dev_sdk/src/popups/show_overlay.dart';

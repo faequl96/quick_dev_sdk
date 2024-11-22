@@ -1,6 +1,6 @@
 import 'dart:developer';
 
-import 'package:quick_dev_sdk/src/widgets/card_container.dart';
+import 'package:quick_dev_sdk/src/widgets/basic/card_container.dart';
 import 'package:flutter/material.dart';
 
 class ShowOverlay {
@@ -13,13 +13,32 @@ class ShowOverlay {
 
   late BuildContext _context;
 
+  Alignment _getAlignment(OverlayAlign alignment) {
+    final alignMap = {
+      OverlayAlign.left: Alignment.topLeft,
+      OverlayAlign.center: Alignment.topCenter,
+      OverlayAlign.right: Alignment.topRight,
+    };
+    return alignMap[alignment]!;
+  }
+
+  double _getAlignOffset(OverlayAlign alignment) {
+    final Map<OverlayAlign, double> alignMap = {
+      OverlayAlign.left: -14,
+      OverlayAlign.center: 0,
+      OverlayAlign.right: 14,
+    };
+    return alignMap[alignment]!;
+  }
+
   void create({
     required GlobalKey key,
     required LayerLink linkToTarget,
     bool dynamicWidth = false,
     bool slideTransition = true,
     bool closeOnTapOutside = true,
-    Offset? offset,
+    double? yOffset,
+    OverlayAlign alignment = OverlayAlign.center,
     OverlayDecoration? decoration,
     required Widget Function(BuildContext context) contentBuilder,
   }) {
@@ -34,6 +53,8 @@ class ShowOverlay {
     final renderBox = _context.findRenderObject() as RenderBox;
     final buttonSize = renderBox.size;
 
+    Alignment align = _getAlignment(alignment);
+
     _overlayEntry = OverlayEntry(builder: (_) {
       return Stack(
         children: [
@@ -43,11 +64,11 @@ class ShowOverlay {
               link: linkToTarget,
               showWhenUnlinked: false,
               offset: Offset(
-                offset?.dx ?? 0,
-                buttonSize.height + ((offset?.dy ?? 0) - 10),
+                _getAlignOffset(alignment),
+                buttonSize.height + ((yOffset ?? 0) - 10),
               ),
-              targetAnchor: Alignment.topCenter,
-              followerAnchor: Alignment.topCenter,
+              targetAnchor: align,
+              followerAnchor: align,
               child: Material(
                 type: MaterialType.transparency,
                 child: TapRegion(
@@ -197,3 +218,5 @@ class OverlayDecoration {
   final BoxShadow boxShadow;
   final Clip clipBehavior;
 }
+
+enum OverlayAlign { left, center, right }

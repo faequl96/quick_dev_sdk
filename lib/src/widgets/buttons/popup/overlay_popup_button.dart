@@ -1,8 +1,8 @@
 import 'package:quick_dev_sdk/quick_dev_sdk.dart';
 import 'package:flutter/material.dart';
 
-class ShowOverlayButton extends StatefulWidget {
-  const ShowOverlayButton({
+class OverlayPopupButton extends StatefulWidget {
+  const OverlayPopupButton({
     super.key,
     this.width,
     this.height,
@@ -15,7 +15,6 @@ class ShowOverlayButton extends StatefulWidget {
     this.borderRadius,
     this.border,
     this.clipBehavior = Clip.none,
-    this.isDisabled,
     this.onTap,
     this.onHover,
     this.closeOnTapOutside = true,
@@ -35,12 +34,12 @@ class ShowOverlayButton extends StatefulWidget {
   final BorderRadius? borderRadius;
   final BoxBorder? border;
   final Clip clipBehavior;
-  final bool? isDisabled;
   final void Function(
     void Function({
       bool dynamicWidth,
       bool slideTransition,
-      Offset? offset,
+      double? yOffset,
+      OverlayAlign alignment,
       OverlayDecoration? decoration,
       required Widget Function(BuildContext context) contentBuilder,
     }) handleShowOverlay,
@@ -50,7 +49,8 @@ class ShowOverlayButton extends StatefulWidget {
     void Function({
       bool dynamicWidth,
       bool slideTransition,
-      Offset? offset,
+      double? yOffset,
+      OverlayAlign alignment,
       OverlayDecoration? decoration,
       required Widget Function(BuildContext context) contentBuilder,
     }) handleShowOverlay,
@@ -62,10 +62,10 @@ class ShowOverlayButton extends StatefulWidget {
   final Widget? child;
 
   @override
-  State<ShowOverlayButton> createState() => _ShowOverlayButtonState();
+  State<OverlayPopupButton> createState() => _OverlayPopupButtonState();
 }
 
-class _ShowOverlayButtonState extends State<ShowOverlayButton> {
+class _OverlayPopupButtonState extends State<OverlayPopupButton> {
   final ShowOverlay _showOverlay = ShowOverlay.instance;
   final GlobalKey _key = GlobalKey();
   final LayerLink _layerLink = LayerLink();
@@ -87,12 +87,13 @@ class _ShowOverlayButtonState extends State<ShowOverlayButton> {
         borderRadius: widget.borderRadius,
         border: widget.border,
         clipBehavior: widget.clipBehavior,
-        isDisabled: widget.isDisabled == true || widget.onTap == null,
+        isDisabled: widget.onTap == null,
         onTap: () => widget.onTap?.call(
           ({
             bool dynamicWidth = false,
             bool slideTransition = true,
-            Offset? offset,
+            double? yOffset,
+            OverlayAlign alignment = OverlayAlign.center,
             OverlayDecoration? decoration,
             required Widget Function(BuildContext) contentBuilder,
           }) {
@@ -102,7 +103,8 @@ class _ShowOverlayButtonState extends State<ShowOverlayButton> {
               dynamicWidth: dynamicWidth,
               slideTransition: slideTransition,
               closeOnTapOutside: widget.closeOnTapOutside,
-              offset: offset,
+              yOffset: yOffset,
+              alignment: alignment,
               decoration: decoration,
               contentBuilder: contentBuilder,
             );
@@ -115,7 +117,8 @@ class _ShowOverlayButtonState extends State<ShowOverlayButton> {
               ({
                 bool dynamicWidth = false,
                 bool slideTransition = true,
-                Offset? offset,
+                double? yOffset,
+                OverlayAlign alignment = OverlayAlign.center,
                 OverlayDecoration? decoration,
                 required Widget Function(BuildContext) contentBuilder,
               }) {
@@ -124,7 +127,8 @@ class _ShowOverlayButtonState extends State<ShowOverlayButton> {
                   linkToTarget: _layerLink,
                   dynamicWidth: dynamicWidth,
                   slideTransition: slideTransition,
-                  offset: offset,
+                  yOffset: yOffset,
+                  alignment: alignment,
                   decoration: decoration,
                   closeOnTapOutside: widget.closeOnTapOutside,
                   contentBuilder: contentBuilder,

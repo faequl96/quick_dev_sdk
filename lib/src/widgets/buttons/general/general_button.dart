@@ -1,4 +1,4 @@
-import 'package:quick_dev_sdk/src/widgets/hovered_background.dart';
+import 'package:quick_dev_sdk/src/widgets/basic/hovered_background.dart';
 import 'package:flutter/material.dart';
 
 class GeneralButton extends StatelessWidget {
