@@ -1,7 +1,7 @@
 import 'package:quick_dev_sdk/src/utils/color_converter.dart';
 import 'package:flutter/material.dart';
 
-class GeneralEffectsButton extends StatelessWidget {
+class GeneralEffectsButton extends StatefulWidget {
   const GeneralEffectsButton({
     super.key,
     this.width,
@@ -10,7 +10,6 @@ class GeneralEffectsButton extends StatelessWidget {
     this.color,
     this.hoveredColor,
     this.splashColor,
-    this.highlightColor,
     this.useInitialElevation = false,
     this.hoveredElevation,
     this.borderRadius,
@@ -29,7 +28,6 @@ class GeneralEffectsButton extends StatelessWidget {
   final Color? color;
   final Color? hoveredColor;
   final Color? splashColor;
-  final Color? highlightColor;
   final bool useInitialElevation;
   final double? hoveredElevation;
   final BorderRadius? borderRadius;
@@ -41,47 +39,56 @@ class GeneralEffectsButton extends StatelessWidget {
   final Widget Function(bool value)? onHoverChildBuilder;
   final Widget? child;
 
-  static void Function(bool value)? _onHoverParent;
-  static void Function(bool value)? _onHoverChild;
+  @override
+  State<GeneralEffectsButton> createState() => _GeneralEffectsButtonState();
+}
+
+class _GeneralEffectsButtonState extends State<GeneralEffectsButton> {
+  void Function(bool value)? _onHoverParent;
+  void Function(bool value)? _onHoverChild;
 
   @override
   Widget build(BuildContext context) {
-    final unhoveredColor = (color ?? Colors.transparent);
+    final unhoveredColor = (widget.color ?? Colors.transparent);
 
     return _ExtendedStyle(
-      color: color,
-      useInitialElevation: useInitialElevation,
-      hoveredElevation: hoveredElevation,
-      borderRadius: borderRadius,
+      color: widget.color,
+      useInitialElevation: widget.useInitialElevation,
+      hoveredElevation: widget.hoveredElevation,
+      borderRadius: widget.borderRadius,
       rebuild: (onHover) => _onHoverParent = onHover,
       child: InkWell(
-        onTap: isDisabled ? null : onTap,
-        hoverColor: hoveredColor ?? ColorConverter.lighten(unhoveredColor, 25),
-        splashColor: splashColor ?? color ?? Colors.transparent,
-        // highlightColor: ColorConverter.lighten(unhoveredColor, 30),
-        borderRadius: borderRadius,
+        onTap: widget.isDisabled ? () {} : () => widget.onTap(),
+        hoverColor:
+            widget.hoveredColor ?? ColorConverter.lighten(unhoveredColor, 25),
+        splashColor: widget.splashColor ?? widget.color ?? Colors.transparent,
+        highlightColor: Colors.transparent,
+        borderRadius: widget.borderRadius,
         hoverDuration: const Duration(milliseconds: 250),
+        mouseCursor: widget.isDisabled
+            ? SystemMouseCursors.basic
+            : SystemMouseCursors.click,
         onHover: (value) {
-          onHover?.call(value);
-          if (useInitialElevation || hoveredElevation != null) {
+          widget.onHover?.call(value);
+          if (widget.useInitialElevation || widget.hoveredElevation != null) {
             _onHoverParent?.call(value);
           }
-          if (onHoverChildBuilder != null) _onHoverChild?.call(value);
+          if (widget.onHoverChildBuilder != null) _onHoverChild?.call(value);
         },
         child: SizedBox(
-          width: width,
-          height: height,
+          width: widget.width,
+          height: widget.height,
           child: DecoratedBox(
             decoration: BoxDecoration(
-              border: border,
-              borderRadius: borderRadius,
+              border: widget.border,
+              borderRadius: widget.borderRadius,
             ),
             child: Padding(
-              padding: padding ?? EdgeInsets.zero,
+              padding: widget.padding ?? EdgeInsets.zero,
               child: _ChildWidget(
                 rebuild: (onHover) => _onHoverChild = onHover,
-                onHoverChildBuilder: onHoverChildBuilder,
-                child: child,
+                onHoverChildBuilder: widget.onHoverChildBuilder,
+                child: widget.child,
               ),
             ),
           ),
@@ -153,23 +160,16 @@ class _ChildWidget extends StatefulWidget {
 }
 
 class _ChildWidgetState extends State<_ChildWidget> {
-  bool isHovered = false;
-
   Widget? childHovered;
 
   @override
   void initState() {
     widget.rebuild?.call((value) => setState(() {
-          isHovered = value;
           childHovered = widget.onHoverChildBuilder?.call(value);
         }));
 
     if (widget.onHoverChildBuilder != null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        setState(() {
-          childHovered = widget.onHoverChildBuilder?.call(false);
-        });
-      });
+      childHovered = widget.onHoverChildBuilder?.call(false);
     }
 
     super.initState();

@@ -148,17 +148,20 @@ class _OverlayContentState extends State<_OverlayContent>
               padding: widget.decoration?.padding ?? EdgeInsets.zero,
               color: widget.decoration?.color ?? Colors.white,
               borderRadius: widget.decoration?.borderRadius ?? 8,
-              border: widget.decoration?.border,
+              border: widget.decoration?.border ??
+                  const Border.fromBorderSide(
+                    BorderSide(color: Color.fromARGB(255, 224, 224, 224)),
+                  ),
               boxShadow: widget.decoration?.boxShadow ??
                   const BoxShadow(
-                    offset: Offset(0, 2.5),
+                    offset: Offset(0, 3),
                     blurRadius: 2,
                     color: Colors.black12,
-                    spreadRadius: 0.5,
                   ),
               clipBehavior: widget.decoration?.clipBehavior ?? Clip.none,
-              child:
-                  IntrinsicWidth(child: IntrinsicHeight(child: widget.child)),
+              child: IntrinsicWidth(
+                child: IntrinsicHeight(child: widget.child),
+              ),
             ),
           ),
         ),
@@ -174,12 +177,13 @@ class OverlayDecoration {
     this.padding = EdgeInsets.zero,
     this.color,
     this.borderRadius = 8,
-    this.border,
+    this.border = const Border.fromBorderSide(
+      BorderSide(color: Color.fromARGB(255, 224, 224, 224)),
+    ),
     this.boxShadow = const BoxShadow(
-      offset: Offset(0, 2.5),
+      offset: Offset(0, 3),
       blurRadius: 2,
       color: Colors.black12,
-      spreadRadius: 0.5,
     ),
     this.clipBehavior = Clip.none,
   });
@@ -189,7 +193,7 @@ class OverlayDecoration {
   final EdgeInsets padding;
   final Color? color;
   final double borderRadius;
-  final BoxBorder? border;
+  final BoxBorder border;
   final BoxShadow boxShadow;
   final Clip clipBehavior;
 }

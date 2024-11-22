@@ -1,5 +1,4 @@
-import 'package:quick_dev_sdk/src/popups/show_overlay.dart';
-import 'package:quick_dev_sdk/src/widgets/general_button.dart';
+import 'package:quick_dev_sdk/quick_dev_sdk.dart';
 import 'package:flutter/material.dart';
 
 class ShowOverlayButton extends StatefulWidget {
@@ -8,14 +7,13 @@ class ShowOverlayButton extends StatefulWidget {
     this.width,
     this.height,
     this.padding,
-    this.margin,
+    this.color,
     this.hoveredColor,
-    this.unhoveredColor,
-    this.useInitialBoxShadow = false,
-    this.hoveredBoxShadow,
+    this.splashColor,
+    this.useInitialElevation = false,
+    this.hoveredElevation,
     this.borderRadius,
     this.border,
-    this.boxShape,
     this.clipBehavior = Clip.none,
     this.isDisabled,
     this.onTap,
@@ -29,14 +27,13 @@ class ShowOverlayButton extends StatefulWidget {
   final double? width;
   final double? height;
   final EdgeInsets? padding;
-  final EdgeInsets? margin;
+  final Color? color;
   final Color? hoveredColor;
-  final Color? unhoveredColor;
-  final bool useInitialBoxShadow;
-  final BoxShadow? hoveredBoxShadow;
+  final Color? splashColor;
+  final bool useInitialElevation;
+  final double? hoveredElevation;
   final BorderRadius? borderRadius;
   final BoxBorder? border;
-  final BoxShape? boxShape;
   final Clip clipBehavior;
   final bool? isDisabled;
   final void Function(
@@ -77,18 +74,18 @@ class _ShowOverlayButtonState extends State<ShowOverlayButton> {
   Widget build(BuildContext context) {
     return CompositedTransformTarget(
       link: _layerLink,
-      child: GeneralButton(
+      child: GeneralEffectsButton(
         key: _key,
         width: widget.width,
         height: widget.height,
         padding: widget.padding,
+        color: widget.color,
         hoveredColor: widget.hoveredColor,
-        unhoveredColor: widget.unhoveredColor,
-        useInitialBoxShadow: widget.useInitialBoxShadow,
-        hoveredBoxShadow: widget.hoveredBoxShadow,
+        splashColor: widget.splashColor,
+        useInitialElevation: widget.useInitialElevation,
+        hoveredElevation: widget.hoveredElevation,
         borderRadius: widget.borderRadius,
         border: widget.border,
-        boxShape: widget.boxShape,
         clipBehavior: widget.clipBehavior,
         isDisabled: widget.isDisabled == true || widget.onTap == null,
         onTap: () => widget.onTap?.call(
