@@ -5,6 +5,7 @@ class CardContainer extends StatelessWidget {
     super.key,
     this.width,
     this.height,
+    this.constraints,
     this.margin,
     this.padding = EdgeInsets.zero,
     this.color,
@@ -17,6 +18,7 @@ class CardContainer extends StatelessWidget {
 
   final double? width;
   final double? height;
+  final BoxConstraints? constraints;
   final EdgeInsets? margin;
   final EdgeInsets padding;
   final Color? color;
@@ -31,6 +33,9 @@ class CardContainer extends StatelessWidget {
     return Container(
       width: width,
       height: height,
+      constraints: constraints,
+      margin: margin,
+      padding: padding,
       decoration: BoxDecoration(
         color: color ?? Colors.white,
         borderRadius: BorderRadius.circular(borderRadius),
@@ -47,8 +52,6 @@ class CardContainer extends StatelessWidget {
             ),
         ],
       ),
-      margin: margin,
-      padding: padding,
       clipBehavior: clipBehavior,
       child: child,
     );

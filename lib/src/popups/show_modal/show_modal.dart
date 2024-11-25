@@ -67,17 +67,9 @@ class ShowModal {
         side: decoration?.borderSide ?? BorderSide.none,
         borderRadius: decoration?.borderRadius ?? BorderRadius.circular(10.0),
       ),
-      child: SizedBox(
-        width: decoration?.width,
-        height: decoration?.height,
-        child: IntrinsicWidth(
-          child: IntrinsicHeight(
-            child: ModalDialogContent(
-              header: header,
-              child: contentBuilder(context),
-            ),
-          ),
-        ),
+      child: ModalDialogContent(
+        header: header,
+        child: contentBuilder(context),
       ),
     );
 

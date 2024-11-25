@@ -11,12 +11,11 @@ class HeaderAction extends StatelessWidget {
   });
 
   static HeaderAction loading({double size = 28}) {
-    HeaderAction instance = HeaderAction(
+    return HeaderAction(
       actionIcon: Icons.circle_outlined,
       iconSize: size,
       onTap: () {},
     );
-    return instance;
   }
 
   final IconData actionIcon;

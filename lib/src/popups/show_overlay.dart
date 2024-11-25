@@ -1,4 +1,5 @@
-import 'dart:developer';
+import 'dart:developer' as dev;
+import 'dart:math';
 
 import 'package:quick_dev_sdk/src/widgets/basic/card_container.dart';
 import 'package:flutter/material.dart';
@@ -31,6 +32,28 @@ class ShowOverlay {
     return alignMap[alignment]!;
   }
 
+  double _getMaxWidth({
+    required OverlayAlign alignment,
+    required Size size,
+    required Size buttonSize,
+    required Offset position,
+  }) {
+    double leftRemainder = size.width - position.dx;
+    double rightRemainder = size.width - (position.dx + buttonSize.width);
+    List<double> remainders = [leftRemainder, rightRemainder];
+    double minNumber = remainders[0];
+    for (var number in remainders) {
+      minNumber = min(minNumber, number);
+    }
+    final Map<OverlayAlign, double> alignMap = {
+      OverlayAlign.left: size.width - (position.dx + buttonSize.width),
+      OverlayAlign.center: minNumber,
+      OverlayAlign.right: size.width - position.dx,
+    };
+
+    return alignMap[alignment]!;
+  }
+
   void create({
     required GlobalKey key,
     required LayerLink linkToTarget,
@@ -46,14 +69,26 @@ class ShowOverlay {
 
     if (key.currentContext != null) _context = key.currentContext!;
     if (_context.mounted == false) {
-      log('Your key is not associated with any widget "ShowOverlay.of(GlobalKey key)"');
+      dev.log(
+        'Your key is not associated with any widget "ShowOverlay.of(GlobalKey key)"',
+      );
       return;
     }
 
+    final size = MediaQuery.of(_context).size;
+
     final renderBox = _context.findRenderObject() as RenderBox;
     final buttonSize = renderBox.size;
-
-    Alignment align = _getAlignment(alignment);
+    final position = renderBox.localToGlobal(Offset.zero);
+    final align = _getAlignment(alignment);
+    final maxWidth = _getMaxWidth(
+      alignment: alignment,
+      size: size,
+      buttonSize: buttonSize,
+      position: position,
+    );
+    final maxHeight =
+        size.height - (position.dy + buttonSize.height + (yOffset ?? 0));
 
     _overlayEntry = OverlayEntry(builder: (_) {
       return Stack(
@@ -74,6 +109,8 @@ class ShowOverlay {
                 child: TapRegion(
                   onTapOutside: closeOnTapOutside ? (_) => remove() : null,
                   child: _OverlayContent(
+                    maxWidth: maxWidth,
+                    maxHeight: maxHeight,
                     slideTransition: slideTransition,
                     dynamicWidth: dynamicWidth,
                     decoration: decoration,
@@ -105,12 +142,16 @@ class ShowOverlay {
 
 class _OverlayContent extends StatefulWidget {
   const _OverlayContent({
+    required this.maxWidth,
+    required this.maxHeight,
     this.slideTransition = true,
     this.dynamicWidth,
     this.decoration,
     required this.child,
   });
 
+  final double maxWidth;
+  final double maxHeight;
   final bool slideTransition;
   final bool? dynamicWidth;
   final OverlayDecoration? decoration;
@@ -122,6 +163,9 @@ class _OverlayContent extends StatefulWidget {
 
 class _OverlayContentState extends State<_OverlayContent>
     with TickerProviderStateMixin {
+  final GlobalKey _key = GlobalKey();
+  double? _staticHeight;
+
   late AnimationController _animationController;
   late Animation<double> _animation;
 
@@ -136,7 +180,12 @@ class _OverlayContentState extends State<_OverlayContent>
       _animationController,
     );
 
-    if (widget.slideTransition) _animationController.forward();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget.decoration?.height == null) {
+        setState(() => _staticHeight = _key.currentContext?.size?.height);
+      }
+      if (widget.slideTransition) _animationController.forward();
+    });
 
     super.initState();
   }
@@ -159,13 +208,15 @@ class _OverlayContentState extends State<_OverlayContent>
             end: const Offset(0, 0),
           ).animate(CurvedAnimation(parent: _animation, curve: Curves.easeOut)),
           child: FadeTransition(
-            opacity: CurvedAnimation(
-              parent: _animation,
-              curve: Curves.easeIn,
-            ),
+            opacity: CurvedAnimation(parent: _animation, curve: Curves.easeIn),
             child: CardContainer(
+              key: _key,
               width: widget.decoration?.width,
-              height: widget.decoration?.height,
+              height: _staticHeight ?? widget.decoration?.height,
+              constraints: BoxConstraints(
+                maxWidth: widget.maxWidth,
+                maxHeight: widget.maxHeight <= 72 ? 72 : widget.maxHeight,
+              ),
               padding: widget.decoration?.padding ?? EdgeInsets.zero,
               color: widget.decoration?.color ?? Colors.white,
               borderRadius: widget.decoration?.borderRadius ?? 8,
@@ -180,9 +231,7 @@ class _OverlayContentState extends State<_OverlayContent>
                     color: Colors.black12,
                   ),
               clipBehavior: widget.decoration?.clipBehavior ?? Clip.none,
-              child: IntrinsicWidth(
-                child: IntrinsicHeight(child: widget.child),
-              ),
+              child: widget.child,
             ),
           ),
         ),

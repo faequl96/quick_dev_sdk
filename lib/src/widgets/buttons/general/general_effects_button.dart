@@ -10,6 +10,7 @@ class GeneralEffectsButton extends StatefulWidget {
     this.color,
     this.hoveredColor,
     this.splashColor,
+    this.hoverDuration = const Duration(milliseconds: 250),
     this.useInitialElevation = false,
     this.hoveredElevation,
     this.borderRadius,
@@ -28,6 +29,7 @@ class GeneralEffectsButton extends StatefulWidget {
   final Color? color;
   final Color? hoveredColor;
   final Color? splashColor;
+  final Duration hoverDuration;
   final bool useInitialElevation;
   final double? hoveredElevation;
   final BorderRadius? borderRadius;
@@ -64,7 +66,7 @@ class _GeneralEffectsButtonState extends State<GeneralEffectsButton> {
         splashColor: widget.splashColor ?? widget.color ?? Colors.transparent,
         highlightColor: Colors.transparent,
         borderRadius: widget.borderRadius,
-        hoverDuration: const Duration(milliseconds: 250),
+        hoverDuration: widget.hoverDuration,
         mouseCursor: widget.isDisabled
             ? SystemMouseCursors.basic
             : SystemMouseCursors.click,
