@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:quick_dev_sdk/quick_dev_sdk.dart';
 
-class OverlayMenuButton<T> extends StatelessWidget {
-  const OverlayMenuButton({
+class OverlayDropdownButton<T> extends StatelessWidget {
+  const OverlayDropdownButton({
     super.key,
     this.width,
     this.height,
@@ -19,16 +19,16 @@ class OverlayMenuButton<T> extends StatelessWidget {
     this.overlayYOffset,
     this.overlayAlignment = OverlayAlign.center,
     this.overlaydecoration,
-    this.menuItemsBorderRadius = 4,
-    this.menuItemsPadding = const EdgeInsets.symmetric(
+    this.dropdownItemsBorderRadius = 4,
+    this.dropdownItemsPadding = const EdgeInsets.symmetric(
       horizontal: 8,
       vertical: 4,
     ),
-    required this.menuItems,
-    required this.menuItemBuilder,
+    required this.value,
+    required this.dropdownItems,
+    required this.dropdownItemBuilder,
     required this.onSelected,
-    this.onHoverChildBuilder,
-    this.child,
+    required this.selectedValueBuilder,
   });
 
   final double? width;
@@ -46,13 +46,13 @@ class OverlayMenuButton<T> extends StatelessWidget {
   final double? overlayYOffset;
   final OverlayAlign overlayAlignment;
   final OverlayDecoration? overlaydecoration;
-  final double menuItemsBorderRadius;
-  final EdgeInsets? menuItemsPadding;
-  final List<T> menuItems;
-  final Widget Function(T value) menuItemBuilder;
+  final double dropdownItemsBorderRadius;
+  final EdgeInsets? dropdownItemsPadding;
+  final T? value;
+  final List<T> dropdownItems;
+  final Widget Function(T value) dropdownItemBuilder;
   final void Function(T value) onSelected;
-  final Widget Function(bool value)? onHoverChildBuilder;
-  final Widget? child;
+  final Widget? Function(T? value) selectedValueBuilder;
 
   @override
   Widget build(BuildContext context) {
@@ -75,25 +75,26 @@ class OverlayMenuButton<T> extends StatelessWidget {
         yOffset: overlayYOffset,
         contentBuilder: (_) => ListView.builder(
           shrinkWrap: true,
-          itemCount: menuItems.length,
+          itemCount: dropdownItems.length,
           itemBuilder: (_, index) {
             return GeneralEffectsButton(
               onTap: () {
-                onSelected(menuItems[index]);
+                onSelected(dropdownItems[index]);
                 closeOverlay();
               },
-              padding: menuItemsPadding,
-              borderRadius: BorderRadius.circular(menuItemsBorderRadius),
+              padding: dropdownItemsPadding,
+              borderRadius: BorderRadius.circular(
+                dropdownItemsBorderRadius,
+              ),
               hoveredColor: Colors.grey.shade300,
               splashColor: Colors.grey.shade400,
               hoverDuration: const Duration(milliseconds: 100),
-              child: menuItemBuilder(menuItems[index]),
+              child: dropdownItemBuilder(dropdownItems[index]),
             );
           },
         ),
       ),
-      onHoverChildBuilder: onHoverChildBuilder,
-      child: child,
+      child: selectedValueBuilder(value),
     );
   }
 }

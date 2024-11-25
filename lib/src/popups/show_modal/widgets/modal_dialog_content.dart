@@ -27,9 +27,7 @@ class _ModalDialogContentState extends State<ModalDialogContent> {
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (widget.width == null) {
-        setState(() {
-          childWidth = _childKey.currentContext?.size?.width ?? 0;
-        });
+        setState(() => childWidth = _childKey.currentContext?.size?.width ?? 0);
       }
     });
     super.initState();
