@@ -163,9 +163,6 @@ class _OverlayContent extends StatefulWidget {
 
 class _OverlayContentState extends State<_OverlayContent>
     with TickerProviderStateMixin {
-  final GlobalKey _key = GlobalKey();
-  double? _staticHeight;
-
   late AnimationController _animationController;
   late Animation<double> _animation;
 
@@ -180,12 +177,7 @@ class _OverlayContentState extends State<_OverlayContent>
       _animationController,
     );
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (widget.decoration?.height == null) {
-        setState(() => _staticHeight = _key.currentContext?.size?.height);
-      }
-      if (widget.slideTransition) _animationController.forward();
-    });
+    _animationController.forward();
 
     super.initState();
   }
@@ -204,34 +196,40 @@ class _OverlayContentState extends State<_OverlayContent>
             const EdgeInsets.only(top: 10, left: 14, right: 14, bottom: 18),
         child: SlideTransition(
           position: Tween(
-            begin: const Offset(0, -1),
+            begin: Offset(0, widget.slideTransition ? -1 : 0),
             end: const Offset(0, 0),
           ).animate(CurvedAnimation(parent: _animation, curve: Curves.easeOut)),
           child: FadeTransition(
             opacity: CurvedAnimation(parent: _animation, curve: Curves.easeIn),
-            child: CardContainer(
-              key: _key,
-              width: widget.decoration?.width,
-              height: _staticHeight ?? widget.decoration?.height,
-              constraints: BoxConstraints(
-                maxWidth: widget.maxWidth,
-                maxHeight: widget.maxHeight <= 72 ? 72 : widget.maxHeight,
-              ),
-              padding: widget.decoration?.padding ?? EdgeInsets.zero,
-              color: widget.decoration?.color ?? Colors.white,
-              borderRadius: widget.decoration?.borderRadius ?? 8,
-              border: widget.decoration?.border ??
-                  const Border.fromBorderSide(
-                    BorderSide(color: Color.fromARGB(255, 224, 224, 224)),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Flexible(
+                  child: CardContainer(
+                    width: widget.decoration?.width,
+                    height: widget.decoration?.height,
+                    constraints: BoxConstraints(
+                      maxWidth: widget.maxWidth,
+                      maxHeight: widget.maxHeight <= 72 ? 72 : widget.maxHeight,
+                    ),
+                    padding: widget.decoration?.padding ?? EdgeInsets.zero,
+                    color: widget.decoration?.color ?? Colors.white,
+                    borderRadius: widget.decoration?.borderRadius ?? 8,
+                    border: widget.decoration?.border ??
+                        const Border.fromBorderSide(
+                          BorderSide(color: Color.fromARGB(255, 224, 224, 224)),
+                        ),
+                    boxShadow: widget.decoration?.boxShadow ??
+                        const BoxShadow(
+                          offset: Offset(0, 3),
+                          blurRadius: 2,
+                          color: Colors.black12,
+                        ),
+                    clipBehavior: widget.decoration?.clipBehavior ?? Clip.none,
+                    child: widget.child,
                   ),
-              boxShadow: widget.decoration?.boxShadow ??
-                  const BoxShadow(
-                    offset: Offset(0, 3),
-                    blurRadius: 2,
-                    color: Colors.black12,
-                  ),
-              clipBehavior: widget.decoration?.clipBehavior ?? Clip.none,
-              child: widget.child,
+                ),
+              ],
             ),
           ),
         ),

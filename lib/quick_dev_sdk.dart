@@ -7,6 +7,8 @@ export 'package:quick_dev_sdk/src/widgets/basic/hovered_background.dart';
 export 'package:quick_dev_sdk/src/widgets/buttons/popup/overlay_dropdown_button.dart';
 export 'package:quick_dev_sdk/src/widgets/buttons/popup/overlay_menu_button.dart';
 export 'package:quick_dev_sdk/src/widgets/buttons/popup/overlay_popup_button.dart';
+export 'package:quick_dev_sdk/src/widgets/field/general/static_height_text_field.dart';
+export 'package:quick_dev_sdk/src/widgets/field/popup/overlay_suggestion_field.dart';
 
 export 'package:quick_dev_sdk/src/popups/show_modal/show_modal.dart';
 export 'package:quick_dev_sdk/src/popups/show_overlay.dart';

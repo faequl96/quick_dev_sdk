@@ -78,14 +78,18 @@ class OverlayDropdownButton<T> extends StatelessWidget {
           itemCount: dropdownItems.length,
           itemBuilder: (_, index) {
             return GeneralEffectsButton(
-              onTap: () {
+              onTap: () async {
                 onSelected(dropdownItems[index]);
+                await Future.delayed(const Duration(milliseconds: 120));
                 closeOverlay();
               },
               padding: dropdownItemsPadding,
               borderRadius: BorderRadius.circular(
                 dropdownItemsBorderRadius,
               ),
+              color: dropdownItems[index] == value
+                  ? Colors.grey.shade200
+                  : Colors.transparent,
               hoveredColor: Colors.grey.shade300,
               splashColor: Colors.grey.shade400,
               hoverDuration: const Duration(milliseconds: 100),

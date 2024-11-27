@@ -1,15 +1,15 @@
 class TextInputDebouncer {
   TextInputDebouncer._();
 
-  static String _keywordStop = "";
+  static String _keywordsStop = "";
 
   static Future<void> onChange({
-    required String keyword,
+    required String keywords,
     Duration duration = const Duration(milliseconds: 300),
     required void Function() callBack,
   }) async {
-    _keywordStop = keyword;
+    _keywordsStop = keywords;
     await Future<void>.delayed(duration);
-    if (_keywordStop == keyword) if (keyword.isNotEmpty) callBack();
+    if (_keywordsStop == keywords) if (keywords.isNotEmpty) callBack();
   }
 }
