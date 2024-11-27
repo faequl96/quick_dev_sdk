@@ -55,8 +55,6 @@ class _StaticHeightTextFieldState extends State<StaticHeightTextField> {
   @override
   void dispose() {
     widget.controller.removeListener(_onChangeListener);
-    widget.controller.dispose();
-    widget.focusNode?.dispose();
     super.dispose();
   }
 

@@ -108,7 +108,7 @@ class _OverlaySuggestionFieldState<T> extends State<OverlaySuggestionField<T>> {
   void dispose() {
     widget.controller.removeListener(_onChangeListener);
     widget.controller.dispose();
-    _focusNode.removeListener(_onChangeListener);
+    _focusNode.removeListener(_onFocusListener);
     widget.focusNode?.dispose();
 
     super.dispose();
