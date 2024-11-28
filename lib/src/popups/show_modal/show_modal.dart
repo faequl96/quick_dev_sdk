@@ -68,6 +68,8 @@ class ShowModal {
         borderRadius: decoration?.borderRadius ?? BorderRadius.circular(10.0),
       ),
       child: ModalDialogContent(
+        width: decoration?.width,
+        height: decoration?.height,
         header: header,
         child: contentBuilder(context),
       ),
