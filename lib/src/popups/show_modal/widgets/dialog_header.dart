@@ -44,7 +44,9 @@ class DialogHeader extends StatelessWidget {
                   ),
               ],
             ),
-          ),
+          )
+        else
+          SizedBox(height: 16 + 4 + (action?.iconSize ?? 24)),
         if (action != null) Positioned(top: 8, right: 14, child: action!),
       ],
     );
