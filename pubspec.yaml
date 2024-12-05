@@ -1,6 +1,6 @@
 name: quick_dev_sdk
-description: "A new Flutter package project."
-version: 0.0.1+5
+description: "A Flutter Software Development Kit."
+version: 0.0.2
 homepage:
 
 environment:
