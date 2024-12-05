@@ -8,6 +8,8 @@ part 'widgets/dialog_header.dart';
 part 'widgets/header_action.dart';
 
 class ShowModal {
+  ShowModal._();
+
   static void bottomSheet(
     BuildContext context, {
     bool dismissible = true,
