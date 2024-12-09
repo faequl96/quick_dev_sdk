@@ -3,16 +3,18 @@ part of '../show_modal.dart';
 class DialogHeader extends StatelessWidget {
   const DialogHeader({
     super.key,
-    this.titleIcon,
-    this.titleIconSize = 26,
+    this.icon,
+    this.iconSize = 26,
+    this.iconColor,
     this.title,
     this.titleSize = 16,
     this.titleFontWeight = FontWeight.bold,
     this.action,
   });
 
-  final IconData? titleIcon;
-  final double titleIconSize;
+  final IconData? icon;
+  final double iconSize;
+  final Color? iconColor;
   final String? title;
   final double titleSize;
   final FontWeight titleFontWeight;
@@ -22,7 +24,7 @@ class DialogHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        if (title != null || titleIcon != null)
+        if (title != null || icon != null)
           SizedBox(
             height: 16 + 4 + (action?.iconSize ?? 24),
             child: Row(
@@ -30,8 +32,8 @@ class DialogHeader extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 const SizedBox(width: 16),
-                if (titleIcon != null) ...[
-                  Icon(titleIcon, size: titleIconSize),
+                if (icon != null) ...[
+                  Icon(icon, size: iconSize),
                   const SizedBox(width: 6),
                 ],
                 if (title != null)

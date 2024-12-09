@@ -72,6 +72,7 @@ class ShowModal {
       child: ModalDialogContent(
         width: decoration?.width,
         height: decoration?.height,
+        padding: decoration?.padding ?? EdgeInsets.zero,
         header: header,
         child: contentBuilder(context),
       ),

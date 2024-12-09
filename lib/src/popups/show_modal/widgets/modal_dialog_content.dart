@@ -5,12 +5,14 @@ class ModalDialogContent extends StatefulWidget {
     super.key,
     this.width,
     this.height,
+    this.padding = EdgeInsets.zero,
     this.header,
     required this.child,
   });
 
   final double? width;
   final double? height;
+  final EdgeInsets padding;
   final Widget? header;
   final Widget child;
 
@@ -52,7 +54,7 @@ class _ModalDialogContentState extends State<ModalDialogContent> {
             child: ConstrainedBox(
               key: _childKey,
               constraints: const BoxConstraints(minWidth: 280.0),
-              child: widget.child,
+              child: Padding(padding: widget.padding, child: widget.child),
             ),
           ),
         ],
