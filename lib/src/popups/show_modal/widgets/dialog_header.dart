@@ -22,35 +22,33 @@ class DialogHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        if (title != null || icon != null)
-          SizedBox(
-            height: 16 + 4 + (action?.iconSize ?? 24),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                const SizedBox(width: 16),
-                if (icon != null) ...[
-                  Icon(icon, size: iconSize),
-                  const SizedBox(width: 6),
-                ],
-                if (title != null)
-                  Text(
-                    title!,
-                    style: TextStyle(
-                      fontSize: titleSize,
-                      fontWeight: titleFontWeight,
-                    ),
-                  ),
+    return Stack(children: [
+      if (title != null || icon != null)
+        SizedBox(
+          height: 16 + 4 + (action?.iconSize ?? 24),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              const SizedBox(width: 16),
+              if (icon != null) ...[
+                Icon(icon, size: iconSize),
+                const SizedBox(width: 6),
               ],
-            ),
-          )
-        else
-          SizedBox(height: 16 + 4 + (action?.iconSize ?? 24)),
-        if (action != null) Positioned(top: 8, right: 14, child: action!),
-      ],
-    );
+              if (title != null)
+                Text(
+                  title!,
+                  style: TextStyle(
+                    fontSize: titleSize,
+                    fontWeight: titleFontWeight,
+                  ),
+                ),
+            ],
+          ),
+        )
+      else
+        SizedBox(height: 16 + 4 + (action?.iconSize ?? 24)),
+      if (action != null) Positioned(top: 8, right: 14, child: action!),
+    ]);
   }
 }

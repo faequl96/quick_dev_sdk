@@ -91,37 +91,35 @@ class ShowOverlay {
         size.height - (position.dy + buttonSize.height + (yOffset ?? 0));
 
     _overlayEntry = OverlayEntry(builder: (_) {
-      return Stack(
-        children: [
-          Positioned(
-            width: dynamicWidth ? null : (buttonSize.width + 28),
-            child: CompositedTransformFollower(
-              link: linkToTarget,
-              showWhenUnlinked: false,
-              offset: Offset(
-                _getAlignOffset(alignment),
-                buttonSize.height + ((yOffset ?? 0) - 10),
-              ),
-              targetAnchor: align,
-              followerAnchor: align,
-              child: Material(
-                type: MaterialType.transparency,
-                child: TapRegion(
-                  onTapOutside: closeOnTapOutside ? (_) => remove() : null,
-                  child: _OverlayContent(
-                    maxWidth: maxWidth,
-                    maxHeight: maxHeight,
-                    slideTransition: slideTransition,
-                    dynamicWidth: dynamicWidth,
-                    decoration: decoration,
-                    child: contentBuilder(_context),
-                  ),
+      return Stack(children: [
+        Positioned(
+          width: dynamicWidth ? null : (buttonSize.width + 28),
+          child: CompositedTransformFollower(
+            link: linkToTarget,
+            showWhenUnlinked: false,
+            offset: Offset(
+              _getAlignOffset(alignment),
+              buttonSize.height + ((yOffset ?? 0) - 10),
+            ),
+            targetAnchor: align,
+            followerAnchor: align,
+            child: Material(
+              type: MaterialType.transparency,
+              child: TapRegion(
+                onTapOutside: closeOnTapOutside ? (_) => remove() : null,
+                child: _OverlayContent(
+                  maxWidth: maxWidth,
+                  maxHeight: maxHeight,
+                  slideTransition: slideTransition,
+                  dynamicWidth: dynamicWidth,
+                  decoration: decoration,
+                  child: contentBuilder(_context),
                 ),
               ),
             ),
           ),
-        ],
-      );
+        ),
+      ]);
     });
 
     Overlay.of(_context).insert(_overlayEntry!);
@@ -201,36 +199,33 @@ class _OverlayContentState extends State<_OverlayContent>
           ).animate(CurvedAnimation(parent: _animation, curve: Curves.easeOut)),
           child: FadeTransition(
             opacity: CurvedAnimation(parent: _animation, curve: Curves.easeIn),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Flexible(
-                  child: CardContainer(
-                    width: widget.decoration?.width,
-                    height: widget.decoration?.height,
-                    constraints: BoxConstraints(
-                      maxWidth: widget.maxWidth,
-                      maxHeight: widget.maxHeight <= 72 ? 72 : widget.maxHeight,
-                    ),
-                    padding: widget.decoration?.padding ?? EdgeInsets.zero,
-                    color: widget.decoration?.color ?? Colors.white,
-                    borderRadius: widget.decoration?.borderRadius ?? 8,
-                    border: widget.decoration?.border ??
-                        const Border.fromBorderSide(
-                          BorderSide(color: Color.fromARGB(255, 224, 224, 224)),
-                        ),
-                    boxShadow: widget.decoration?.boxShadow ??
-                        const BoxShadow(
-                          offset: Offset(0, 3),
-                          blurRadius: 2,
-                          color: Colors.black12,
-                        ),
-                    clipBehavior: widget.decoration?.clipBehavior ?? Clip.none,
-                    child: widget.child,
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              Flexible(
+                child: CardContainer(
+                  width: widget.decoration?.width,
+                  height: widget.decoration?.height,
+                  constraints: BoxConstraints(
+                    maxWidth: widget.maxWidth,
+                    maxHeight: widget.maxHeight <= 72 ? 72 : widget.maxHeight,
                   ),
+                  padding: widget.decoration?.padding ?? EdgeInsets.zero,
+                  color: widget.decoration?.color ?? Colors.white,
+                  borderRadius: widget.decoration?.borderRadius ?? 8,
+                  border: widget.decoration?.border ??
+                      const Border.fromBorderSide(
+                        BorderSide(color: Color.fromARGB(255, 224, 224, 224)),
+                      ),
+                  boxShadow: widget.decoration?.boxShadow ??
+                      const BoxShadow(
+                        offset: Offset(0, 3),
+                        blurRadius: 2,
+                        color: Colors.black12,
+                      ),
+                  clipBehavior: widget.decoration?.clipBehavior ?? Clip.none,
+                  child: widget.child,
                 ),
-              ],
-            ),
+              ),
+            ]),
           ),
         ),
       ),

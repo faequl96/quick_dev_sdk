@@ -34,20 +34,15 @@ class ShowModal {
       constraints: const BoxConstraints(),
       clipBehavior: decoration?.clipBehavior ?? Clip.hardEdge,
       context: context,
-      builder: (context) {
-        return SizedBox(
-          height: decoration?.height,
-          width: double.maxFinite,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (header != null) header,
-              contentBuilder(context),
-              SizedBox(height: MediaQuery.of(context).viewInsets.bottom)
-            ],
-          ),
-        );
-      },
+      builder: (_) => SizedBox(
+        height: decoration?.height,
+        width: double.maxFinite,
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          if (header != null) header,
+          contentBuilder(context),
+          SizedBox(height: MediaQuery.of(context).viewInsets.bottom)
+        ]),
+      ),
     );
   }
 
@@ -72,7 +67,6 @@ class ShowModal {
       child: ModalDialogContent(
         width: decoration?.width,
         height: decoration?.height,
-        padding: decoration?.padding ?? EdgeInsets.zero,
         header: header,
         child: contentBuilder(context),
       ),
@@ -85,15 +79,13 @@ class ShowModal {
         barrierDismissible: dismissible,
         barrierColor: barrierColor,
         pageBuilder: (_, __, ___) => dialogContent,
-        transitionBuilder: (_, animation, __, child) {
-          return SlideTransition(
-            position: Tween(
-              begin: const Offset(0, 1),
-              end: const Offset(0, 0),
-            ).animate(animation),
-            child: child,
-          );
-        },
+        transitionBuilder: (_, animation, __, child) => SlideTransition(
+          position: Tween(
+            begin: const Offset(0, 1),
+            end: const Offset(0, 0),
+          ).animate(animation),
+          child: child,
+        ),
       );
     } else {
       showDialog<void>(

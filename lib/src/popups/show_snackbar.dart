@@ -39,9 +39,7 @@ class ShowSnackbar {
     );
   }
 
-  void remove() {
-    ScaffoldMessenger.of(_context).hideCurrentSnackBar();
-  }
+  void remove() => ScaffoldMessenger.of(_context).hideCurrentSnackBar();
 }
 
 class SnackBarDecoration {

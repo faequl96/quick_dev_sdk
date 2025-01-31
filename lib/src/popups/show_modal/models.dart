@@ -3,7 +3,6 @@ part of 'show_modal.dart';
 class BottomSheetDecoration {
   BottomSheetDecoration({
     this.height,
-    this.padding = EdgeInsets.zero,
     this.color,
     this.borderSide = BorderSide.none,
     this.borderRadius = const BorderRadius.only(
@@ -14,7 +13,6 @@ class BottomSheetDecoration {
   });
 
   final double? height;
-  final EdgeInsets padding;
   final Color? color;
   final BorderSide borderSide;
   final BorderRadius borderRadius;
@@ -25,7 +23,6 @@ class DialogDecoration {
   DialogDecoration({
     this.width,
     this.height,
-    this.padding = EdgeInsets.zero,
     this.color = Colors.white,
     this.elevation = 24,
     this.shadowColor = Colors.black12,
@@ -36,7 +33,6 @@ class DialogDecoration {
 
   final double? width;
   final double? height;
-  final EdgeInsets padding;
   final Color? color;
   final double? elevation;
   final Color? shadowColor;
