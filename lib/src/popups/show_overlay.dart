@@ -14,23 +14,17 @@ class ShowOverlay {
 
   late BuildContext _context;
 
-  Alignment _getAlignment(OverlayAlign alignment) {
-    final alignMap = {
-      OverlayAlign.left: Alignment.topLeft,
-      OverlayAlign.center: Alignment.topCenter,
-      OverlayAlign.right: Alignment.topRight,
-    };
-    return alignMap[alignment]!;
-  }
+  Alignment _getAlignment(OverlayAlign alignment) => {
+        OverlayAlign.left: Alignment.topLeft,
+        OverlayAlign.center: Alignment.topCenter,
+        OverlayAlign.right: Alignment.topRight,
+      }[alignment]!;
 
-  double _getAlignOffset(OverlayAlign alignment) {
-    final Map<OverlayAlign, double> alignMap = {
-      OverlayAlign.left: -14,
-      OverlayAlign.center: 0,
-      OverlayAlign.right: 14,
-    };
-    return alignMap[alignment]!;
-  }
+  double _getAlignOffset(OverlayAlign alignment) => {
+        OverlayAlign.left: -14.0,
+        OverlayAlign.center: 0.0,
+        OverlayAlign.right: 14.0,
+      }[alignment]!;
 
   double _getMaxWidth({
     required OverlayAlign alignment,
@@ -38,20 +32,14 @@ class ShowOverlay {
     required Size buttonSize,
     required Offset position,
   }) {
-    double leftRemainder = size.width - position.dx;
+    double leftRemainder = position.dx;
     double rightRemainder = size.width - (position.dx + buttonSize.width);
-    List<double> remainders = [leftRemainder, rightRemainder];
-    double minNumber = remainders[0];
-    for (var number in remainders) {
-      minNumber = min(minNumber, number);
-    }
-    final Map<OverlayAlign, double> alignMap = {
-      OverlayAlign.left: size.width - (position.dx + buttonSize.width),
-      OverlayAlign.center: minNumber,
-      OverlayAlign.right: size.width - position.dx,
-    };
-
-    return alignMap[alignment]!;
+    double minNumber = min(leftRemainder, rightRemainder);
+    return {
+      OverlayAlign.left: (rightRemainder + buttonSize.width) - 14,
+      OverlayAlign.center: (minNumber * 2 + buttonSize.width) - 28,
+      OverlayAlign.right: (leftRemainder + buttonSize.width) - 14,
+    }[alignment]!;
   }
 
   void create({
@@ -88,7 +76,7 @@ class ShowOverlay {
       position: position,
     );
     final maxHeight =
-        size.height - (position.dy + buttonSize.height + (yOffset ?? 0));
+        (size.height - (position.dy + buttonSize.height + (yOffset ?? 0))) - 14;
 
     _overlayEntry = OverlayEntry(builder: (_) {
       return Stack(children: [
