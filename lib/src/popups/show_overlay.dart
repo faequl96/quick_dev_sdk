@@ -175,45 +175,43 @@ class _OverlayContentState extends State<_OverlayContent>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return ClipRect(
-      child: Padding(
-        padding:
-            const EdgeInsets.only(top: 10, left: 14, right: 14, bottom: 18),
-        child: SlideTransition(
-          position: Tween(
-            begin: Offset(0, widget.slideTransition ? -1 : 0),
-            end: const Offset(0, 0),
-          ).animate(CurvedAnimation(parent: _animation, curve: Curves.easeOut)),
-          child: FadeTransition(
-            opacity: CurvedAnimation(parent: _animation, curve: Curves.easeIn),
-            child: Column(mainAxisSize: MainAxisSize.min, children: [
-              Flexible(
-                child: CardContainer(
-                  width: widget.decoration?.width,
-                  height: widget.decoration?.height,
-                  constraints: BoxConstraints(
-                    maxWidth: widget.maxWidth,
-                    maxHeight: widget.maxHeight <= 72 ? 72 : widget.maxHeight,
-                  ),
-                  padding: widget.decoration?.padding ?? EdgeInsets.zero,
-                  color: widget.decoration?.color ?? Colors.white,
-                  borderRadius: widget.decoration?.borderRadius ?? 8,
-                  border: widget.decoration?.border ??
-                      const Border.fromBorderSide(
-                        BorderSide(color: Color.fromARGB(255, 224, 224, 224)),
-                      ),
-                  boxShadow: widget.decoration?.boxShadow ??
-                      const BoxShadow(
-                        offset: Offset(0, 3),
-                        blurRadius: 2,
-                        color: Colors.black12,
-                      ),
-                  clipBehavior: widget.decoration?.clipBehavior ?? Clip.none,
-                  child: widget.child,
+  Widget build(BuildContext context) => ClipRect(child: _content());
+
+  Widget _content() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 10, left: 14, right: 14, bottom: 18),
+      child: SlideTransition(
+        position: Tween(
+          begin: Offset(0, widget.slideTransition ? -1 : 0),
+          end: const Offset(0, 0),
+        ).animate(CurvedAnimation(parent: _animation, curve: Curves.easeOut)),
+        child: FadeTransition(
+          opacity: CurvedAnimation(parent: _animation, curve: Curves.easeIn),
+          child: CardContainer(
+            width: widget.decoration?.width,
+            height: widget.decoration?.height ??
+                (widget.decoration?.verticalAxisSize == VerticalAxisSize.max
+                    ? widget.maxHeight
+                    : null),
+            constraints: BoxConstraints(
+              maxWidth: widget.maxWidth,
+              maxHeight: widget.maxHeight <= 72 ? 72 : widget.maxHeight,
+            ),
+            padding: widget.decoration?.padding ?? EdgeInsets.zero,
+            color: widget.decoration?.color ?? Colors.white,
+            borderRadius: widget.decoration?.borderRadius ?? 8,
+            border: widget.decoration?.border ??
+                const Border.fromBorderSide(
+                  BorderSide(color: Color.fromARGB(255, 224, 224, 224)),
                 ),
-              ),
-            ]),
+            boxShadow: widget.decoration?.boxShadow ??
+                const BoxShadow(
+                  offset: Offset(0, 3),
+                  blurRadius: 2,
+                  color: Colors.black12,
+                ),
+            clipBehavior: widget.decoration?.clipBehavior ?? Clip.none,
+            child: widget.child,
           ),
         ),
       ),
@@ -225,6 +223,7 @@ class OverlayDecoration {
   OverlayDecoration({
     this.width,
     this.height,
+    this.verticalAxisSize = VerticalAxisSize.min,
     this.padding = EdgeInsets.zero,
     this.color,
     this.borderRadius = 8,
@@ -241,6 +240,7 @@ class OverlayDecoration {
 
   final double? width;
   final double? height;
+  final VerticalAxisSize verticalAxisSize;
   final EdgeInsets padding;
   final Color? color;
   final double borderRadius;
@@ -250,3 +250,5 @@ class OverlayDecoration {
 }
 
 enum OverlayAlign { left, center, right }
+
+enum VerticalAxisSize { min, max }
