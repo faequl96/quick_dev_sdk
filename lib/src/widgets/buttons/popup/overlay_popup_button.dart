@@ -73,21 +73,11 @@ class _OverlayPopupButtonState extends State<OverlayPopupButton> {
 
   bool _isOverlayContentHovered = false;
   bool _isButtonHovered = false;
-  bool _isOverlayRemoved = true;
 
   void _onHoverContentInside(bool value) async {
     _isOverlayContentHovered = value;
-    if (value == false) {
-      await Future.delayed(const Duration(milliseconds: 300));
-      if (_showOverlay.isReplacedWithNewOverlay == false) {
-        if (_isButtonHovered == false) {
-          _showOverlay.remove();
-          _isOverlayRemoved = true;
-        }
-      }
-    } else {
-      _isOverlayRemoved = false;
-    }
+    await Future.delayed(Duration.zero);
+    if (value == false) if (_isButtonHovered == false) _showOverlay.remove();
   }
 
   @override
@@ -118,7 +108,6 @@ class _OverlayPopupButtonState extends State<OverlayPopupButton> {
             OverlayDecoration? decoration,
             required Widget Function(BuildContext) contentBuilder,
           }) async {
-            _showOverlay.isReplacedWithNewOverlay = true;
             _showOverlay.create(
               key: _key,
               linkToTarget: _layerLink,
@@ -133,12 +122,8 @@ class _OverlayPopupButtonState extends State<OverlayPopupButton> {
               },
               contentBuilder: contentBuilder,
             );
-            _showOverlay.isReplacedWithNewOverlay = false;
           },
-          () {
-            _showOverlay.remove();
-            _isOverlayRemoved = true;
-          },
+          () => _showOverlay.remove(),
         ),
         onHover: (value) async {
           _isButtonHovered = value;
@@ -151,39 +136,29 @@ class _OverlayPopupButtonState extends State<OverlayPopupButton> {
               OverlayDecoration? decoration,
               required Widget Function(BuildContext) contentBuilder,
             }) {
-              if (_isOverlayRemoved) {
-                _showOverlay.isReplacedWithNewOverlay = true;
-                _showOverlay.create(
-                  key: _key,
-                  linkToTarget: _layerLink,
-                  dynamicWidth: dynamicWidth,
-                  slideTransition: slideTransition,
-                  yOffset: yOffset,
-                  alignment: alignment,
-                  decoration: decoration,
-                  closeOnTapOutside: widget.closeOnTapOutside,
-                  onHoverInside: (value) {
-                    if (widget.closeOnUnHover) _onHoverContentInside(value);
-                  },
-                  contentBuilder: contentBuilder,
-                );
-              }
+              _showOverlay.create(
+                key: _key,
+                linkToTarget: _layerLink,
+                dynamicWidth: dynamicWidth,
+                slideTransition: slideTransition,
+                yOffset: yOffset,
+                alignment: alignment,
+                decoration: decoration,
+                closeOnTapOutside: widget.closeOnTapOutside,
+                onHoverInside: (value) {
+                  if (widget.closeOnUnHover) _onHoverContentInside(value);
+                },
+                contentBuilder: contentBuilder,
+              );
             });
           } else {
             if (widget.closeOnUnHover) {
-              await Future.delayed(const Duration(milliseconds: 300));
+              await Future.delayed(Duration.zero);
               if (!_isOverlayContentHovered && !_isButtonHovered) {
-                if (_showOverlay.isReplacedWithNewOverlay == false) {
-                  _showOverlay.remove();
-                  _isOverlayRemoved = true;
-                }
-              } else {
-                _isOverlayRemoved = false;
+                _showOverlay.remove();
               }
             }
           }
-          await Future.delayed(const Duration(milliseconds: 300));
-          _showOverlay.isReplacedWithNewOverlay = false;
         },
         onHoverChildBuilder: widget.onHoverChildBuilder,
         child: widget.child,

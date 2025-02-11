@@ -14,8 +14,6 @@ class ShowOverlay {
 
   late BuildContext _context;
 
-  bool isReplacedWithNewOverlay = false;
-
   Alignment _getAlignment(OverlayAlign alignment) => {
         OverlayAlign.left: Alignment.topLeft,
         OverlayAlign.center: Alignment.topCenter,
@@ -88,10 +86,7 @@ class ShowOverlay {
           child: CompositedTransformFollower(
             link: linkToTarget,
             showWhenUnlinked: false,
-            offset: Offset(
-              _getAlignOffset(alignment),
-              buttonSize.height + ((yOffset ?? 0) - 10),
-            ),
+            offset: Offset(_getAlignOffset(alignment), buttonSize.height),
             targetAnchor: align,
             followerAnchor: align,
             child: Material(
@@ -101,6 +96,7 @@ class ShowOverlay {
                 child: _OverlayContent(
                   maxWidth: maxWidth,
                   maxHeight: maxHeight,
+                  yOffset: yOffset,
                   slideTransition: slideTransition,
                   dynamicWidth: dynamicWidth,
                   decoration: decoration,
@@ -134,6 +130,7 @@ class _OverlayContent extends StatefulWidget {
   const _OverlayContent({
     required this.maxWidth,
     required this.maxHeight,
+    this.yOffset,
     this.slideTransition = true,
     this.dynamicWidth,
     this.decoration,
@@ -143,6 +140,7 @@ class _OverlayContent extends StatefulWidget {
 
   final double maxWidth;
   final double maxHeight;
+  final double? yOffset;
   final bool slideTransition;
   final bool? dynamicWidth;
   final OverlayDecoration? decoration;
@@ -185,7 +183,7 @@ class _OverlayContentState extends State<_OverlayContent>
 
   Widget _mainContent() {
     return Padding(
-      padding: const EdgeInsets.only(top: 10, left: 14, right: 14, bottom: 18),
+      padding: const EdgeInsets.only(left: 14, right: 14, bottom: 18),
       child: SlideTransition(
         position: Tween(
           begin: Offset(0, widget.slideTransition ? -1 : 0),
@@ -214,6 +212,7 @@ class _OverlayContentState extends State<_OverlayContent>
             maxWidth: widget.maxWidth,
             maxHeight: widget.maxHeight <= 72 ? 72 : widget.maxHeight,
           ),
+          margin: EdgeInsets.only(top: (widget.yOffset ?? 0)),
           padding: widget.decoration?.padding ?? EdgeInsets.zero,
           color: widget.decoration?.color ?? Colors.white,
           borderRadius: widget.decoration?.borderRadius ?? 8,
