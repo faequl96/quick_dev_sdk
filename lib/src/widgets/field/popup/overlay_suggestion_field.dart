@@ -66,10 +66,11 @@ class _OverlaySuggestionFieldState<T> extends State<OverlaySuggestionField<T>> {
         linkToTarget: _layerLink,
         slideTransition: false,
         closeOnTapOutside: false,
-        decoration: OverlayDecoration(
-          color: Colors.transparent,
-          border: const Border(),
-          boxShadow: const BoxShadow(color: Colors.transparent),
+        decoration: OverlayDecoration.transparent(
+          width: widget.decoration?.width,
+          height: widget.decoration?.height,
+          verticalAxisSize:
+              widget.decoration?.verticalAxisSize ?? VerticalAxisSize.min,
         ),
         yOffset: 10,
         contentBuilder: (_) => _SuggestionsContent(

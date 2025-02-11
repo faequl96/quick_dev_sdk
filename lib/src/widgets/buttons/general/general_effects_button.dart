@@ -49,6 +49,8 @@ class _GeneralEffectsButtonState extends State<GeneralEffectsButton> {
   void Function(bool value)? _onHoverParent;
   void Function(bool value)? _onHoverChild;
 
+  final _focusNode = FocusNode();
+
   @override
   Widget build(BuildContext context) {
     final unhoveredColor = (widget.color ?? Colors.transparent);
@@ -67,10 +69,12 @@ class _GeneralEffectsButtonState extends State<GeneralEffectsButton> {
         highlightColor: Colors.transparent,
         borderRadius: widget.borderRadius,
         hoverDuration: widget.hoverDuration,
+        focusNode: _focusNode,
         mouseCursor: widget.isDisabled
             ? SystemMouseCursors.basic
             : SystemMouseCursors.click,
         onHover: (value) {
+          if (value) _focusNode.requestFocus();
           widget.onHover?.call(value);
           if (widget.useInitialElevation || widget.hoveredElevation != null) {
             _onHoverParent?.call(value);

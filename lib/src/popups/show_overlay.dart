@@ -14,6 +14,8 @@ class ShowOverlay {
 
   late BuildContext _context;
 
+  bool isReplacedWithNewOverlay = false;
+
   Alignment _getAlignment(OverlayAlign alignment) => {
         OverlayAlign.left: Alignment.topLeft,
         OverlayAlign.center: Alignment.topCenter,
@@ -51,6 +53,7 @@ class ShowOverlay {
     double? yOffset,
     OverlayAlign alignment = OverlayAlign.center,
     OverlayDecoration? decoration,
+    void Function(bool value)? onHoverInside,
     required Widget Function(BuildContext context) contentBuilder,
   }) {
     _removePreviousOverlay();
@@ -101,6 +104,7 @@ class ShowOverlay {
                   slideTransition: slideTransition,
                   dynamicWidth: dynamicWidth,
                   decoration: decoration,
+                  onHoverInside: onHoverInside,
                   child: contentBuilder(_context),
                 ),
               ),
@@ -133,6 +137,7 @@ class _OverlayContent extends StatefulWidget {
     this.slideTransition = true,
     this.dynamicWidth,
     this.decoration,
+    this.onHoverInside,
     required this.child,
   });
 
@@ -141,6 +146,7 @@ class _OverlayContent extends StatefulWidget {
   final bool slideTransition;
   final bool? dynamicWidth;
   final OverlayDecoration? decoration;
+  final void Function(bool value)? onHoverInside;
   final Widget child;
 
   @override
@@ -175,9 +181,9 @@ class _OverlayContentState extends State<_OverlayContent>
   }
 
   @override
-  Widget build(BuildContext context) => ClipRect(child: _content());
+  Widget build(BuildContext context) => ClipRect(child: _mainContent());
 
-  Widget _content() {
+  Widget _mainContent() {
     return Padding(
       padding: const EdgeInsets.only(top: 10, left: 14, right: 14, bottom: 18),
       child: SlideTransition(
@@ -187,36 +193,59 @@ class _OverlayContentState extends State<_OverlayContent>
         ).animate(CurvedAnimation(parent: _animation, curve: Curves.easeOut)),
         child: FadeTransition(
           opacity: CurvedAnimation(parent: _animation, curve: Curves.easeIn),
-          child: CardContainer(
-            width: widget.decoration?.width,
-            height: widget.decoration?.height ??
-                (widget.decoration?.verticalAxisSize == VerticalAxisSize.max
-                    ? widget.maxHeight
-                    : null),
-            constraints: BoxConstraints(
-              maxWidth: widget.maxWidth,
-              maxHeight: widget.maxHeight <= 72 ? 72 : widget.maxHeight,
-            ),
-            padding: widget.decoration?.padding ?? EdgeInsets.zero,
-            color: widget.decoration?.color ?? Colors.white,
-            borderRadius: widget.decoration?.borderRadius ?? 8,
-            border: widget.decoration?.border ??
-                const Border.fromBorderSide(
-                  BorderSide(color: Color.fromARGB(255, 224, 224, 224)),
-                ),
-            boxShadow: widget.decoration?.boxShadow ??
-                const BoxShadow(
-                  offset: Offset(0, 3),
-                  blurRadius: 2,
-                  color: Colors.black12,
-                ),
-            clipBehavior: widget.decoration?.clipBehavior ?? Clip.none,
-            child: widget.child,
-          ),
+          child: widget.decoration?.isTransparent == true
+              ? _transparentContent()
+              : _defaultContent(),
         ),
       ),
     );
   }
+
+  Widget _defaultContent() => MouseRegion(
+        onEnter: (_) => widget.onHoverInside?.call(true),
+        onExit: (_) => widget.onHoverInside?.call(false),
+        child: CardContainer(
+          width: widget.decoration?.width,
+          height: widget.decoration?.height ??
+              (widget.decoration?.verticalAxisSize == VerticalAxisSize.max
+                  ? widget.maxHeight
+                  : null),
+          constraints: BoxConstraints(
+            maxWidth: widget.maxWidth,
+            maxHeight: widget.maxHeight <= 72 ? 72 : widget.maxHeight,
+          ),
+          padding: widget.decoration?.padding ?? EdgeInsets.zero,
+          color: widget.decoration?.color ?? Colors.white,
+          borderRadius: widget.decoration?.borderRadius ?? 8,
+          border: widget.decoration?.border ??
+              const Border.fromBorderSide(
+                BorderSide(color: Color.fromARGB(255, 224, 224, 224)),
+              ),
+          boxShadow: widget.decoration?.boxShadow ??
+              const BoxShadow(
+                offset: Offset(0, 3),
+                blurRadius: 2,
+                color: Colors.black12,
+              ),
+          clipBehavior: widget.decoration?.clipBehavior ?? Clip.none,
+          child: widget.child,
+        ),
+      );
+
+  Widget _transparentContent() => SizedBox(
+        width: widget.decoration?.width,
+        height: widget.decoration?.height ??
+            (widget.decoration?.verticalAxisSize == VerticalAxisSize.max
+                ? widget.maxHeight
+                : null),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: widget.maxWidth,
+            maxHeight: widget.maxHeight <= 72 ? 72 : widget.maxHeight,
+          ),
+          child: widget.child,
+        ),
+      );
 }
 
 class OverlayDecoration {
@@ -236,19 +265,60 @@ class OverlayDecoration {
       color: Colors.black12,
     ),
     this.clipBehavior = Clip.none,
-  });
+  }) : isTransparent = false;
 
+  OverlayDecoration.transparent({
+    this.width,
+    this.height,
+    this.verticalAxisSize = VerticalAxisSize.min,
+  }) : isTransparent = true;
+
+  final bool isTransparent;
   final double? width;
   final double? height;
   final VerticalAxisSize verticalAxisSize;
-  final EdgeInsets padding;
-  final Color? color;
-  final double borderRadius;
-  final BoxBorder border;
-  final BoxShadow boxShadow;
-  final Clip clipBehavior;
+  late final EdgeInsets padding;
+  late final Color? color;
+  late final double borderRadius;
+  late final BoxBorder border;
+  late final BoxShadow boxShadow;
+  late final Clip clipBehavior;
 }
 
 enum OverlayAlign { left, center, right }
 
 enum VerticalAxisSize { min, max }
+
+class OverlayWrapper extends StatefulWidget {
+  const OverlayWrapper({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  State<OverlayWrapper> createState() => _OverlayWrapperState();
+}
+
+class _OverlayWrapperState extends State<OverlayWrapper> {
+  late final _entry = OverlayEntry(
+    canSizeOverlay: true,
+    opaque: true,
+    builder: (BuildContext context) => widget.child,
+  );
+
+  @override
+  void didUpdateWidget(OverlayWrapper oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _entry.markNeedsBuild();
+  }
+
+  @override
+  void dispose() {
+    _entry
+      ..remove()
+      ..dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Overlay(initialEntries: [_entry]);
+}
