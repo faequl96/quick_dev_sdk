@@ -15,6 +15,7 @@ class OverlayPopupButton extends StatefulWidget {
     this.borderRadius,
     this.border,
     this.clipBehavior = Clip.none,
+    this.requestFocusOnHover = false,
     this.onTap,
     this.onHover,
     this.closeOnTapOutside = true,
@@ -34,6 +35,7 @@ class OverlayPopupButton extends StatefulWidget {
   final BorderRadius? borderRadius;
   final BoxBorder? border;
   final Clip clipBehavior;
+  final bool requestFocusOnHover;
   final void Function(
     void Function({
       bool dynamicWidth,
@@ -73,6 +75,21 @@ class _OverlayPopupButtonState extends State<OverlayPopupButton> {
   bool _isButtonHovered = false;
   bool _isOverlayRemoved = true;
 
+  void _onHoverContentInside(bool value) async {
+    _isOverlayContentHovered = value;
+    if (value == false) {
+      await Future.delayed(const Duration(milliseconds: 300));
+      if (_showOverlay.isReplacedWithNewOverlay == false) {
+        if (_isButtonHovered == false) {
+          _showOverlay.remove();
+          _isOverlayRemoved = true;
+        }
+      }
+    } else {
+      _isOverlayRemoved = false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return CompositedTransformTarget(
@@ -91,6 +108,7 @@ class _OverlayPopupButtonState extends State<OverlayPopupButton> {
         border: widget.border,
         clipBehavior: widget.clipBehavior,
         isDisabled: widget.onTap == null,
+        requestFocusOnHover: widget.requestFocusOnHover,
         onTap: () => widget.onTap?.call(
           ({
             bool dynamicWidth = false,
@@ -110,21 +128,8 @@ class _OverlayPopupButtonState extends State<OverlayPopupButton> {
               yOffset: yOffset,
               alignment: alignment,
               decoration: decoration,
-              onHoverInside: (value) async {
-                if (widget.closeOnUnHover) {
-                  _isOverlayContentHovered = value;
-                  if (value == false) {
-                    await Future.delayed(const Duration(milliseconds: 300));
-                    if (_showOverlay.isReplacedWithNewOverlay == false) {
-                      if (_isButtonHovered == false) {
-                        _showOverlay.remove();
-                        _isOverlayRemoved = true;
-                      }
-                    }
-                  } else {
-                    _isOverlayRemoved = false;
-                  }
-                }
+              onHoverInside: (value) {
+                if (widget.closeOnUnHover) _onHoverContentInside(value);
               },
               contentBuilder: contentBuilder,
             );
@@ -157,21 +162,8 @@ class _OverlayPopupButtonState extends State<OverlayPopupButton> {
                   alignment: alignment,
                   decoration: decoration,
                   closeOnTapOutside: widget.closeOnTapOutside,
-                  onHoverInside: (value) async {
-                    if (widget.closeOnUnHover) {
-                      _isOverlayContentHovered = value;
-                      if (value == false) {
-                        await Future.delayed(const Duration(milliseconds: 300));
-                        if (_showOverlay.isReplacedWithNewOverlay == false) {
-                          if (_isButtonHovered == false) {
-                            _showOverlay.remove();
-                            _isOverlayRemoved = true;
-                          }
-                        }
-                      } else {
-                        _isOverlayRemoved = false;
-                      }
-                    }
+                  onHoverInside: (value) {
+                    if (widget.closeOnUnHover) _onHoverContentInside(value);
                   },
                   contentBuilder: contentBuilder,
                 );

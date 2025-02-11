@@ -17,6 +17,7 @@ class GeneralEffectsButton extends StatefulWidget {
     this.border,
     this.clipBehavior = Clip.none,
     this.isDisabled = false,
+    this.requestFocusOnHover = false,
     required this.onTap,
     this.onHover,
     this.onHoverChildBuilder,
@@ -36,6 +37,7 @@ class GeneralEffectsButton extends StatefulWidget {
   final BoxBorder? border;
   final Clip clipBehavior;
   final bool isDisabled;
+  final bool requestFocusOnHover;
   final void Function() onTap;
   final void Function(bool value)? onHover;
   final Widget Function(bool value)? onHoverChildBuilder;
@@ -80,10 +82,9 @@ class _GeneralEffectsButtonState extends State<GeneralEffectsButton> {
             _onHoverParent?.call(value);
           }
           if (widget.onHoverChildBuilder != null) _onHoverChild?.call(value);
-          if (value) {
-            _focusNode.requestFocus();
-            return;
-          }
+
+          if (!widget.requestFocusOnHover) return;
+          if (value) return _focusNode.requestFocus();
           _focusNode.unfocus();
         },
         child: SizedBox(
