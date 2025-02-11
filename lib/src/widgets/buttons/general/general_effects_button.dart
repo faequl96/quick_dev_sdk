@@ -66,6 +66,7 @@ class _GeneralEffectsButtonState extends State<GeneralEffectsButton> {
         hoverColor:
             widget.hoveredColor ?? ColorConverter.lighten(unhoveredColor, 25),
         splashColor: widget.splashColor ?? widget.color ?? Colors.transparent,
+        focusColor: Colors.transparent,
         highlightColor: Colors.transparent,
         borderRadius: widget.borderRadius,
         hoverDuration: widget.hoverDuration,
@@ -74,12 +75,16 @@ class _GeneralEffectsButtonState extends State<GeneralEffectsButton> {
             ? SystemMouseCursors.basic
             : SystemMouseCursors.click,
         onHover: (value) {
-          if (value) _focusNode.requestFocus();
           widget.onHover?.call(value);
           if (widget.useInitialElevation || widget.hoveredElevation != null) {
             _onHoverParent?.call(value);
           }
           if (widget.onHoverChildBuilder != null) _onHoverChild?.call(value);
+          if (value) {
+            _focusNode.requestFocus();
+            return;
+          }
+          _focusNode.unfocus();
         },
         child: SizedBox(
           width: widget.width,
