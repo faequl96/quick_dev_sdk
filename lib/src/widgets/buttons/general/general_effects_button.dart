@@ -78,10 +78,9 @@ class _GeneralEffectsButtonState extends State<GeneralEffectsButton> {
             : SystemMouseCursors.click,
         onHover: (value) {
           widget.onHover?.call(value);
-          if (widget.useInitialElevation || widget.hoveredElevation != null) {
-            _onHoverParent?.call(value);
-          }
-          if (widget.onHoverChildBuilder != null) _onHoverChild?.call(value);
+
+          _onHoverParent?.call(value);
+          _onHoverChild?.call(value);
 
           if (!widget.requestFocusOnHover) return;
           if (value) return _focusNode.requestFocus();
@@ -132,18 +131,18 @@ class _ExtendedStyle extends StatefulWidget {
 }
 
 class _ExtendedStyleState extends State<_ExtendedStyle> {
-  bool isHovered = false;
+  bool _isHovered = false;
 
   double _elevation() {
     final elevation = widget.hoveredElevation;
-    if (elevation != null && isHovered) return elevation;
+    if (elevation != null && _isHovered) return elevation;
     if (widget.useInitialElevation) return 1;
     return 0;
   }
 
   @override
   void initState() {
-    widget.rebuild?.call((value) => setState(() => isHovered = value));
+    widget.rebuild?.call((value) => setState(() => _isHovered = value));
     super.initState();
   }
 
@@ -172,23 +171,18 @@ class _ChildWidget extends StatefulWidget {
 }
 
 class _ChildWidgetState extends State<_ChildWidget> {
-  Widget? childHovered;
+  Widget? _childHovered;
+  bool _isHovered = false;
 
   @override
   void initState() {
-    widget.rebuild?.call((value) => setState(() {
-          childHovered = widget.onHoverChildBuilder?.call(value);
-        }));
-
-    if (widget.onHoverChildBuilder != null) {
-      childHovered = widget.onHoverChildBuilder?.call(false);
-    }
-
+    widget.rebuild?.call((value) => setState(() => _isHovered = value));
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return childHovered ?? widget.child ?? const SizedBox.shrink();
+    _childHovered = widget.onHoverChildBuilder?.call(_isHovered);
+    return _childHovered ?? widget.child ?? const SizedBox.shrink();
   }
 }

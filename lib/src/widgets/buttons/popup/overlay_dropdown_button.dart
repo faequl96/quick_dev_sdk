@@ -71,30 +71,93 @@ class OverlayDropdownButton<T> extends StatelessWidget {
       onTap: (handleShowOverlay, closeOverlay) => handleShowOverlay(
         dynamicWidth: overlayDynamicWidth,
         alignment: overlayAlignment,
-        decoration: overlaydecoration,
+        decoration: overlaydecoration?.copyWith(padding: EdgeInsets.zero),
         yOffset: overlayYOffset,
-        contentBuilder: (_) => ListView.builder(
-          shrinkWrap: true,
-          itemCount: dropdownItems.length,
-          itemBuilder: (_, index) => GeneralEffectsButton(
+        contentBuilder: (_) => _Dropdowns(
+          dropdownItemsBorderRadius: dropdownItemsBorderRadius,
+          dropdownItemsPadding: dropdownItemsPadding,
+          overlayPadding: overlaydecoration?.padding,
+          value: value,
+          items: dropdownItems,
+          dropdownItemBuilder: dropdownItemBuilder,
+          onSelected: onSelected,
+          closeOverlay: closeOverlay,
+        ),
+      ),
+      child: selectedValueBuilder(value),
+    );
+  }
+}
+
+class _Dropdowns<T> extends StatefulWidget {
+  const _Dropdowns({
+    required this.dropdownItemsBorderRadius,
+    this.dropdownItemsPadding,
+    this.overlayPadding,
+    this.value,
+    required this.items,
+    required this.dropdownItemBuilder,
+    required this.onSelected,
+    required this.closeOverlay,
+  });
+
+  final double dropdownItemsBorderRadius;
+  final EdgeInsets? dropdownItemsPadding;
+  final EdgeInsets? overlayPadding;
+  final T? value;
+  final List<T> items;
+  final Widget Function(T value) dropdownItemBuilder;
+  final void Function(T value) onSelected;
+  final void Function() closeOverlay;
+
+  @override
+  State<_Dropdowns<T>> createState() => _DropdownsState<T>();
+}
+
+class _DropdownsState<T> extends State<_Dropdowns<T>> {
+  final _listViewKey = GlobalKey();
+  double? _listViewHeight;
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _listViewHeight = (_listViewKey.currentContext?.size?.height ?? 0) + 2;
+      setState(() {});
+    });
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: _listViewHeight,
+      child: ListView.builder(
+        key: _listViewKey,
+        padding: widget.overlayPadding,
+        shrinkWrap: true,
+        cacheExtent: 10,
+        itemCount: widget.items.length,
+        itemBuilder: (_, index) {
+          return GeneralEffectsButton(
             onTap: () async {
-              onSelected(dropdownItems[index]);
+              widget.onSelected(widget.items[index]);
               await Future.delayed(const Duration(milliseconds: 120));
-              closeOverlay();
+              widget.closeOverlay();
             },
-            padding: dropdownItemsPadding,
-            borderRadius: BorderRadius.circular(dropdownItemsBorderRadius),
-            color: dropdownItems[index] == value
+            padding: widget.dropdownItemsPadding,
+            borderRadius: BorderRadius.circular(
+              widget.dropdownItemsBorderRadius,
+            ),
+            color: widget.items[index] == widget.value
                 ? Colors.grey.shade200
                 : Colors.transparent,
             hoveredColor: Colors.grey.shade300,
             splashColor: Colors.grey.shade400,
             hoverDuration: const Duration(milliseconds: 100),
-            child: dropdownItemBuilder(dropdownItems[index]),
-          ),
-        ),
+            child: widget.dropdownItemBuilder(widget.items[index]),
+          );
+        },
       ),
-      child: selectedValueBuilder(value),
     );
   }
 }

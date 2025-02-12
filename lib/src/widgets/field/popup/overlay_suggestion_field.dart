@@ -227,7 +227,7 @@ class _MainContentState<T> extends State<_MainContent<T>> {
                 width: 24,
                 height: 24,
                 child: CircularProgressIndicator(
-                  strokeWidth: 24 / 5.4,
+                  strokeWidth: 24 / 5.2,
                   color: Theme.of(context).primaryColor,
                 ),
               ),
@@ -249,7 +249,7 @@ class _MainContentState<T> extends State<_MainContent<T>> {
   Widget _defaultCardStyle(Widget content) {
     return CardContainer(
       width: double.maxFinite,
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
       color: widget.decoration?.color ?? Colors.white,
       borderRadius: widget.decoration?.borderRadius ?? 8,
       border: widget.decoration?.border ??
@@ -286,10 +286,10 @@ class _Suggestions<T> extends StatefulWidget {
   final Widget Function(BuildContext context, T value) itemBuilder;
 
   @override
-  State<_Suggestions<T>> createState() => __SuggestionsState<T>();
+  State<_Suggestions<T>> createState() => _SuggestionsState<T>();
 }
 
-class __SuggestionsState<T> extends State<_Suggestions<T>> {
+class _SuggestionsState<T> extends State<_Suggestions<T>> {
   final _listViewKey = GlobalKey();
   double? _listViewHeight;
 
@@ -321,10 +321,10 @@ class __SuggestionsState<T> extends State<_Suggestions<T>> {
           ),
       child: ListView.builder(
         key: _listViewKey,
+        padding: widget.decoration?.padding,
         shrinkWrap: true,
-        itemCount: widget.suggestions.length,
         cacheExtent: 10,
-        padding: widget.decoration?.padding ?? EdgeInsets.zero,
+        itemCount: widget.suggestions.length,
         itemBuilder: (context, index) => GeneralEffectsButton(
           onTap: () => widget.onSelected(widget.suggestions[index]),
           padding: widget.suggestionItemsPadding,

@@ -180,7 +180,7 @@ class _OverlayContentState extends State<_OverlayContent>
 
   @override
   Widget build(BuildContext context) => ClipRect(
-        child: widget.decoration?.isUnStyled == true
+        child: widget.decoration?._isUnStyled == true
             ? _contentWrapper(_unStyledContent)
             : _contentWrapper(_defaultContent),
       );
@@ -262,11 +262,11 @@ class OverlayDecoration {
       color: Colors.black12,
     ),
     this.clipBehavior = Clip.none,
-  }) : isUnStyled = false;
+  }) : _isUnStyled = false;
 
-  OverlayDecoration.unStyled() : isUnStyled = true;
+  OverlayDecoration.unStyled() : _isUnStyled = true;
 
-  final bool isUnStyled;
+  final bool _isUnStyled;
   late final double? width;
   late final double? height;
   late final EdgeInsets padding;
@@ -275,6 +275,28 @@ class OverlayDecoration {
   late final BoxBorder border;
   late final BoxShadow boxShadow;
   late final Clip clipBehavior;
+
+  OverlayDecoration copyWith({
+    double? width,
+    double? height,
+    EdgeInsets? padding,
+    Color? color,
+    double? borderRadius,
+    BoxBorder? border,
+    BoxShadow? boxShadow,
+    Clip? clipBehavior,
+  }) {
+    return OverlayDecoration(
+      width: width ?? this.width,
+      height: height ?? this.height,
+      padding: padding ?? this.padding,
+      color: color ?? this.color,
+      borderRadius: borderRadius ?? this.borderRadius,
+      border: border ?? this.border,
+      boxShadow: boxShadow ?? this.boxShadow,
+      clipBehavior: clipBehavior ?? this.clipBehavior,
+    );
+  }
 }
 
 enum OverlayAlign { left, center, right }

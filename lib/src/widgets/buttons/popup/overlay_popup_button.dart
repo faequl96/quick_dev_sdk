@@ -67,17 +67,16 @@ class OverlayPopupButton extends StatefulWidget {
 }
 
 class _OverlayPopupButtonState extends State<OverlayPopupButton> {
-  final ShowOverlay _showOverlay = ShowOverlay.instance;
-  final GlobalKey _key = GlobalKey();
-  final LayerLink _layerLink = LayerLink();
+  final _showOverlay = ShowOverlay.instance;
+  final _key = GlobalKey();
+  final _layerLink = LayerLink();
 
   bool _isOverlayContentHovered = false;
-  bool _isButtonHovered = false;
 
   void _onHoverContentInside(bool value) async {
     _isOverlayContentHovered = value;
     await Future.delayed(Duration.zero);
-    if (value == false) if (_isButtonHovered == false) _showOverlay.remove();
+    if (value == false) _showOverlay.remove();
   }
 
   @override
@@ -126,7 +125,6 @@ class _OverlayPopupButtonState extends State<OverlayPopupButton> {
           () => _showOverlay.remove(),
         ),
         onHover: (value) async {
-          _isButtonHovered = value;
           if (value) {
             widget.onHover?.call(({
               bool dynamicWidth = false,
@@ -154,9 +152,7 @@ class _OverlayPopupButtonState extends State<OverlayPopupButton> {
           } else {
             if (widget.closeOnUnHover) {
               await Future.delayed(Duration.zero);
-              if (!_isOverlayContentHovered && !_isButtonHovered) {
-                _showOverlay.remove();
-              }
+              if (!_isOverlayContentHovered) _showOverlay.remove();
             }
           }
         },

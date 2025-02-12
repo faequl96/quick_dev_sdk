@@ -71,29 +71,85 @@ class OverlayMenuButton<T> extends StatelessWidget {
       onTap: (handleShowOverlay, closeOverlay) => handleShowOverlay(
         dynamicWidth: overlayDynamicWidth,
         alignment: overlayAlignment,
-        decoration: overlaydecoration,
+        decoration: overlaydecoration?.copyWith(padding: EdgeInsets.zero),
         yOffset: overlayYOffset,
-        contentBuilder: (_) => ListView.builder(
-          shrinkWrap: true,
-          itemCount: menuItems.length,
-          itemBuilder: (_, index) {
-            return GeneralEffectsButton(
-              onTap: () {
-                onSelected(menuItems[index]);
-                closeOverlay();
-              },
-              padding: menuItemsPadding,
-              borderRadius: BorderRadius.circular(menuItemsBorderRadius),
-              hoveredColor: Colors.grey.shade300,
-              splashColor: Colors.grey.shade400,
-              hoverDuration: const Duration(milliseconds: 100),
-              child: menuItemBuilder(menuItems[index]),
-            );
-          },
+        contentBuilder: (_) => _Menus(
+          menuItemsBorderRadius: menuItemsBorderRadius,
+          menuItemsPadding: menuItemsPadding,
+          overlayPadding: overlaydecoration?.padding,
+          items: menuItems,
+          menuItemBuilder: menuItemBuilder,
+          onSelected: onSelected,
+          closeOverlay: closeOverlay,
         ),
       ),
       onHoverChildBuilder: onHoverChildBuilder,
       child: child,
+    );
+  }
+}
+
+class _Menus<T> extends StatefulWidget {
+  const _Menus({
+    required this.menuItemsBorderRadius,
+    this.menuItemsPadding,
+    this.overlayPadding,
+    required this.items,
+    required this.menuItemBuilder,
+    required this.onSelected,
+    required this.closeOverlay,
+  });
+
+  final double menuItemsBorderRadius;
+  final EdgeInsets? menuItemsPadding;
+  final EdgeInsets? overlayPadding;
+  final List<T> items;
+  final Widget Function(T value) menuItemBuilder;
+  final void Function(T value) onSelected;
+  final void Function() closeOverlay;
+
+  @override
+  State<_Menus<T>> createState() => _MenusState<T>();
+}
+
+class _MenusState<T> extends State<_Menus<T>> {
+  final _listViewKey = GlobalKey();
+  double? _listViewHeight;
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _listViewHeight = (_listViewKey.currentContext?.size?.height ?? 0) + 2;
+      setState(() {});
+    });
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: _listViewHeight,
+      child: ListView.builder(
+        key: _listViewKey,
+        padding: widget.overlayPadding,
+        shrinkWrap: true,
+        cacheExtent: 10,
+        itemCount: widget.items.length,
+        itemBuilder: (_, index) {
+          return GeneralEffectsButton(
+            onTap: () {
+              widget.onSelected(widget.items[index]);
+              widget.closeOverlay();
+            },
+            padding: widget.menuItemsPadding,
+            borderRadius: BorderRadius.circular(widget.menuItemsBorderRadius),
+            hoveredColor: Colors.grey.shade300,
+            splashColor: Colors.grey.shade400,
+            hoverDuration: const Duration(milliseconds: 100),
+            child: widget.menuItemBuilder(widget.items[index]),
+          );
+        },
+      ),
     );
   }
 }
