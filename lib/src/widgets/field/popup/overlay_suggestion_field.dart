@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 class OverlaySuggestionField<T> extends StatefulWidget {
   const OverlaySuggestionField({
     super.key,
-    this.width,
-    this.height,
     this.decoration,
     this.suggestionItemsBorderRadius = 4,
     this.suggestionItemsPadding = const EdgeInsets.symmetric(
@@ -23,8 +21,6 @@ class OverlaySuggestionField<T> extends StatefulWidget {
     this.loadingBuilder,
   });
 
-  final double? width;
-  final double? height;
   final OverlayDecoration? decoration;
   final double suggestionItemsBorderRadius;
   final EdgeInsets? suggestionItemsPadding;
@@ -66,14 +62,9 @@ class _OverlaySuggestionFieldState<T> extends State<OverlaySuggestionField<T>> {
         linkToTarget: _layerLink,
         slideTransition: false,
         closeOnTapOutside: false,
-        decoration: OverlayDecoration.transparent(
-          width: widget.decoration?.width,
-          height: widget.decoration?.height,
-          verticalAxisSize:
-              widget.decoration?.verticalAxisSize ?? VerticalAxisSize.min,
-        ),
+        decoration: OverlayDecoration.unStyled(),
         yOffset: 10,
-        contentBuilder: (_) => _SuggestionsContent(
+        contentBuilder: (_) => _MainContent(
           decoration: widget.decoration,
           suggestionItemsBorderRadius: widget.suggestionItemsBorderRadius,
           suggestionItemsPadding: widget.suggestionItemsPadding,
@@ -118,19 +109,15 @@ class _OverlaySuggestionFieldState<T> extends State<OverlaySuggestionField<T>> {
   @override
   Widget build(BuildContext context) {
     return CompositedTransformTarget(
+      key: _key,
       link: _layerLink,
-      child: SizedBox(
-        key: _key,
-        width: widget.width,
-        height: widget.height,
-        child: widget.fieldBuilder(context, widget.controller, _focusNode),
-      ),
+      child: widget.fieldBuilder(context, widget.controller, _focusNode),
     );
   }
 }
 
-class _SuggestionsContent<T> extends StatefulWidget {
-  const _SuggestionsContent({
+class _MainContent<T> extends StatefulWidget {
+  const _MainContent({
     super.key,
     this.decoration,
     this.suggestionItemsBorderRadius = 4,
@@ -166,10 +153,10 @@ class _SuggestionsContent<T> extends StatefulWidget {
       close;
 
   @override
-  State<_SuggestionsContent<T>> createState() => _SuggestionsContentState<T>();
+  State<_MainContent<T>> createState() => _MainContentState<T>();
 }
 
-class _SuggestionsContentState<T> extends State<_SuggestionsContent<T>> {
+class _MainContentState<T> extends State<_MainContent<T>> {
   bool _isDispose = false;
   bool _isOnClose = false;
 
@@ -219,108 +206,137 @@ class _SuggestionsContentState<T> extends State<_SuggestionsContent<T>> {
   @override
   Widget build(BuildContext context) {
     if (_suggestions.isNotEmpty) {
-      return CardContainer(
-        width: double.maxFinite,
-        padding: widget.decoration?.padding ?? EdgeInsets.zero,
-        color: widget.decoration?.color ?? Colors.white,
-        borderRadius: widget.decoration?.borderRadius ?? 8,
-        border: widget.decoration?.border ??
-            const Border.fromBorderSide(
-              BorderSide(color: Color.fromARGB(255, 224, 224, 224)),
-            ),
-        boxShadow: widget.decoration?.boxShadow ??
-            const BoxShadow(
-              offset: Offset(0, 3),
-              blurRadius: 2,
-              color: Colors.black12,
-            ),
-        child: SingleChildScrollView(
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: _suggestions.length,
-            itemBuilder: (_, index) {
-              return GeneralEffectsButton(
-                onTap: () {
-                  _isOnClose = true;
-                  widget.onSelected(_suggestions[index]);
-                },
-                padding: widget.suggestionItemsPadding,
-                borderRadius: BorderRadius.circular(
-                  widget.suggestionItemsBorderRadius,
-                ),
-                hoveredColor: Colors.grey.shade300,
-                splashColor: Colors.grey.shade400,
-                hoverDuration: const Duration(milliseconds: 100),
-                child: widget.itemBuilder(context, _suggestions[index]),
-              );
-            },
-          ),
-        ),
+      return _Suggestions(
+        decoration: widget.decoration,
+        suggestionItemsBorderRadius: widget.suggestionItemsBorderRadius,
+        suggestionItemsPadding: widget.suggestionItemsPadding,
+        onSelected: (value) {
+          _isOnClose = true;
+          widget.onSelected(value);
+        },
+        suggestions: _suggestions,
+        itemBuilder: widget.itemBuilder,
       );
     }
+
     if (_isLoading) {
-      return CardContainer(
-        width: double.maxFinite,
-        padding: widget.decoration?.padding ?? EdgeInsets.zero,
-        color: widget.decoration?.color ?? Colors.white,
-        borderRadius: widget.decoration?.borderRadius ?? 8,
-        border: widget.decoration?.border ??
-            const Border.fromBorderSide(
-              BorderSide(color: Color.fromARGB(255, 224, 224, 224)),
-            ),
-        boxShadow: widget.decoration?.boxShadow ??
-            const BoxShadow(
-              offset: Offset(0, 3),
-              blurRadius: 2,
-              color: Colors.black12,
-            ),
-        child: Padding(
-          padding: widget.suggestionItemsPadding ?? EdgeInsets.zero,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 2),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                widget.loadingBuilder?.call(context) ??
-                    SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 24 / 5.4,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                    ),
-                const SizedBox(width: 10),
-                const Text("Loading..."),
-              ],
-            ),
-          ),
-        ),
+      return _defaultCardStyle(
+        widget.loadingBuilder?.call(context) ??
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  strokeWidth: 24 / 5.4,
+                  color: Theme.of(context).primaryColor,
+                ),
+              ),
+              const SizedBox(width: 10),
+              const Text("Loading..."),
+            ]),
       );
     }
+
     if (widget.controller.text.isNotEmpty) {
-      return CardContainer(
-        width: double.maxFinite,
-        padding: widget.decoration?.padding ?? EdgeInsets.zero,
-        color: widget.decoration?.color ?? Colors.white,
-        borderRadius: widget.decoration?.borderRadius ?? 8,
-        border: widget.decoration?.border ??
-            const Border.fromBorderSide(
-              BorderSide(color: Color.fromARGB(255, 224, 224, 224)),
-            ),
-        boxShadow: widget.decoration?.boxShadow ??
-            const BoxShadow(
-              offset: Offset(0, 3),
-              blurRadius: 2,
-              color: Colors.black12,
-            ),
-        child: Padding(
-          padding: widget.suggestionItemsPadding ?? EdgeInsets.zero,
-          child: widget.emptyBuilder?.call(context) ??
-              const Text("Data not found"),
-        ),
+      return _defaultCardStyle(
+        widget.emptyBuilder?.call(context) ?? const Text("Data not found"),
       );
     }
+
     return const SizedBox.shrink();
+  }
+
+  Widget _defaultCardStyle(Widget content) {
+    return CardContainer(
+      width: double.maxFinite,
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+      color: widget.decoration?.color ?? Colors.white,
+      borderRadius: widget.decoration?.borderRadius ?? 8,
+      border: widget.decoration?.border ??
+          const Border.fromBorderSide(
+            BorderSide(color: Color.fromARGB(255, 224, 224, 224)),
+          ),
+      boxShadow: widget.decoration?.boxShadow ??
+          const BoxShadow(
+            offset: Offset(0, 3),
+            blurRadius: 2,
+            color: Colors.black12,
+          ),
+      child: content,
+    );
+  }
+}
+
+class _Suggestions<T> extends StatefulWidget {
+  const _Suggestions({
+    super.key,
+    this.decoration,
+    required this.suggestionItemsBorderRadius,
+    this.suggestionItemsPadding,
+    required this.onSelected,
+    required this.suggestions,
+    required this.itemBuilder,
+  });
+
+  final OverlayDecoration? decoration;
+  final double suggestionItemsBorderRadius;
+  final EdgeInsets? suggestionItemsPadding;
+  final void Function(T value) onSelected;
+  final List<T> suggestions;
+  final Widget Function(BuildContext context, T value) itemBuilder;
+
+  @override
+  State<_Suggestions<T>> createState() => __SuggestionsState<T>();
+}
+
+class __SuggestionsState<T> extends State<_Suggestions<T>> {
+  final _listViewKey = GlobalKey();
+  double? _listViewHeight;
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _listViewHeight = (_listViewKey.currentContext?.size?.height ?? 0) + 2;
+      setState(() {});
+    });
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return CardContainer(
+      height: _listViewHeight,
+      width: double.maxFinite,
+      color: widget.decoration?.color ?? Colors.white,
+      borderRadius: widget.decoration?.borderRadius ?? 8,
+      border: widget.decoration?.border ??
+          const Border.fromBorderSide(
+            BorderSide(color: Color.fromARGB(255, 224, 224, 224)),
+          ),
+      boxShadow: widget.decoration?.boxShadow ??
+          const BoxShadow(
+            offset: Offset(0, 3),
+            blurRadius: 2,
+            color: Colors.black12,
+          ),
+      child: ListView.builder(
+        key: _listViewKey,
+        shrinkWrap: true,
+        itemCount: widget.suggestions.length,
+        cacheExtent: 10,
+        padding: widget.decoration?.padding ?? EdgeInsets.zero,
+        itemBuilder: (context, index) => GeneralEffectsButton(
+          onTap: () => widget.onSelected(widget.suggestions[index]),
+          padding: widget.suggestionItemsPadding,
+          borderRadius: BorderRadius.circular(
+            widget.suggestionItemsBorderRadius,
+          ),
+          hoveredColor: Colors.grey.shade300,
+          splashColor: Colors.grey.shade400,
+          hoverDuration: const Duration(milliseconds: 100),
+          child: widget.itemBuilder(context, widget.suggestions[index]),
+        ),
+      ),
+    );
   }
 }

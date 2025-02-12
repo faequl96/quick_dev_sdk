@@ -179,9 +179,13 @@ class _OverlayContentState extends State<_OverlayContent>
   }
 
   @override
-  Widget build(BuildContext context) => ClipRect(child: _mainContent());
+  Widget build(BuildContext context) => ClipRect(
+        child: widget.decoration?.isUnStyled == true
+            ? _contentWrapper(_unStyledContent)
+            : _contentWrapper(_defaultContent),
+      );
 
-  Widget _mainContent() {
+  Widget _contentWrapper(Widget content) {
     return Padding(
       padding: const EdgeInsets.only(left: 14, right: 14, bottom: 18),
       child: SlideTransition(
@@ -191,23 +195,18 @@ class _OverlayContentState extends State<_OverlayContent>
         ).animate(CurvedAnimation(parent: _animation, curve: Curves.easeOut)),
         child: FadeTransition(
           opacity: CurvedAnimation(parent: _animation, curve: Curves.easeIn),
-          child: widget.decoration?.isTransparent == true
-              ? _transparentContent()
-              : _defaultContent(),
+          child: content,
         ),
       ),
     );
   }
 
-  Widget _defaultContent() => MouseRegion(
+  Widget get _defaultContent => MouseRegion(
         onEnter: (_) => widget.onHoverInside?.call(true),
         onExit: (_) => widget.onHoverInside?.call(false),
         child: CardContainer(
           width: widget.decoration?.width,
-          height: widget.decoration?.height ??
-              (widget.decoration?.verticalAxisSize == VerticalAxisSize.max
-                  ? widget.maxHeight
-                  : null),
+          height: widget.decoration?.height,
           constraints: BoxConstraints(
             maxWidth: widget.maxWidth,
             maxHeight: widget.maxHeight <= 72 ? 72 : widget.maxHeight,
@@ -231,18 +230,18 @@ class _OverlayContentState extends State<_OverlayContent>
         ),
       );
 
-  Widget _transparentContent() => SizedBox(
-        width: widget.decoration?.width,
-        height: widget.decoration?.height ??
-            (widget.decoration?.verticalAxisSize == VerticalAxisSize.max
-                ? widget.maxHeight
-                : null),
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            maxWidth: widget.maxWidth,
-            maxHeight: widget.maxHeight <= 72 ? 72 : widget.maxHeight,
+  Widget get _unStyledContent => MouseRegion(
+        onEnter: (_) => widget.onHoverInside?.call(true),
+        onExit: (_) => widget.onHoverInside?.call(false),
+        child: Padding(
+          padding: EdgeInsets.only(top: (widget.yOffset ?? 0)),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: widget.maxWidth,
+              maxHeight: widget.maxHeight <= 72 ? 72 : widget.maxHeight,
+            ),
+            child: widget.child,
           ),
-          child: widget.child,
         ),
       );
 }
@@ -251,7 +250,6 @@ class OverlayDecoration {
   OverlayDecoration({
     this.width,
     this.height,
-    this.verticalAxisSize = VerticalAxisSize.min,
     this.padding = EdgeInsets.zero,
     this.color,
     this.borderRadius = 8,
@@ -264,18 +262,13 @@ class OverlayDecoration {
       color: Colors.black12,
     ),
     this.clipBehavior = Clip.none,
-  }) : isTransparent = false;
+  }) : isUnStyled = false;
 
-  OverlayDecoration.transparent({
-    this.width,
-    this.height,
-    this.verticalAxisSize = VerticalAxisSize.min,
-  }) : isTransparent = true;
+  OverlayDecoration.unStyled() : isUnStyled = true;
 
-  final bool isTransparent;
-  final double? width;
-  final double? height;
-  final VerticalAxisSize verticalAxisSize;
+  final bool isUnStyled;
+  late final double? width;
+  late final double? height;
   late final EdgeInsets padding;
   late final Color? color;
   late final double borderRadius;
