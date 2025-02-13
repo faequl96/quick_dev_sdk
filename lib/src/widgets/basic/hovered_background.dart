@@ -41,9 +41,8 @@ class HoveredBackground extends StatefulWidget {
 }
 
 class _HoveredBackgroundState extends State<HoveredBackground> {
-  bool isHovered = false;
-
-  Widget? childHovered;
+  bool _isHovered = false;
+  Widget? _childHovered;
 
   final _initialBoxShadow = const BoxShadow(
     offset: Offset(0, 1),
@@ -52,31 +51,21 @@ class _HoveredBackgroundState extends State<HoveredBackground> {
   );
 
   @override
-  void initState() {
-    if (widget.onHoverChildBuilder != null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        setState(() {
-          childHovered = widget.onHoverChildBuilder?.call(false);
-        });
-      });
-    }
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    _childHovered = widget.onHoverChildBuilder?.call(_isHovered);
+
     return Container(
       height: widget.height,
       width: widget.width,
       decoration: BoxDecoration(
         borderRadius: widget.borderRadius,
         border: widget.border,
-        color: isHovered
+        color: _isHovered
             ? widget.hoveredColor ?? Colors.transparent
             : widget.unhoveredColor ?? Colors.transparent,
         boxShadow: [
           if (widget.hoveredBoxShadow != null) ...[
-            if (isHovered)
+            if (_isHovered)
               widget.hoveredBoxShadow!
             else ...[if (widget.useInitialBoxShadow) _initialBoxShadow]
           ] else ...[
@@ -89,18 +78,16 @@ class _HoveredBackgroundState extends State<HoveredBackground> {
       child: MouseRegion(
         onEnter: (_) => setState(() {
           widget.onHover?.call(true);
-          isHovered = true;
-          childHovered = widget.onHoverChildBuilder?.call(true);
+          _isHovered = true;
         }),
         onExit: (_) => setState(() {
           widget.onHover?.call(false);
-          isHovered = false;
-          childHovered = widget.onHoverChildBuilder?.call(false);
+          _isHovered = false;
         }),
         cursor: widget.cursor,
         child: Padding(
           padding: widget.padding ?? EdgeInsets.zero,
-          child: childHovered ?? widget.child,
+          child: _childHovered ?? widget.child,
         ),
       ),
     );
