@@ -14,34 +14,6 @@ class ShowOverlay {
 
   late BuildContext _context;
 
-  Alignment _getAlignment(OverlayAlign alignment) => {
-        OverlayAlign.left: Alignment.topLeft,
-        OverlayAlign.center: Alignment.topCenter,
-        OverlayAlign.right: Alignment.topRight,
-      }[alignment]!;
-
-  double _getAlignOffset(OverlayAlign alignment) => {
-        OverlayAlign.left: -14.0,
-        OverlayAlign.center: 0.0,
-        OverlayAlign.right: 14.0,
-      }[alignment]!;
-
-  double _getMaxWidth({
-    required OverlayAlign alignment,
-    required Size size,
-    required Size buttonSize,
-    required Offset position,
-  }) {
-    double leftRemainder = position.dx;
-    double rightRemainder = size.width - (position.dx + buttonSize.width);
-    double minNumber = min(leftRemainder, rightRemainder);
-    return {
-      OverlayAlign.left: (rightRemainder + buttonSize.width) - 14,
-      OverlayAlign.center: (minNumber * 2 + buttonSize.width) - 28,
-      OverlayAlign.right: (leftRemainder + buttonSize.width) - 14,
-    }[alignment]!;
-  }
-
   void create({
     required GlobalKey key,
     required LayerLink linkToTarget,
@@ -76,7 +48,7 @@ class ShowOverlay {
       buttonSize: buttonSize,
       position: position,
     );
-    final maxHeight =
+    final dynamicMaxHeight =
         (size.height - (position.dy + buttonSize.height + (yOffset ?? 0))) - 14;
 
     _overlayEntry = OverlayEntry(builder: (_) {
@@ -95,7 +67,7 @@ class ShowOverlay {
                 onTapOutside: closeOnTapOutside ? (_) => remove() : null,
                 child: _OverlayContent(
                   maxWidth: maxWidth,
-                  maxHeight: maxHeight,
+                  maxHeight: decoration?.maxHeight ?? dynamicMaxHeight,
                   yOffset: yOffset,
                   slideTransition: slideTransition,
                   dynamicWidth: dynamicWidth,
@@ -123,6 +95,34 @@ class ShowOverlay {
     _overlayEntry?.remove();
     _overlayEntry?.dispose();
     _overlayEntry = null;
+  }
+
+  Alignment _getAlignment(OverlayAlign alignment) => {
+        OverlayAlign.left: Alignment.topLeft,
+        OverlayAlign.center: Alignment.topCenter,
+        OverlayAlign.right: Alignment.topRight,
+      }[alignment]!;
+
+  double _getAlignOffset(OverlayAlign alignment) => {
+        OverlayAlign.left: -14.0,
+        OverlayAlign.center: 0.0,
+        OverlayAlign.right: 14.0,
+      }[alignment]!;
+
+  double _getMaxWidth({
+    required OverlayAlign alignment,
+    required Size size,
+    required Size buttonSize,
+    required Offset position,
+  }) {
+    double leftRemainder = position.dx;
+    double rightRemainder = size.width - (position.dx + buttonSize.width);
+    double minNumber = min(leftRemainder, rightRemainder);
+    return {
+      OverlayAlign.left: (rightRemainder + buttonSize.width) - 14,
+      OverlayAlign.center: (minNumber * 2 + buttonSize.width) - 28,
+      OverlayAlign.right: (leftRemainder + buttonSize.width) - 14,
+    }[alignment]!;
   }
 }
 
@@ -250,6 +250,7 @@ class OverlayDecoration {
   OverlayDecoration({
     this.width,
     this.height,
+    this.maxHeight,
     this.padding = EdgeInsets.zero,
     this.color,
     this.borderRadius = 8,
@@ -264,11 +265,12 @@ class OverlayDecoration {
     this.clipBehavior = Clip.none,
   }) : _isUnStyled = false;
 
-  OverlayDecoration.unStyled() : _isUnStyled = true;
+  OverlayDecoration.unStyled({this.maxHeight}) : _isUnStyled = true;
 
   final bool _isUnStyled;
   late final double? width;
   late final double? height;
+  final double? maxHeight;
   late final EdgeInsets padding;
   late final Color? color;
   late final double borderRadius;

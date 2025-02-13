@@ -62,7 +62,9 @@ class _OverlaySuggestionFieldState<T> extends State<OverlaySuggestionField<T>> {
         linkToTarget: _layerLink,
         slideTransition: false,
         closeOnTapOutside: false,
-        decoration: OverlayDecoration.unStyled(),
+        decoration: OverlayDecoration.unStyled(
+          maxHeight: widget.decoration?.maxHeight,
+        ),
         yOffset: 10,
         contentBuilder: (_) => _MainContent(
           decoration: widget.decoration,
@@ -171,7 +173,7 @@ class _MainContentState<T> extends State<_MainContent<T>> {
       if (_isDispose == false) setState(() {});
       TextInputDebouncer.onChange(
         keywords: keywords,
-        duration: const Duration(seconds: 1),
+        duration: widget.debouncer,
         callBack: () {
           widget.suggestions(keywords).then((value) {
             _suggestions = value;
