@@ -44,18 +44,26 @@ class GeneralTextField extends StatefulWidget {
 }
 
 class _GeneralTextFieldState extends State<GeneralTextField> {
-  late final FieldDecoration? _decoration;
-
   Widget? _validateMessage;
 
+  String _lastText = '';
+
   void _onChangeListener() {
-    if (widget.controller.text.isEmpty) _validateMessage = null;
-    setState(() {});
+    if (widget.controller.text != _lastText) {
+      _lastText = widget.controller.text;
+
+      widget.onChanged?.call(widget.controller.text);
+      final validate = widget.validator?.call(widget.controller.text);
+      if (validate?.isSuccess != true) {
+        setState(() => _validateMessage = validate?.message);
+        return;
+      }
+      setState(() => _validateMessage = null);
+    }
   }
 
   @override
   void initState() {
-    _decoration = widget.decoration;
     widget.controller.addListener(_onChangeListener);
     super.initState();
   }
@@ -68,96 +76,74 @@ class _GeneralTextFieldState extends State<GeneralTextField> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(children: [
-      SizedBox(
-        width: widget.width,
-        height: widget.height,
-        child: Theme(
-          data: Theme.of(context).copyWith(
-            textTheme:
-                widget.useBuiltInFont ? GoogleFonts.nunitoTextTheme() : null,
-          ),
-          child: TextField(
-            controller: widget.controller,
-            focusNode: widget.focusNode,
-            autofocus: widget.autofocus,
-            enabled: widget.enabled,
-            style: widget.style.copyWith(
-              fontSize: (widget.style.fontSize ?? 16),
-            ),
-            keyboardType: widget.keyboardType,
-            inputFormatters: widget.inputFormatters,
-            maxLength: widget.maxLength,
-            obscureText: _decoration?.obscureText ?? false,
-            obscuringCharacter: _decoration?.obscuringCharacter ?? '•',
-            cursorHeight: (widget.style.fontSize ?? 16) + 10,
-            decoration: InputDecoration(
-              labelText: _decoration?.labelText,
-              labelStyle: _decoration?.labelStyle,
-              floatingLabelBehavior: _decoration?.floatingLabelBehavior,
-              hintText: _decoration?.hintText,
-              hintStyle: _decoration?.hintStyle,
-              prefixIcon: _decoration?.prefixIcon != null
-                  ? _preSuffix(_decoration?.prefixIcon)
-                  : null,
-              suffixIcon: _decoration?.suffixIcon != null &&
-                      (_decoration?.hideSuffixIconOnEmpty == false ||
-                          (_decoration?.hideSuffixIconOnEmpty == true &&
-                              widget.controller.text.isNotEmpty))
-                  ? _preSuffix(_decoration?.suffixIcon)
-                  : null,
-              contentPadding: EdgeInsets.symmetric(
-                horizontal: _decoration?.contentHorizontalPadding ?? 12,
-                vertical: widget.height != null
-                    ? 0
-                    : 16 + (_decoration?.contentVerticalPadding ?? 0),
-              ),
-              enabledBorder: _decoration?.enabledBorder ??
-                  const OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.black26),
-                    borderRadius: BorderRadius.all(Radius.circular(8)),
-                  ),
-              disabledBorder: _decoration?.disabledBorder ??
-                  const OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.black26),
-                    borderRadius: BorderRadius.all(Radius.circular(8)),
-                  ),
-              focusedBorder: _decoration?.focusedBorder ??
-                  const OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.black26),
-                    borderRadius: BorderRadius.all(Radius.circular(8)),
-                  ),
-            ),
-            onChanged: (value) {
-              widget.onChanged?.call(value);
-              final validate = widget.validator?.call(value);
-              if (validate?.isSuccess != true) {
-                setState(() => _validateMessage = validate?.message);
-                return;
-              }
-              setState(() => _validateMessage = null);
-            },
-            onEditingComplete: widget.onEditingComplete,
-          ),
-        ),
-      ),
-      if (_validateMessage != null)
+    final usePrefixIcon = widget.decoration?.prefixIcon != null;
+    final useSuffixIcon =
+        widget.decoration?.suffixIcon != null &&
+        (widget.decoration?.hideSuffixIconOnEmpty == false ||
+            (widget.decoration?.hideSuffixIconOnEmpty == true && widget.controller.text.isNotEmpty));
+    return Column(
+      children: [
         SizedBox(
           width: widget.width,
-          child: Row(children: [
-            const SizedBox(width: 1),
-            Flexible(child: _validateMessage!),
-          ]),
+          height: widget.height,
+          child: Theme(
+            data: Theme.of(context).copyWith(textTheme: widget.useBuiltInFont ? GoogleFonts.nunitoTextTheme() : null),
+            child: TextField(
+              controller: widget.controller,
+              focusNode: widget.focusNode,
+              autofocus: widget.autofocus,
+              enabled: widget.enabled,
+              style: widget.style.copyWith(fontSize: (widget.style.fontSize ?? 16)),
+              keyboardType: widget.keyboardType,
+              inputFormatters: widget.inputFormatters,
+              maxLength: widget.maxLength,
+              obscureText: widget.decoration?.obscureText ?? false,
+              obscuringCharacter: widget.decoration?.obscuringCharacter ?? '•',
+              cursorHeight: (widget.style.fontSize ?? 16) + 10,
+              decoration: InputDecoration(
+                labelText: widget.decoration?.labelText,
+                labelStyle: widget.decoration?.labelStyle,
+                floatingLabelBehavior: widget.decoration?.floatingLabelBehavior,
+                hintText: widget.decoration?.hintText,
+                hintStyle: widget.decoration?.hintStyle,
+                prefixIcon: usePrefixIcon ? _preSuffix(widget.decoration?.prefixIcon) : null,
+                suffixIcon: useSuffixIcon ? _preSuffix(widget.decoration?.suffixIcon) : null,
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: widget.decoration?.contentHorizontalPadding ?? 12,
+                  vertical: widget.height != null ? 0 : 16 + (widget.decoration?.contentVerticalPadding ?? 0),
+                ),
+                enabledBorder:
+                    widget.decoration?.enabledBorder ??
+                    const OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.black26),
+                      borderRadius: BorderRadius.all(Radius.circular(8)),
+                    ),
+                disabledBorder:
+                    widget.decoration?.disabledBorder ??
+                    const OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.black26),
+                      borderRadius: BorderRadius.all(Radius.circular(8)),
+                    ),
+                focusedBorder:
+                    widget.decoration?.focusedBorder ??
+                    const OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.black26),
+                      borderRadius: BorderRadius.all(Radius.circular(8)),
+                    ),
+              ),
+              onEditingComplete: widget.onEditingComplete,
+            ),
+          ),
         ),
-    ]);
+        if (_validateMessage != null)
+          SizedBox(width: widget.width, child: Row(children: [const SizedBox(width: 1), Flexible(child: _validateMessage!)])),
+      ],
+    );
   }
 
   Widget _preSuffix(PreSufFixIcon? preSuffixIcon) {
     return Padding(
-      padding: EdgeInsets.only(
-        left: 8,
-        right: _decoration?.contentHorizontalPadding ?? 12,
-      ),
+      padding: EdgeInsets.only(left: 8, right: widget.decoration?.contentHorizontalPadding ?? 12),
       child: GeneralEffectsButton(
         onTap: () => preSuffixIcon?.onTap.call(),
         padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
@@ -203,9 +189,9 @@ class FieldDecoration {
   final PreSufFixIcon? prefixIcon;
   final PreSufFixIcon? suffixIcon;
   final bool hideSuffixIconOnEmpty;
-  final InputBorder enabledBorder;
-  final InputBorder disabledBorder;
-  final InputBorder focusedBorder;
+  final OutlineInputBorder enabledBorder;
+  final OutlineInputBorder disabledBorder;
+  final OutlineInputBorder focusedBorder;
   final String? labelText;
   final TextStyle? labelStyle;
   final FloatingLabelBehavior floatingLabelBehavior;
@@ -214,20 +200,3 @@ class FieldDecoration {
   final String obscuringCharacter;
   final bool obscureText;
 }
-
-class PreSufFixIcon {
-  PreSufFixIcon({required this.onTap, required this.child});
-
-  final void Function() onTap;
-  final Widget child;
-}
-
-class TextFieldValidator {
-  TextFieldValidator.success() : isSuccess = true;
-  TextFieldValidator.failed({required this.message}) : isSuccess = false;
-
-  final bool isSuccess;
-  late Widget message;
-}
-
-enum ValidatePosition { bottomOutside, rightInside }

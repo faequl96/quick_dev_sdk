@@ -1,4 +1,4 @@
-library quick_dev_sdk;
+library;
 
 export 'package:quick_dev_sdk/src/widgets/basic/card_container.dart';
 export 'package:quick_dev_sdk/src/widgets/buttons/general/general_button.dart';
@@ -8,6 +8,8 @@ export 'package:quick_dev_sdk/src/widgets/buttons/popup/overlay_dropdown_button.
 export 'package:quick_dev_sdk/src/widgets/buttons/popup/overlay_menu_button.dart';
 export 'package:quick_dev_sdk/src/widgets/buttons/popup/overlay_popup_button.dart';
 export 'package:quick_dev_sdk/src/widgets/field/general/general_text_field.dart';
+export 'package:quick_dev_sdk/src/widgets/field/general/general_underlined_text_field.dart';
+export 'package:quick_dev_sdk/src/widgets/field/general/presuffix_icon.dart';
 export 'package:quick_dev_sdk/src/widgets/field/popup/overlay_suggestion_field.dart';
 
 export 'package:quick_dev_sdk/src/popups/show_modal/show_modal.dart';

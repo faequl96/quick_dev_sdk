@@ -65,17 +65,14 @@ class _GeneralEffectsButtonState extends State<GeneralEffectsButton> {
       rebuild: (onHover) => _onHoverParent = onHover,
       child: InkWell(
         onTap: widget.isDisabled ? () {} : () => widget.onTap(),
-        hoverColor:
-            widget.hoveredColor ?? ColorConverter.lighten(unhoveredColor, 25),
+        hoverColor: widget.hoveredColor ?? ColorConverter.lighten(unhoveredColor, 25),
         splashColor: widget.splashColor ?? widget.color ?? Colors.transparent,
         focusColor: Colors.transparent,
         highlightColor: Colors.transparent,
         borderRadius: widget.borderRadius,
         hoverDuration: widget.hoverDuration,
         focusNode: _focusNode,
-        mouseCursor: widget.isDisabled
-            ? SystemMouseCursors.basic
-            : SystemMouseCursors.click,
+        mouseCursor: widget.isDisabled ? SystemMouseCursors.basic : SystemMouseCursors.click,
         onHover: (value) {
           widget.onHover?.call(value);
 
@@ -90,10 +87,7 @@ class _GeneralEffectsButtonState extends State<GeneralEffectsButton> {
           width: widget.width,
           height: widget.height,
           child: DecoratedBox(
-            decoration: BoxDecoration(
-              border: widget.border,
-              borderRadius: widget.borderRadius,
-            ),
+            decoration: BoxDecoration(border: widget.border, borderRadius: widget.borderRadius),
             child: Padding(
               padding: widget.padding ?? EdgeInsets.zero,
               child: _ChildWidget(
