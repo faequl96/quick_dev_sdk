@@ -11,11 +11,7 @@ class HeaderAction extends StatelessWidget {
   });
 
   static HeaderAction loading({double size = 28}) {
-    return HeaderAction(
-      actionIcon: Icons.circle_outlined,
-      iconSize: size,
-      onTap: () {},
-    );
+    return HeaderAction(actionIcon: Icons.circle_outlined, iconSize: size, onTap: () {});
   }
 
   final IconData actionIcon;
@@ -32,23 +28,17 @@ class HeaderAction extends StatelessWidget {
         child: SizedBox(
           width: iconSize,
           height: iconSize,
-          child: CircularProgressIndicator(
-            strokeWidth: iconSize / 5.4,
-            color: Theme.of(context).primaryColor,
-          ),
+          child: CircularProgressIndicator(strokeWidth: iconSize / 5.4, color: Theme.of(context).primaryColor),
         ),
       );
     }
-    return GeneralButton(
+    return GeneralEffectsButton(
+      onTap: () => onTap(),
       padding: const EdgeInsets.all(2),
       borderRadius: BorderRadius.circular((iconSize + 4) / 2),
       hoveredColor: onHoverBackgroundColor ?? Colors.grey.shade200,
-      onTap: () => onTap(),
-      onHoverChildBuilder: (value) => Icon(
-        actionIcon,
-        size: iconSize,
-        color: value ? onHoverIconColor : null,
-      ),
+      splashColor: Colors.grey.shade200,
+      onHoverChildBuilder: (value) => Icon(actionIcon, size: iconSize, color: value ? onHoverIconColor : null),
     );
   }
 }

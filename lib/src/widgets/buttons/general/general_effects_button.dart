@@ -58,7 +58,7 @@ class _GeneralEffectsButtonState extends State<GeneralEffectsButton> {
     final unhoveredColor = (widget.color ?? Colors.transparent);
 
     return _ExtendedStyle(
-      color: widget.color,
+      color: widget.isDisabled ? Colors.grey.shade400 : widget.color,
       useInitialElevation: widget.useInitialElevation,
       hoveredElevation: widget.hoveredElevation,
       borderRadius: widget.borderRadius,
@@ -66,7 +66,7 @@ class _GeneralEffectsButtonState extends State<GeneralEffectsButton> {
       child: InkWell(
         onTap: widget.isDisabled ? () {} : () => widget.onTap(),
         hoverColor: widget.hoveredColor ?? ColorConverter.lighten(unhoveredColor, 25),
-        splashColor: widget.splashColor ?? widget.color ?? Colors.transparent,
+        splashColor: widget.isDisabled ? Colors.grey.shade400 : widget.splashColor ?? widget.color ?? Colors.transparent,
         focusColor: Colors.transparent,
         highlightColor: Colors.transparent,
         borderRadius: widget.borderRadius,

@@ -108,6 +108,8 @@ class _GeneralTextFieldState extends State<GeneralTextField> {
                 hintStyle: widget.decoration?.hintStyle,
                 prefixIcon: usePrefixIcon ? _preSuffix(widget.decoration?.prefixIcon) : null,
                 suffixIcon: useSuffixIcon ? _preSuffix(widget.decoration?.suffixIcon) : null,
+                filled: widget.decoration?.filled,
+                fillColor: Colors.white,
                 contentPadding: EdgeInsets.symmetric(
                   horizontal: widget.decoration?.contentHorizontalPadding ?? 12,
                   vertical: widget.height != null ? 0 : 16 + (widget.decoration?.contentVerticalPadding ?? 0),
@@ -131,12 +133,21 @@ class _GeneralTextFieldState extends State<GeneralTextField> {
                       borderRadius: BorderRadius.all(Radius.circular(8)),
                     ),
               ),
+              onTapOutside: (event) => widget.focusNode?.unfocus(),
               onEditingComplete: widget.onEditingComplete,
             ),
           ),
         ),
         if (_validateMessage != null)
-          SizedBox(width: widget.width, child: Row(children: [const SizedBox(width: 1), Flexible(child: _validateMessage!)])),
+          SizedBox(
+            width: widget.width,
+            child: Row(
+              children: [
+                const SizedBox(width: 1),
+                Flexible(child: _validateMessage!),
+              ],
+            ),
+          ),
       ],
     );
   }
@@ -144,13 +155,19 @@ class _GeneralTextFieldState extends State<GeneralTextField> {
   Widget _preSuffix(PreSufFixIcon? preSuffixIcon) {
     return Padding(
       padding: EdgeInsets.only(left: 8, right: widget.decoration?.contentHorizontalPadding ?? 12),
-      child: GeneralEffectsButton(
-        onTap: () => preSuffixIcon?.onTap.call(),
-        padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
-        hoveredColor: Colors.grey.shade300,
-        splashColor: Colors.grey.shade400,
-        borderRadius: BorderRadius.circular(40),
-        child: preSuffixIcon?.child,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          GeneralEffectsButton(
+            onTap: () => preSuffixIcon?.onTap.call(),
+            padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+            color: preSuffixIcon?.backgroundColor,
+            hoveredColor: preSuffixIcon?.hoveredColor,
+            splashColor: preSuffixIcon?.splashColor,
+            borderRadius: BorderRadius.circular(40),
+            child: preSuffixIcon?.child,
+          ),
+        ],
       ),
     );
   }
@@ -180,6 +197,7 @@ class FieldDecoration {
     this.floatingLabelBehavior = FloatingLabelBehavior.auto,
     this.hintText,
     this.hintStyle,
+    this.filled = false,
     this.obscuringCharacter = '•',
     this.obscureText = false,
   });
@@ -197,6 +215,7 @@ class FieldDecoration {
   final FloatingLabelBehavior floatingLabelBehavior;
   final String? hintText;
   final TextStyle? hintStyle;
+  final bool filled;
   final String obscuringCharacter;
   final bool obscureText;
 }

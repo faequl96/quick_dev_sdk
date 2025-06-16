@@ -3,13 +3,25 @@ part of 'show_modal.dart';
 class BottomSheetDecoration {
   BottomSheetDecoration({
     this.height,
+    this.constraints,
     this.color,
     this.borderSide = BorderSide.none,
     this.borderRadius = const BorderRadius.only(topLeft: Radius.circular(10), topRight: Radius.circular(10)),
     this.clipBehavior = Clip.none,
-  });
+  }) : draggable = false;
 
+  BottomSheetDecoration.draggable({
+    this.color,
+    this.borderSide = BorderSide.none,
+    this.borderRadius = const BorderRadius.only(topLeft: Radius.circular(10), topRight: Radius.circular(10)),
+    this.clipBehavior = Clip.none,
+  }) : height = null,
+       constraints = null,
+       draggable = true;
+
+  final bool draggable;
   final double? height;
+  final BoxConstraints? constraints;
   final Color? color;
   final BorderSide borderSide;
   final BorderRadius borderRadius;
@@ -20,6 +32,7 @@ class DialogDecoration {
   DialogDecoration({
     this.width,
     this.height,
+    this.constraints,
     this.padding = EdgeInsets.zero,
     this.color = Colors.white,
     this.elevation = 24,
@@ -31,6 +44,7 @@ class DialogDecoration {
 
   final double? width;
   final double? height;
+  final BoxConstraints? constraints;
   final EdgeInsets padding;
   final Color? color;
   final double? elevation;

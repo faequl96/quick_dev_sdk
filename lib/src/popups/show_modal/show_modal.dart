@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:quick_dev_sdk/quick_dev_sdk.dart';
+import 'package:quick_dev_sdk/src/popups/show_modal/widgets/bottom_sheet_dialog_content.dart';
+import 'package:quick_dev_sdk/src/popups/show_modal/widgets/draggable_bottom_sheet_dialog_content.dart';
 import 'package:quick_dev_sdk/src/popups/show_modal/widgets/modal_dialog_content.dart';
 import 'package:flutter/material.dart';
 
@@ -24,6 +26,7 @@ class ShowModal {
     final completer = Completer<T>();
 
     showModalBottomSheet<T>(
+      context: context,
       backgroundColor: decoration?.color ?? Colors.white,
       barrierColor: barrierColor,
       shape: RoundedRectangleBorder(
@@ -33,26 +36,24 @@ class ShowModal {
       ),
       isDismissible: dismissible,
       isScrollControlled: true,
-      constraints: const BoxConstraints(),
+      constraints: decoration?.constraints,
       clipBehavior: decoration?.clipBehavior ?? Clip.hardEdge,
-      context: context,
       builder: (_) {
-        return Stack(
-          children: [
-            if (wallpapers != null) ...wallpapers,
-            SizedBox(
-              height: decoration?.height,
-              width: double.maxFinite,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (header != null) header,
-                  contentBuilder(context),
-                  SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
-                ],
-              ),
-            ),
-          ],
+        if (decoration?.draggable == true) {
+          return DraggableBottomSheetDialogContent(
+            parentContext: context,
+            decoration: decoration,
+            wallpapers: wallpapers,
+            header: header,
+            contentBuilder: contentBuilder,
+          );
+        }
+        return BottomSheetDialogContent(
+          parentContext: context,
+          decoration: decoration,
+          wallpapers: wallpapers,
+          header: header,
+          contentBuilder: contentBuilder,
         );
       },
     ).then((value) => completer.complete(value));

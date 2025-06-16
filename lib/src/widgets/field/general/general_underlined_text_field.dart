@@ -110,7 +110,15 @@ class _GeneralUnderlineTextFieldState extends State<GeneralUnderlineTextField> {
           ),
         ),
         if (_validateMessage != null)
-          SizedBox(width: double.maxFinite, child: Row(children: [const SizedBox(width: 1), Flexible(child: _validateMessage!)])),
+          SizedBox(
+            width: double.maxFinite,
+            child: Row(
+              children: [
+                const SizedBox(width: 1),
+                Flexible(child: _validateMessage!),
+              ],
+            ),
+          ),
       ],
     );
   }
