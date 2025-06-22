@@ -20,10 +20,8 @@ class OverlayDropdownButton<T> extends StatelessWidget {
     this.overlayAlignment = OverlayAlign.center,
     this.overlaydecoration,
     this.dropdownItemsBorderRadius = 4,
-    this.dropdownItemsPadding = const EdgeInsets.symmetric(
-      horizontal: 8,
-      vertical: 4,
-    ),
+    this.dropdownItemsPadding = const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+    this.disabled = false,
     required this.value,
     required this.dropdownItems,
     required this.dropdownItemBuilder,
@@ -48,6 +46,7 @@ class OverlayDropdownButton<T> extends StatelessWidget {
   final OverlayDecoration? overlaydecoration;
   final double dropdownItemsBorderRadius;
   final EdgeInsets? dropdownItemsPadding;
+  final bool disabled;
   final T? value;
   final List<T> dropdownItems;
   final Widget Function(T value) dropdownItemBuilder;
@@ -62,28 +61,31 @@ class OverlayDropdownButton<T> extends StatelessWidget {
       padding: padding,
       color: color,
       hoveredColor: hoveredColor,
-      splashColor: splashColor,
+      splashColor: disabled ? null : splashColor,
       useInitialElevation: useInitialElevation,
       hoveredElevation: hoveredElevation,
       borderRadius: borderRadius,
       border: border,
       clipBehavior: clipBehavior,
-      onTap: (handleShowOverlay, closeOverlay) => handleShowOverlay(
-        dynamicWidth: overlayDynamicWidth,
-        alignment: overlayAlignment,
-        decoration: overlaydecoration?.copyWith(padding: EdgeInsets.zero),
-        yOffset: overlayYOffset,
-        contentBuilder: (_) => _Dropdowns(
-          dropdownItemsBorderRadius: dropdownItemsBorderRadius,
-          dropdownItemsPadding: dropdownItemsPadding,
-          overlayPadding: overlaydecoration?.padding,
-          value: value,
-          items: dropdownItems,
-          dropdownItemBuilder: dropdownItemBuilder,
-          onSelected: onSelected,
-          closeOverlay: closeOverlay,
-        ),
-      ),
+      onTap: (handleShowOverlay, closeOverlay) {
+        if (disabled) return;
+        handleShowOverlay(
+          dynamicWidth: overlayDynamicWidth,
+          alignment: overlayAlignment,
+          decoration: overlaydecoration?.copyWith(padding: EdgeInsets.zero),
+          yOffset: overlayYOffset,
+          contentBuilder: (_) => _Dropdowns(
+            dropdownItemsBorderRadius: dropdownItemsBorderRadius,
+            dropdownItemsPadding: dropdownItemsPadding,
+            overlayPadding: overlaydecoration?.padding,
+            value: value,
+            items: dropdownItems,
+            dropdownItemBuilder: dropdownItemBuilder,
+            onSelected: onSelected,
+            closeOverlay: closeOverlay,
+          ),
+        );
+      },
       child: selectedValueBuilder(value),
     );
   }
@@ -145,12 +147,8 @@ class _DropdownsState<T> extends State<_Dropdowns<T>> {
               widget.closeOverlay();
             },
             padding: widget.dropdownItemsPadding,
-            borderRadius: BorderRadius.circular(
-              widget.dropdownItemsBorderRadius,
-            ),
-            color: widget.items[index] == widget.value
-                ? Colors.grey.shade200
-                : Colors.transparent,
+            borderRadius: BorderRadius.circular(widget.dropdownItemsBorderRadius),
+            color: widget.items[index] == widget.value ? Colors.grey.shade200 : Colors.transparent,
             hoveredColor: Colors.grey.shade300,
             splashColor: Colors.grey.shade400,
             hoverDuration: const Duration(milliseconds: 100),

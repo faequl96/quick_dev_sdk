@@ -36,7 +36,10 @@ class BottomSheetDialogContent extends StatelessWidget {
               width: double.maxFinite,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
-                children: [if (header != null) header!, Flexible(child: contentBuilder(context))],
+                children: [
+                  if (header != null) header!,
+                  Flexible(child: contentBuilder(context)),
+                ],
               ),
             ),
           ),
