@@ -60,13 +60,15 @@ class _GeneralUnderlineTextFieldState extends State<GeneralUnderlineTextField> {
 
   @override
   void initState() {
-    widget.controller.addListener(_onChangeListener);
     super.initState();
+
+    widget.controller.addListener(_onChangeListener);
   }
 
   @override
   void dispose() {
     widget.controller.removeListener(_onChangeListener);
+
     super.dispose();
   }
 

@@ -122,11 +122,12 @@ class _DropdownsState<T> extends State<_Dropdowns<T>> {
 
   @override
   void initState() {
+    super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _listViewHeight = (_listViewKey.currentContext?.size?.height ?? 0) + 2;
+      _listViewHeight = (_listViewKey.currentContext?.size?.height ?? 0);
       setState(() {});
     });
-    super.initState();
   }
 
   @override

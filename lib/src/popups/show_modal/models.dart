@@ -7,7 +7,7 @@ class BottomSheetDecoration {
     this.color,
     this.borderSide = BorderSide.none,
     this.borderRadius = const BorderRadius.only(topLeft: Radius.circular(10), topRight: Radius.circular(10)),
-    this.clipBehavior = Clip.none,
+    this.clipBehavior = Clip.hardEdge,
   }) : draggable = false;
 
   BottomSheetDecoration.draggable({

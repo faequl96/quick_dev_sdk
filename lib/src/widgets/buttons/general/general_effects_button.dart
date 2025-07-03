@@ -136,8 +136,9 @@ class _ExtendedStyleState extends State<_ExtendedStyle> {
 
   @override
   void initState() {
-    widget.rebuild?.call((value) => setState(() => _isHovered = value));
     super.initState();
+
+    widget.rebuild?.call((value) => setState(() => _isHovered = value));
   }
 
   @override
@@ -170,8 +171,9 @@ class _ChildWidgetState extends State<_ChildWidget> {
 
   @override
   void initState() {
-    widget.rebuild?.call((value) => setState(() => _isHovered = value));
     super.initState();
+
+    widget.rebuild?.call((value) => setState(() => _isHovered = value));
   }
 
   @override

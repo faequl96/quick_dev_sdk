@@ -17,6 +17,7 @@ class ShowModal {
   static Future<T> bottomSheet<T>(
     BuildContext context, {
     bool dismissible = true,
+    bool enableDrag = true,
     Color barrierColor = Colors.black26,
     BottomSheetDecoration? decoration,
     List<Wallpaper>? wallpapers,
@@ -36,6 +37,7 @@ class ShowModal {
       ),
       isDismissible: dismissible,
       isScrollControlled: true,
+      enableDrag: enableDrag,
       constraints: decoration?.constraints,
       clipBehavior: decoration?.clipBehavior ?? Clip.hardEdge,
       builder: (_) {
@@ -139,7 +141,9 @@ class ShowModal {
         height: 110,
         width: 110,
         position: const Position(top: -36, right: -28),
-        child: DecoratedBox(decoration: BoxDecoration(borderRadius: BorderRadius.circular(55), color: Colors.amber.shade100)),
+        child: DecoratedBox(
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(55), color: Colors.amber.shade100),
+        ),
       ),
     ];
   }

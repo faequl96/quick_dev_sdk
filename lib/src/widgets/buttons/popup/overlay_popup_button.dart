@@ -44,9 +44,11 @@ class OverlayPopupButton extends StatefulWidget {
       OverlayAlign alignment,
       OverlayDecoration? decoration,
       required Widget Function(BuildContext context) contentBuilder,
-    }) handleShowOverlay,
+    })
+    handleShowOverlay,
     void Function() handleCloseOverlay,
-  )? onTap;
+  )?
+  onTap;
   final void Function(
     void Function({
       bool dynamicWidth,
@@ -55,8 +57,10 @@ class OverlayPopupButton extends StatefulWidget {
       OverlayAlign alignment,
       OverlayDecoration? decoration,
       required Widget Function(BuildContext context) contentBuilder,
-    }) handleShowOverlay,
-  )? onHover;
+    })
+    handleShowOverlay,
+  )?
+  onHover;
   final bool closeOnTapOutside;
   final bool closeOnUnHover;
   final Widget Function(bool value)? onHoverChildBuilder;
@@ -98,32 +102,29 @@ class _OverlayPopupButtonState extends State<OverlayPopupButton> {
         clipBehavior: widget.clipBehavior,
         isDisabled: widget.onTap == null,
         requestFocusOnHover: widget.requestFocusOnHover,
-        onTap: () => widget.onTap?.call(
-          ({
-            bool dynamicWidth = false,
-            bool slideTransition = true,
-            double? yOffset,
-            OverlayAlign alignment = OverlayAlign.center,
-            OverlayDecoration? decoration,
-            required Widget Function(BuildContext) contentBuilder,
-          }) async {
-            _showOverlay.create(
-              key: _key,
-              linkToTarget: _layerLink,
-              dynamicWidth: dynamicWidth,
-              slideTransition: slideTransition,
-              closeOnTapOutside: widget.closeOnTapOutside,
-              yOffset: yOffset,
-              alignment: alignment,
-              decoration: decoration,
-              onHoverInside: (value) {
-                if (widget.closeOnUnHover) _onHoverContentInside(value);
-              },
-              contentBuilder: contentBuilder,
-            );
-          },
-          () => _showOverlay.remove(),
-        ),
+        onTap: () => widget.onTap?.call(({
+          bool dynamicWidth = false,
+          bool slideTransition = true,
+          double? yOffset,
+          OverlayAlign alignment = OverlayAlign.center,
+          OverlayDecoration? decoration,
+          required Widget Function(BuildContext) contentBuilder,
+        }) async {
+          _showOverlay.create(
+            key: _key,
+            linkToTarget: _layerLink,
+            dynamicWidth: dynamicWidth,
+            slideTransition: slideTransition,
+            closeOnTapOutside: widget.closeOnTapOutside,
+            yOffset: yOffset,
+            alignment: alignment,
+            decoration: decoration,
+            onHoverInside: (value) {
+              if (widget.closeOnUnHover) _onHoverContentInside(value);
+            },
+            contentBuilder: contentBuilder,
+          );
+        }, () => _showOverlay.remove()),
         onHover: (value) async {
           if (value) {
             widget.onHover?.call(({

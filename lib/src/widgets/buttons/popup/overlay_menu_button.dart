@@ -20,10 +20,7 @@ class OverlayMenuButton<T> extends StatelessWidget {
     this.overlayAlignment = OverlayAlign.center,
     this.overlaydecoration,
     this.menuItemsBorderRadius = 4,
-    this.menuItemsPadding = const EdgeInsets.symmetric(
-      horizontal: 8,
-      vertical: 4,
-    ),
+    this.menuItemsPadding = const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
     required this.menuItems,
     required this.menuItemBuilder,
     required this.onSelected,
@@ -118,11 +115,12 @@ class _MenusState<T> extends State<_Menus<T>> {
 
   @override
   void initState() {
+    super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _listViewHeight = (_listViewKey.currentContext?.size?.height ?? 0) + 2;
       setState(() {});
     });
-    super.initState();
   }
 
   @override

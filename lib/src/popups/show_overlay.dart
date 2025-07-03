@@ -30,9 +30,7 @@ class ShowOverlay {
 
     if (key.currentContext != null) _context = key.currentContext!;
     if (_context.mounted == false) {
-      dev.log(
-        'Your key is not associated with any widget "ShowOverlay.of(GlobalKey key)"',
-      );
+      dev.log('Your key is not associated with any widget "ShowOverlay.of(GlobalKey key)"');
       return;
     }
 
@@ -42,45 +40,43 @@ class ShowOverlay {
     final buttonSize = renderBox.size;
     final position = renderBox.localToGlobal(Offset.zero);
     final align = _getAlignment(alignment);
-    final maxWidth = _getMaxWidth(
-      alignment: alignment,
-      size: size,
-      buttonSize: buttonSize,
-      position: position,
-    );
-    final dynamicMaxHeight =
-        (size.height - (position.dy + buttonSize.height + (yOffset ?? 0))) - 14;
+    final maxWidth = _getMaxWidth(alignment: alignment, size: size, buttonSize: buttonSize, position: position);
+    final dynamicMaxHeight = (size.height - (position.dy + buttonSize.height + (yOffset ?? 0))) - 14;
 
-    _overlayEntry = OverlayEntry(builder: (_) {
-      return Stack(children: [
-        Positioned(
-          width: dynamicWidth ? null : (buttonSize.width + 28),
-          child: CompositedTransformFollower(
-            link: linkToTarget,
-            showWhenUnlinked: false,
-            offset: Offset(_getAlignOffset(alignment), buttonSize.height),
-            targetAnchor: align,
-            followerAnchor: align,
-            child: Material(
-              type: MaterialType.transparency,
-              child: TapRegion(
-                onTapOutside: closeOnTapOutside ? (_) => remove() : null,
-                child: _OverlayContent(
-                  maxWidth: maxWidth,
-                  maxHeight: decoration?.maxHeight ?? dynamicMaxHeight,
-                  yOffset: yOffset,
-                  slideTransition: slideTransition,
-                  dynamicWidth: dynamicWidth,
-                  decoration: decoration,
-                  onHoverInside: onHoverInside,
-                  child: contentBuilder(_context),
+    _overlayEntry = OverlayEntry(
+      builder: (_) {
+        return Stack(
+          children: [
+            Positioned(
+              width: dynamicWidth ? null : (buttonSize.width + 28),
+              child: CompositedTransformFollower(
+                link: linkToTarget,
+                showWhenUnlinked: false,
+                offset: Offset(_getAlignOffset(alignment), buttonSize.height),
+                targetAnchor: align,
+                followerAnchor: align,
+                child: Material(
+                  type: MaterialType.transparency,
+                  child: TapRegion(
+                    onTapOutside: closeOnTapOutside ? (_) => remove() : null,
+                    child: _OverlayContent(
+                      maxWidth: maxWidth,
+                      maxHeight: decoration?.maxHeight ?? dynamicMaxHeight,
+                      yOffset: yOffset,
+                      slideTransition: slideTransition,
+                      dynamicWidth: dynamicWidth,
+                      decoration: decoration,
+                      onHoverInside: onHoverInside,
+                      child: contentBuilder(_context),
+                    ),
+                  ),
                 ),
               ),
             ),
-          ),
-        ),
-      ]);
-    });
+          ],
+        );
+      },
+    );
 
     Overlay.of(_context).insert(_overlayEntry!);
   }
@@ -98,23 +94,15 @@ class ShowOverlay {
   }
 
   Alignment _getAlignment(OverlayAlign alignment) => {
-        OverlayAlign.left: Alignment.topLeft,
-        OverlayAlign.center: Alignment.topCenter,
-        OverlayAlign.right: Alignment.topRight,
-      }[alignment]!;
+    OverlayAlign.left: Alignment.topLeft,
+    OverlayAlign.center: Alignment.topCenter,
+    OverlayAlign.right: Alignment.topRight,
+  }[alignment]!;
 
-  double _getAlignOffset(OverlayAlign alignment) => {
-        OverlayAlign.left: -14.0,
-        OverlayAlign.center: 0.0,
-        OverlayAlign.right: 14.0,
-      }[alignment]!;
+  double _getAlignOffset(OverlayAlign alignment) =>
+      {OverlayAlign.left: -14.0, OverlayAlign.center: 0.0, OverlayAlign.right: 14.0}[alignment]!;
 
-  double _getMaxWidth({
-    required OverlayAlign alignment,
-    required Size size,
-    required Size buttonSize,
-    required Offset position,
-  }) {
+  double _getMaxWidth({required OverlayAlign alignment, required Size size, required Size buttonSize, required Offset position}) {
     double leftRemainder = position.dx;
     double rightRemainder = size.width - (position.dx + buttonSize.width);
     double minNumber = min(leftRemainder, rightRemainder);
@@ -151,39 +139,30 @@ class _OverlayContent extends StatefulWidget {
   State<_OverlayContent> createState() => _OverlayContentState();
 }
 
-class _OverlayContentState extends State<_OverlayContent>
-    with TickerProviderStateMixin {
+class _OverlayContentState extends State<_OverlayContent> with TickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _animation;
 
   @override
   void initState() {
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 100),
-    );
-
-    _animation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      _animationController,
-    );
-
-    _animationController.forward();
-
     super.initState();
+
+    _animationController = AnimationController(vsync: this, duration: const Duration(milliseconds: 100));
+    _animation = Tween<double>(begin: 0.0, end: 1.0).animate(_animationController);
+    _animationController.forward();
   }
 
   @override
   void dispose() {
     _animationController.dispose();
+
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) => ClipRect(
-        child: widget.decoration?._isUnStyled == true
-            ? _contentWrapper(_unStyledContent)
-            : _contentWrapper(_defaultContent),
-      );
+    child: widget.decoration?._isUnStyled == true ? _contentWrapper(_unStyledContent) : _contentWrapper(_defaultContent),
+  );
 
   Widget _contentWrapper(Widget content) {
     return Padding(
@@ -202,48 +181,34 @@ class _OverlayContentState extends State<_OverlayContent>
   }
 
   Widget get _defaultContent => MouseRegion(
-        onEnter: (_) => widget.onHoverInside?.call(true),
-        onExit: (_) => widget.onHoverInside?.call(false),
-        child: CardContainer(
-          width: widget.decoration?.width,
-          height: widget.decoration?.height,
-          constraints: BoxConstraints(
-            maxWidth: widget.maxWidth,
-            maxHeight: widget.maxHeight <= 72 ? 72 : widget.maxHeight,
-          ),
-          margin: EdgeInsets.only(top: (widget.yOffset ?? 0)),
-          padding: widget.decoration?.padding ?? EdgeInsets.zero,
-          color: widget.decoration?.color ?? Colors.white,
-          borderRadius: widget.decoration?.borderRadius ?? 8,
-          border: widget.decoration?.border ??
-              const Border.fromBorderSide(
-                BorderSide(color: Color.fromARGB(255, 224, 224, 224)),
-              ),
-          boxShadow: widget.decoration?.boxShadow ??
-              const BoxShadow(
-                offset: Offset(0, 3),
-                blurRadius: 2,
-                color: Colors.black12,
-              ),
-          clipBehavior: widget.decoration?.clipBehavior ?? Clip.none,
-          child: widget.child,
-        ),
-      );
+    onEnter: (_) => widget.onHoverInside?.call(true),
+    onExit: (_) => widget.onHoverInside?.call(false),
+    child: CardContainer(
+      width: widget.decoration?.width,
+      height: widget.decoration?.height,
+      constraints: BoxConstraints(maxWidth: widget.maxWidth, maxHeight: widget.maxHeight <= 72 ? 72 : widget.maxHeight),
+      margin: EdgeInsets.only(top: (widget.yOffset ?? 0)),
+      padding: widget.decoration?.padding ?? EdgeInsets.zero,
+      color: widget.decoration?.color ?? Colors.white,
+      borderRadius: widget.decoration?.borderRadius ?? 8,
+      border: widget.decoration?.border ?? const Border.fromBorderSide(BorderSide(color: Color.fromARGB(255, 224, 224, 224))),
+      boxShadow: widget.decoration?.boxShadow ?? const BoxShadow(offset: Offset(0, 3), blurRadius: 2, color: Colors.black12),
+      clipBehavior: widget.decoration?.clipBehavior ?? Clip.none,
+      child: widget.child,
+    ),
+  );
 
   Widget get _unStyledContent => MouseRegion(
-        onEnter: (_) => widget.onHoverInside?.call(true),
-        onExit: (_) => widget.onHoverInside?.call(false),
-        child: Padding(
-          padding: EdgeInsets.only(top: (widget.yOffset ?? 0)),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxWidth: widget.maxWidth,
-              maxHeight: widget.maxHeight <= 72 ? 72 : widget.maxHeight,
-            ),
-            child: widget.child,
-          ),
-        ),
-      );
+    onEnter: (_) => widget.onHoverInside?.call(true),
+    onExit: (_) => widget.onHoverInside?.call(false),
+    child: Padding(
+      padding: EdgeInsets.only(top: (widget.yOffset ?? 0)),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: widget.maxWidth, maxHeight: widget.maxHeight <= 72 ? 72 : widget.maxHeight),
+        child: widget.child,
+      ),
+    ),
+  );
 }
 
 class OverlayDecoration {
@@ -254,14 +219,8 @@ class OverlayDecoration {
     this.padding = EdgeInsets.zero,
     this.color,
     this.borderRadius = 8,
-    this.border = const Border.fromBorderSide(
-      BorderSide(color: Color.fromARGB(255, 224, 224, 224)),
-    ),
-    this.boxShadow = const BoxShadow(
-      offset: Offset(0, 3),
-      blurRadius: 2,
-      color: Colors.black12,
-    ),
+    this.border = const Border.fromBorderSide(BorderSide(color: Color.fromARGB(255, 224, 224, 224))),
+    this.boxShadow = const BoxShadow(offset: Offset(0, 3), blurRadius: 2, color: Colors.black12),
     this.clipBehavior = Clip.none,
   }) : _isUnStyled = false;
 
@@ -315,11 +274,7 @@ class OverlayWrapper extends StatefulWidget {
 }
 
 class _OverlayWrapperState extends State<OverlayWrapper> {
-  late final _entry = OverlayEntry(
-    canSizeOverlay: true,
-    opaque: true,
-    builder: (BuildContext context) => widget.child,
-  );
+  late final _entry = OverlayEntry(canSizeOverlay: true, opaque: true, builder: (BuildContext context) => widget.child);
 
   @override
   void didUpdateWidget(OverlayWrapper oldWidget) {
@@ -332,6 +287,7 @@ class _OverlayWrapperState extends State<OverlayWrapper> {
     _entry
       ..remove()
       ..dispose();
+
     super.dispose();
   }
 

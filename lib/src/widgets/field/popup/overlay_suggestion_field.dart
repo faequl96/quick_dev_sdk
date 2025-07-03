@@ -6,10 +6,7 @@ class OverlaySuggestionField<T> extends StatefulWidget {
     super.key,
     this.decoration,
     this.suggestionItemsBorderRadius = 4,
-    this.suggestionItemsPadding = const EdgeInsets.symmetric(
-      horizontal: 8,
-      vertical: 4,
-    ),
+    this.suggestionItemsPadding = const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
     this.debouncer = const Duration(milliseconds: 300),
     required this.fieldBuilder,
     required this.controller,
@@ -25,11 +22,7 @@ class OverlaySuggestionField<T> extends StatefulWidget {
   final double suggestionItemsBorderRadius;
   final EdgeInsets? suggestionItemsPadding;
   final Duration debouncer;
-  final Widget Function(
-    BuildContext context,
-    TextEditingController controller,
-    FocusNode focusNode,
-  ) fieldBuilder;
+  final Widget Function(BuildContext context, TextEditingController controller, FocusNode focusNode) fieldBuilder;
   final TextEditingController controller;
   final FocusNode? focusNode;
   final void Function(T value) onSelected;
@@ -39,8 +32,7 @@ class OverlaySuggestionField<T> extends StatefulWidget {
   final Widget Function(BuildContext context)? loadingBuilder;
 
   @override
-  State<OverlaySuggestionField<T>> createState() =>
-      _OverlaySuggestionFieldState<T>();
+  State<OverlaySuggestionField<T>> createState() => _OverlaySuggestionFieldState<T>();
 }
 
 class _OverlaySuggestionFieldState<T> extends State<OverlaySuggestionField<T>> {
@@ -62,9 +54,7 @@ class _OverlaySuggestionFieldState<T> extends State<OverlaySuggestionField<T>> {
         linkToTarget: _layerLink,
         slideTransition: false,
         closeOnTapOutside: false,
-        decoration: OverlayDecoration.unStyled(
-          maxHeight: widget.decoration?.maxHeight,
-        ),
+        decoration: OverlayDecoration.unStyled(maxHeight: widget.decoration?.maxHeight),
         yOffset: 10,
         contentBuilder: (_) => _MainContent(
           decoration: widget.decoration,
@@ -87,6 +77,8 @@ class _OverlaySuggestionFieldState<T> extends State<OverlaySuggestionField<T>> {
 
   @override
   void initState() {
+    super.initState();
+
     if (widget.focusNode != null) {
       _focusNode = widget.focusNode!;
     } else {
@@ -94,8 +86,6 @@ class _OverlaySuggestionFieldState<T> extends State<OverlaySuggestionField<T>> {
     }
     widget.controller.addListener(_onChangeListener);
     _focusNode.addListener(_onFocusListener);
-
-    super.initState();
   }
 
   @override
@@ -123,10 +113,7 @@ class _MainContent<T> extends StatefulWidget {
     super.key,
     this.decoration,
     this.suggestionItemsBorderRadius = 4,
-    this.suggestionItemsPadding = const EdgeInsets.symmetric(
-      horizontal: 8,
-      vertical: 4,
-    ),
+    this.suggestionItemsPadding = const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
     this.debouncer = const Duration(milliseconds: 300),
     required this.focusNode,
     required this.controller,
@@ -151,8 +138,7 @@ class _MainContent<T> extends StatefulWidget {
   final Widget Function(BuildContext context)? emptyBuilder;
   final Widget Function(BuildContext context)? loadingBuilder;
   final void Function(void Function(String value) onChange) rebuild;
-  final void Function(void Function(void Function() value) onFocusRemoved)
-      close;
+  final void Function(void Function(void Function() value) onFocusRemoved) close;
 
   @override
   State<_MainContent<T>> createState() => _MainContentState<T>();
@@ -193,15 +179,17 @@ class _MainContentState<T> extends State<_MainContent<T>> {
 
   @override
   void initState() {
+    super.initState();
+
     widget.rebuild((value) => _setSuggestions(value));
     widget.close((value) => _handleCloseOverlay(value));
     _setSuggestions(widget.controller.text);
-    super.initState();
   }
 
   @override
   void dispose() {
     _isDispose = true;
+
     super.dispose();
   }
 
@@ -224,25 +212,23 @@ class _MainContentState<T> extends State<_MainContent<T>> {
     if (_isLoading) {
       return _defaultCardStyle(
         widget.loadingBuilder?.call(context) ??
-            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(
-                  strokeWidth: 24 / 5.2,
-                  color: Theme.of(context).primaryColor,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(strokeWidth: 24 / 5.2, color: Theme.of(context).primaryColor),
                 ),
-              ),
-              const SizedBox(width: 10),
-              const Text("Loading..."),
-            ]),
+                const SizedBox(width: 10),
+                const Text('Loading...'),
+              ],
+            ),
       );
     }
 
     if (widget.controller.text.isNotEmpty) {
-      return _defaultCardStyle(
-        widget.emptyBuilder?.call(context) ?? const Text("Data not found"),
-      );
+      return _defaultCardStyle(widget.emptyBuilder?.call(context) ?? const Text('Data not found'));
     }
 
     return const SizedBox.shrink();
@@ -254,16 +240,8 @@ class _MainContentState<T> extends State<_MainContent<T>> {
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
       color: widget.decoration?.color ?? Colors.white,
       borderRadius: widget.decoration?.borderRadius ?? 8,
-      border: widget.decoration?.border ??
-          const Border.fromBorderSide(
-            BorderSide(color: Color.fromARGB(255, 224, 224, 224)),
-          ),
-      boxShadow: widget.decoration?.boxShadow ??
-          const BoxShadow(
-            offset: Offset(0, 3),
-            blurRadius: 2,
-            color: Colors.black12,
-          ),
+      border: widget.decoration?.border ?? const Border.fromBorderSide(BorderSide(color: Color.fromARGB(255, 224, 224, 224))),
+      boxShadow: widget.decoration?.boxShadow ?? const BoxShadow(offset: Offset(0, 3), blurRadius: 2, color: Colors.black12),
       child: content,
     );
   }
@@ -297,11 +275,12 @@ class _SuggestionsState<T> extends State<_Suggestions<T>> {
 
   @override
   void initState() {
+    super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _listViewHeight = (_listViewKey.currentContext?.size?.height ?? 0) + 2;
       setState(() {});
     });
-    super.initState();
   }
 
   @override
@@ -311,16 +290,8 @@ class _SuggestionsState<T> extends State<_Suggestions<T>> {
       width: double.maxFinite,
       color: widget.decoration?.color ?? Colors.white,
       borderRadius: widget.decoration?.borderRadius ?? 8,
-      border: widget.decoration?.border ??
-          const Border.fromBorderSide(
-            BorderSide(color: Color.fromARGB(255, 224, 224, 224)),
-          ),
-      boxShadow: widget.decoration?.boxShadow ??
-          const BoxShadow(
-            offset: Offset(0, 3),
-            blurRadius: 2,
-            color: Colors.black12,
-          ),
+      border: widget.decoration?.border ?? const Border.fromBorderSide(BorderSide(color: Color.fromARGB(255, 224, 224, 224))),
+      boxShadow: widget.decoration?.boxShadow ?? const BoxShadow(offset: Offset(0, 3), blurRadius: 2, color: Colors.black12),
       child: ListView.builder(
         key: _listViewKey,
         padding: widget.decoration?.padding,
@@ -330,9 +301,7 @@ class _SuggestionsState<T> extends State<_Suggestions<T>> {
         itemBuilder: (context, index) => GeneralEffectsButton(
           onTap: () => widget.onSelected(widget.suggestions[index]),
           padding: widget.suggestionItemsPadding,
-          borderRadius: BorderRadius.circular(
-            widget.suggestionItemsBorderRadius,
-          ),
+          borderRadius: BorderRadius.circular(widget.suggestionItemsBorderRadius),
           hoveredColor: Colors.grey.shade300,
           splashColor: Colors.grey.shade400,
           hoverDuration: const Duration(milliseconds: 100),

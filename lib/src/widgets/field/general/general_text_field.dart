@@ -64,13 +64,15 @@ class _GeneralTextFieldState extends State<GeneralTextField> {
 
   @override
   void initState() {
-    widget.controller.addListener(_onChangeListener);
     super.initState();
+
+    widget.controller.addListener(_onChangeListener);
   }
 
   @override
   void dispose() {
     widget.controller.removeListener(_onChangeListener);
+
     super.dispose();
   }
 
