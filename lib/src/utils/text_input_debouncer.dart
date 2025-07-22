@@ -1,7 +1,7 @@
 class TextInputDebouncer {
   TextInputDebouncer._();
 
-  static String _keywordsStop = "";
+  static String _keywordsStop = '';
 
   static Future<void> onChange({
     required String keywords,

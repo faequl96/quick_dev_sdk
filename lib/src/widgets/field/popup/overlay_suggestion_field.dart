@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 class OverlaySuggestionField<T> extends StatefulWidget {
   const OverlaySuggestionField({
     super.key,
+    this.parenContext,
     this.decoration,
     this.suggestionItemsBorderRadius = 4,
     this.suggestionItemsPadding = const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -18,6 +19,7 @@ class OverlaySuggestionField<T> extends StatefulWidget {
     this.loadingBuilder,
   });
 
+  final BuildContext? parenContext;
   final OverlayDecoration? decoration;
   final double suggestionItemsBorderRadius;
   final EdgeInsets? suggestionItemsPadding;
@@ -52,6 +54,7 @@ class _OverlaySuggestionFieldState<T> extends State<OverlaySuggestionField<T>> {
       _showOverlay.create(
         key: _key,
         linkToTarget: _layerLink,
+        context: widget.parenContext ?? context,
         slideTransition: false,
         closeOnTapOutside: false,
         decoration: OverlayDecoration.unStyled(maxHeight: widget.decoration?.maxHeight),

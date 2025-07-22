@@ -38,6 +38,7 @@ class OverlayPopupButton extends StatefulWidget {
   final bool requestFocusOnHover;
   final void Function(
     void Function({
+      required BuildContext context,
       bool dynamicWidth,
       bool slideTransition,
       double? yOffset,
@@ -51,6 +52,7 @@ class OverlayPopupButton extends StatefulWidget {
   onTap;
   final void Function(
     void Function({
+      required BuildContext context,
       bool dynamicWidth,
       bool slideTransition,
       double? yOffset,
@@ -103,6 +105,7 @@ class _OverlayPopupButtonState extends State<OverlayPopupButton> {
         isDisabled: widget.onTap == null,
         requestFocusOnHover: widget.requestFocusOnHover,
         onTap: () => widget.onTap?.call(({
+          required BuildContext context,
           bool dynamicWidth = false,
           bool slideTransition = true,
           double? yOffset,
@@ -113,6 +116,7 @@ class _OverlayPopupButtonState extends State<OverlayPopupButton> {
           _showOverlay.create(
             key: _key,
             linkToTarget: _layerLink,
+            context: context,
             dynamicWidth: dynamicWidth,
             slideTransition: slideTransition,
             closeOnTapOutside: widget.closeOnTapOutside,
@@ -128,6 +132,7 @@ class _OverlayPopupButtonState extends State<OverlayPopupButton> {
         onHover: (value) async {
           if (value) {
             widget.onHover?.call(({
+              required BuildContext context,
               bool dynamicWidth = false,
               bool slideTransition = true,
               double? yOffset,
@@ -138,6 +143,7 @@ class _OverlayPopupButtonState extends State<OverlayPopupButton> {
               _showOverlay.create(
                 key: _key,
                 linkToTarget: _layerLink,
+                context: context,
                 dynamicWidth: dynamicWidth,
                 slideTransition: slideTransition,
                 yOffset: yOffset,

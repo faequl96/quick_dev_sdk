@@ -24,26 +24,28 @@ class BottomSheetDialogContent extends StatelessWidget {
     final paddingBottom = MediaQuery.of(parentContext).viewInsets.bottom;
     final usableHeight = (screenHeight - statusBarHeight) - paddingBottom;
 
-    return Padding(
-      padding: EdgeInsets.only(bottom: paddingBottom),
-      child: Stack(
-        children: [
-          if (wallpapers != null) ...wallpapers!,
-          ConstrainedBox(
-            constraints: BoxConstraints(maxHeight: usableHeight),
-            child: SizedBox(
-              height: decoration?.height,
-              width: double.maxFinite,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (header != null) header!,
-                  Flexible(child: contentBuilder(context)),
-                ],
+    return SafeArea(
+      child: Padding(
+        padding: EdgeInsets.only(bottom: paddingBottom),
+        child: Stack(
+          children: [
+            if (wallpapers != null) ...wallpapers!,
+            ConstrainedBox(
+              constraints: BoxConstraints(maxHeight: usableHeight),
+              child: SizedBox(
+                height: decoration?.height,
+                width: double.maxFinite,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (header != null) header!,
+                    Flexible(child: contentBuilder(context)),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

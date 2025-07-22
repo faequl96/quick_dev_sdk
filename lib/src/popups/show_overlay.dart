@@ -17,6 +17,7 @@ class ShowOverlay {
   void create({
     required GlobalKey key,
     required LayerLink linkToTarget,
+    required BuildContext context,
     bool dynamicWidth = false,
     bool slideTransition = true,
     bool closeOnTapOutside = true,
@@ -35,13 +36,14 @@ class ShowOverlay {
     }
 
     final size = MediaQuery.of(_context).size;
+    final paddingBottom = MediaQuery.of(context).padding.bottom;
 
     final renderBox = _context.findRenderObject() as RenderBox;
     final buttonSize = renderBox.size;
     final position = renderBox.localToGlobal(Offset.zero);
     final align = _getAlignment(alignment);
     final maxWidth = _getMaxWidth(alignment: alignment, size: size, buttonSize: buttonSize, position: position);
-    final dynamicMaxHeight = (size.height - (position.dy + buttonSize.height + (yOffset ?? 0))) - 14;
+    final dynamicMaxHeight = (size.height - (position.dy + buttonSize.height + (yOffset ?? 0))) - (14 + paddingBottom);
 
     _overlayEntry = OverlayEntry(
       builder: (_) {

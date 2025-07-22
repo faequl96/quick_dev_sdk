@@ -45,6 +45,7 @@ class GeneralTextField extends StatefulWidget {
 
 class _GeneralTextFieldState extends State<GeneralTextField> {
   Widget? _validateMessage;
+  PreSufFixIcon? _suffixIcon;
 
   String _lastText = '';
 
@@ -53,6 +54,7 @@ class _GeneralTextFieldState extends State<GeneralTextField> {
       _lastText = widget.controller.text;
 
       widget.onChanged?.call(widget.controller.text);
+      _suffixIcon = widget.decoration?.suffixIcon?.call();
       final validate = widget.validator?.call(widget.controller.text);
       if (validate?.isSuccess != true) {
         setState(() => _validateMessage = validate?.message);
@@ -66,6 +68,7 @@ class _GeneralTextFieldState extends State<GeneralTextField> {
   void initState() {
     super.initState();
 
+    _suffixIcon = widget.decoration?.suffixIcon?.call();
     widget.controller.addListener(_onChangeListener);
   }
 
@@ -109,7 +112,7 @@ class _GeneralTextFieldState extends State<GeneralTextField> {
                 hintText: widget.decoration?.hintText,
                 hintStyle: widget.decoration?.hintStyle,
                 prefixIcon: usePrefixIcon ? _preSuffix(widget.decoration?.prefixIcon) : null,
-                suffixIcon: useSuffixIcon ? _preSuffix(widget.decoration?.suffixIcon) : null,
+                suffixIcon: useSuffixIcon ? _preSuffix(_suffixIcon) : null,
                 filled: widget.decoration?.filled,
                 fillColor: Colors.white,
                 contentPadding: EdgeInsets.symmetric(
@@ -207,7 +210,7 @@ class FieldDecoration {
   final double contentVerticalPadding;
   final double contentHorizontalPadding;
   final PreSufFixIcon? prefixIcon;
-  final PreSufFixIcon? suffixIcon;
+  final PreSufFixIcon? Function()? suffixIcon;
   final bool hideSuffixIconOnEmpty;
   final OutlineInputBorder enabledBorder;
   final OutlineInputBorder disabledBorder;

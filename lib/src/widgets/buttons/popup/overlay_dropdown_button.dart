@@ -4,6 +4,7 @@ import 'package:quick_dev_sdk/quick_dev_sdk.dart';
 class OverlayDropdownButton<T> extends StatelessWidget {
   const OverlayDropdownButton({
     super.key,
+    this.parenContext,
     this.width,
     this.height,
     this.padding,
@@ -29,6 +30,7 @@ class OverlayDropdownButton<T> extends StatelessWidget {
     required this.selectedValueBuilder,
   });
 
+  final BuildContext? parenContext;
   final double? width;
   final double? height;
   final EdgeInsets? padding;
@@ -70,6 +72,7 @@ class OverlayDropdownButton<T> extends StatelessWidget {
       onTap: (handleShowOverlay, closeOverlay) {
         if (disabled) return;
         handleShowOverlay(
+          context: parenContext ?? context,
           dynamicWidth: overlayDynamicWidth,
           alignment: overlayAlignment,
           decoration: overlaydecoration?.copyWith(padding: EdgeInsets.zero),

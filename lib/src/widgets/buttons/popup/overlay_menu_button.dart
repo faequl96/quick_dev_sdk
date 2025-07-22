@@ -4,6 +4,7 @@ import 'package:quick_dev_sdk/quick_dev_sdk.dart';
 class OverlayMenuButton<T> extends StatelessWidget {
   const OverlayMenuButton({
     super.key,
+    this.parenContext,
     this.width,
     this.height,
     this.padding,
@@ -28,6 +29,7 @@ class OverlayMenuButton<T> extends StatelessWidget {
     this.child,
   });
 
+  final BuildContext? parenContext;
   final double? width;
   final double? height;
   final EdgeInsets? padding;
@@ -66,6 +68,7 @@ class OverlayMenuButton<T> extends StatelessWidget {
       border: border,
       clipBehavior: clipBehavior,
       onTap: (handleShowOverlay, closeOverlay) => handleShowOverlay(
+        context: parenContext ?? context,
         dynamicWidth: overlayDynamicWidth,
         alignment: overlayAlignment,
         decoration: overlaydecoration?.copyWith(padding: EdgeInsets.zero),

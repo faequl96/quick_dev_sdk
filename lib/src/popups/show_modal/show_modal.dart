@@ -104,8 +104,8 @@ class ShowModal {
         barrierLabel: 'showAnimatedDialog',
         barrierDismissible: dismissible,
         barrierColor: barrierColor,
-        pageBuilder: (_, __, ___) => dialogContent,
-        transitionBuilder: (_, animation, __, child) {
+        pageBuilder: (_, _, _) => dialogContent,
+        transitionBuilder: (_, animation, _, child) {
           return SlideTransition(
             position: Tween(begin: const Offset(0, 1), end: const Offset(0, 0)).animate(animation),
             child: child,
