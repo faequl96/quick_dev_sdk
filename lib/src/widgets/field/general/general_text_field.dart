@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:quick_dev_sdk/quick_dev_sdk.dart';
 
 class GeneralTextField extends StatefulWidget {
@@ -91,56 +90,53 @@ class _GeneralTextFieldState extends State<GeneralTextField> {
         SizedBox(
           width: widget.width,
           height: widget.height,
-          child: Theme(
-            data: Theme.of(context).copyWith(textTheme: widget.useBuiltInFont ? GoogleFonts.nunitoTextTheme() : null),
-            child: TextField(
-              controller: widget.controller,
-              focusNode: widget.focusNode,
-              autofocus: widget.autofocus,
-              enabled: widget.enabled,
-              style: widget.style.copyWith(fontSize: (widget.style.fontSize ?? 16)),
-              keyboardType: widget.keyboardType,
-              inputFormatters: widget.inputFormatters,
-              maxLength: widget.maxLength,
-              obscureText: widget.decoration?.obscureText ?? false,
-              obscuringCharacter: widget.decoration?.obscuringCharacter ?? '•',
-              cursorHeight: (widget.style.fontSize ?? 16) + 10,
-              decoration: InputDecoration(
-                labelText: widget.decoration?.labelText,
-                labelStyle: widget.decoration?.labelStyle,
-                floatingLabelBehavior: widget.decoration?.floatingLabelBehavior,
-                hintText: widget.decoration?.hintText,
-                hintStyle: widget.decoration?.hintStyle,
-                prefixIcon: usePrefixIcon ? _preSuffix(widget.decoration?.prefixIcon) : null,
-                suffixIcon: useSuffixIcon ? _preSuffix(_suffixIcon) : null,
-                filled: widget.decoration?.filled,
-                fillColor: Colors.white,
-                contentPadding: EdgeInsets.symmetric(
-                  horizontal: widget.decoration?.contentHorizontalPadding ?? 12,
-                  vertical: widget.height != null ? 0 : 16 + (widget.decoration?.contentVerticalPadding ?? 0),
-                ),
-                enabledBorder:
-                    widget.decoration?.enabledBorder ??
-                    const OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black26),
-                      borderRadius: BorderRadius.all(Radius.circular(8)),
-                    ),
-                disabledBorder:
-                    widget.decoration?.disabledBorder ??
-                    const OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black26),
-                      borderRadius: BorderRadius.all(Radius.circular(8)),
-                    ),
-                focusedBorder:
-                    widget.decoration?.focusedBorder ??
-                    const OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black26),
-                      borderRadius: BorderRadius.all(Radius.circular(8)),
-                    ),
+          child: TextField(
+            controller: widget.controller,
+            focusNode: widget.focusNode,
+            autofocus: widget.autofocus,
+            enabled: widget.enabled,
+            style: widget.style.copyWith(fontSize: (widget.style.fontSize ?? 16)),
+            keyboardType: widget.keyboardType,
+            inputFormatters: widget.inputFormatters,
+            maxLength: widget.maxLength,
+            obscureText: widget.decoration?.obscureText ?? false,
+            obscuringCharacter: widget.decoration?.obscuringCharacter ?? '•',
+            cursorHeight: (widget.style.fontSize ?? 16) + 10,
+            decoration: InputDecoration(
+              labelText: widget.decoration?.labelText,
+              labelStyle: widget.decoration?.labelStyle,
+              floatingLabelBehavior: widget.decoration?.floatingLabelBehavior,
+              hintText: widget.decoration?.hintText,
+              hintStyle: widget.decoration?.hintStyle,
+              prefixIcon: usePrefixIcon ? _preSuffix(widget.decoration?.prefixIcon) : null,
+              suffixIcon: useSuffixIcon ? _preSuffix(_suffixIcon) : null,
+              filled: widget.decoration?.filled,
+              fillColor: widget.decoration?.fillColor,
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: widget.decoration?.contentHorizontalPadding ?? 12,
+                vertical: widget.height != null ? 0 : 16 + (widget.decoration?.contentVerticalPadding ?? 0),
               ),
-              onTapOutside: (event) => widget.focusNode?.unfocus(),
-              onEditingComplete: widget.onEditingComplete,
+              enabledBorder:
+                  widget.decoration?.enabledBorder ??
+                  const OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.black26),
+                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                  ),
+              disabledBorder:
+                  widget.decoration?.disabledBorder ??
+                  const OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.black26),
+                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                  ),
+              focusedBorder:
+                  widget.decoration?.focusedBorder ??
+                  const OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.black26),
+                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                  ),
             ),
+            onTapOutside: (event) => widget.focusNode?.unfocus(),
+            onEditingComplete: widget.onEditingComplete,
           ),
         ),
         if (_validateMessage != null)
@@ -203,6 +199,7 @@ class FieldDecoration {
     this.hintText,
     this.hintStyle,
     this.filled = false,
+    this.fillColor,
     this.obscuringCharacter = '•',
     this.obscureText = false,
   });
@@ -221,6 +218,7 @@ class FieldDecoration {
   final String? hintText;
   final TextStyle? hintStyle;
   final bool filled;
+  final Color? fillColor;
   final String obscuringCharacter;
   final bool obscureText;
 }

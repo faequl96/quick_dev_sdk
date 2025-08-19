@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:quick_dev_sdk/quick_dev_sdk.dart';
 
 class GeneralUnderlineTextField extends StatefulWidget {
@@ -81,35 +80,32 @@ class _GeneralUnderlineTextFieldState extends State<GeneralUnderlineTextField> {
             (widget.decoration?.hideSuffixIconOnEmpty == true && widget.controller.text.isNotEmpty));
     return Column(
       children: [
-        Theme(
-          data: Theme.of(context).copyWith(textTheme: widget.useBuiltInFont ? GoogleFonts.nunitoTextTheme() : null),
-          child: TextField(
-            controller: widget.controller,
-            focusNode: widget.focusNode,
-            autofocus: widget.autofocus,
-            enabled: widget.enabled,
-            style: widget.style.copyWith(fontSize: (widget.style.fontSize ?? 16)),
-            keyboardType: widget.keyboardType,
-            inputFormatters: widget.inputFormatters,
-            maxLength: widget.maxLength,
-            obscureText: widget.decoration?.obscureText ?? false,
-            obscuringCharacter: widget.decoration?.obscuringCharacter ?? '•',
-            cursorHeight: (widget.style.fontSize ?? 16) + 10,
-            decoration: InputDecoration(
-              labelText: widget.decoration?.labelText,
-              labelStyle: widget.decoration?.labelStyle,
-              floatingLabelBehavior: widget.decoration?.floatingLabelBehavior,
-              hintText: widget.decoration?.hintText,
-              hintStyle: widget.decoration?.hintStyle,
-              prefixIcon: usePrefixIcon ? _preSuffix(widget.decoration?.prefixIcon) : null,
-              suffixIcon: useSuffixIcon ? _preSuffix(widget.decoration?.suffixIcon) : null,
-              contentPadding: widget.decoration?.contentPadding,
-              enabledBorder: widget.decoration?.enabledBorder,
-              disabledBorder: widget.decoration?.disabledBorder,
-              focusedBorder: widget.decoration?.focusedBorder,
-            ),
-            onEditingComplete: widget.onEditingComplete,
+        TextField(
+          controller: widget.controller,
+          focusNode: widget.focusNode,
+          autofocus: widget.autofocus,
+          enabled: widget.enabled,
+          style: widget.style.copyWith(fontSize: (widget.style.fontSize ?? 16)),
+          keyboardType: widget.keyboardType,
+          inputFormatters: widget.inputFormatters,
+          maxLength: widget.maxLength,
+          obscureText: widget.decoration?.obscureText ?? false,
+          obscuringCharacter: widget.decoration?.obscuringCharacter ?? '•',
+          cursorHeight: (widget.style.fontSize ?? 16) + 10,
+          decoration: InputDecoration(
+            labelText: widget.decoration?.labelText,
+            labelStyle: widget.decoration?.labelStyle,
+            floatingLabelBehavior: widget.decoration?.floatingLabelBehavior,
+            hintText: widget.decoration?.hintText,
+            hintStyle: widget.decoration?.hintStyle,
+            prefixIcon: usePrefixIcon ? _preSuffix(widget.decoration?.prefixIcon) : null,
+            suffixIcon: useSuffixIcon ? _preSuffix(widget.decoration?.suffixIcon) : null,
+            contentPadding: widget.decoration?.contentPadding,
+            enabledBorder: widget.decoration?.enabledBorder,
+            disabledBorder: widget.decoration?.disabledBorder,
+            focusedBorder: widget.decoration?.focusedBorder,
           ),
+          onEditingComplete: widget.onEditingComplete,
         ),
         if (_validateMessage != null)
           SizedBox(

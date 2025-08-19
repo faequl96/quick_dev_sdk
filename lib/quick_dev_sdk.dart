@@ -20,7 +20,6 @@ export 'package:quick_dev_sdk/src/utils/color_converter.dart';
 export 'package:quick_dev_sdk/src/utils/currency.dart';
 export 'package:quick_dev_sdk/src/utils/currency_text_input_formarter.dart';
 export 'package:quick_dev_sdk/src/utils/debouncer.dart';
-export 'package:quick_dev_sdk/src/utils/general_fonts.dart';
 export 'package:quick_dev_sdk/src/utils/number_to_word.dart';
 export 'package:quick_dev_sdk/src/utils/radius_clipper.dart';
 export 'package:quick_dev_sdk/src/utils/text_input_debouncer.dart';
