@@ -14,6 +14,7 @@ class GeneralTextField extends StatefulWidget {
     this.style = const TextStyle(fontSize: 16),
     this.useBuiltInFont = true,
     this.decoration,
+    this.maxLines,
     this.maxLength,
     this.keyboardType,
     this.inputFormatters,
@@ -31,6 +32,7 @@ class GeneralTextField extends StatefulWidget {
   final TextStyle style;
   final bool useBuiltInFont;
   final FieldDecoration? decoration;
+  final int? maxLines;
   final int? maxLength;
   final TextInputType? keyboardType;
   final List<TextInputFormatter>? inputFormatters;
@@ -98,6 +100,7 @@ class _GeneralTextFieldState extends State<GeneralTextField> {
             style: widget.style.copyWith(fontSize: (widget.style.fontSize ?? 16)),
             keyboardType: widget.keyboardType,
             inputFormatters: widget.inputFormatters,
+            maxLines: widget.maxLines,
             maxLength: widget.maxLength,
             obscureText: widget.decoration?.obscureText ?? false,
             obscuringCharacter: widget.decoration?.obscuringCharacter ?? '•',
