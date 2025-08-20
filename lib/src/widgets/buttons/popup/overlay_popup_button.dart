@@ -169,3 +169,13 @@ class _OverlayPopupButtonState extends State<OverlayPopupButton> {
     );
   }
 }
+
+class DropdownItemDecoration {
+  const DropdownItemDecoration({this.padding, this.selectedColor, this.hoveredColor, this.splashColor, this.borderRadius = 0});
+
+  final EdgeInsets? padding;
+  final Color? selectedColor;
+  final Color? hoveredColor;
+  final Color? splashColor;
+  final double borderRadius;
+}

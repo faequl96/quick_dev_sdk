@@ -39,6 +39,8 @@ class GeneralUnderlineTextField extends StatefulWidget {
 }
 
 class _GeneralUnderlineTextFieldState extends State<GeneralUnderlineTextField> {
+  late final FocusNode _focusNode;
+
   Widget? _validateMessage;
 
   String _lastText = '';
@@ -61,6 +63,8 @@ class _GeneralUnderlineTextFieldState extends State<GeneralUnderlineTextField> {
   void initState() {
     super.initState();
 
+    _focusNode = widget.focusNode ?? FocusNode();
+
     widget.controller.addListener(_onChangeListener);
   }
 
@@ -82,7 +86,7 @@ class _GeneralUnderlineTextFieldState extends State<GeneralUnderlineTextField> {
       children: [
         TextField(
           controller: widget.controller,
-          focusNode: widget.focusNode,
+          focusNode: _focusNode,
           autofocus: widget.autofocus,
           enabled: widget.enabled,
           style: widget.style.copyWith(fontSize: (widget.style.fontSize ?? 16)),
@@ -105,6 +109,7 @@ class _GeneralUnderlineTextFieldState extends State<GeneralUnderlineTextField> {
             disabledBorder: widget.decoration?.disabledBorder,
             focusedBorder: widget.decoration?.focusedBorder,
           ),
+          onTapOutside: (event) => _focusNode.unfocus(),
           onEditingComplete: widget.onEditingComplete,
         ),
         if (_validateMessage != null)

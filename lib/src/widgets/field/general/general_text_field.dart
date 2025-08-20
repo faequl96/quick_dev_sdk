@@ -12,7 +12,6 @@ class GeneralTextField extends StatefulWidget {
     this.autofocus = false,
     this.enabled,
     this.style = const TextStyle(fontSize: 16),
-    this.useBuiltInFont = true,
     this.decoration,
     this.maxLines,
     this.maxLength,
@@ -30,7 +29,6 @@ class GeneralTextField extends StatefulWidget {
   final bool autofocus;
   final bool? enabled;
   final TextStyle style;
-  final bool useBuiltInFont;
   final FieldDecoration? decoration;
   final int? maxLines;
   final int? maxLength;
@@ -45,6 +43,8 @@ class GeneralTextField extends StatefulWidget {
 }
 
 class _GeneralTextFieldState extends State<GeneralTextField> {
+  late final FocusNode _focusNode;
+
   Widget? _validateMessage;
   PreSufFixIcon? _suffixIcon;
 
@@ -68,6 +68,8 @@ class _GeneralTextFieldState extends State<GeneralTextField> {
   @override
   void initState() {
     super.initState();
+
+    _focusNode = widget.focusNode ?? FocusNode();
 
     _suffixIcon = widget.decoration?.suffixIcon?.call();
     widget.controller.addListener(_onChangeListener);
@@ -94,7 +96,7 @@ class _GeneralTextFieldState extends State<GeneralTextField> {
           height: widget.height,
           child: TextField(
             controller: widget.controller,
-            focusNode: widget.focusNode,
+            focusNode: _focusNode,
             autofocus: widget.autofocus,
             enabled: widget.enabled,
             style: widget.style.copyWith(fontSize: (widget.style.fontSize ?? 16)),
@@ -138,7 +140,7 @@ class _GeneralTextFieldState extends State<GeneralTextField> {
                     borderRadius: BorderRadius.all(Radius.circular(8)),
                   ),
             ),
-            onTapOutside: (event) => widget.focusNode?.unfocus(),
+            onTapOutside: (event) => _focusNode.unfocus(),
             onEditingComplete: widget.onEditingComplete,
           ),
         ),

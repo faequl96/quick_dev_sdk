@@ -5,6 +5,7 @@ export 'package:quick_dev_sdk/src/widgets/buttons/general/general_button.dart';
 export 'package:quick_dev_sdk/src/widgets/buttons/general/general_effects_button.dart';
 export 'package:quick_dev_sdk/src/widgets/basic/hovered_background.dart';
 export 'package:quick_dev_sdk/src/widgets/buttons/popup/overlay_dropdown_button.dart';
+export 'package:quick_dev_sdk/src/widgets/buttons/popup/overlay_dropdown_field.dart';
 export 'package:quick_dev_sdk/src/widgets/buttons/popup/overlay_menu_button.dart';
 export 'package:quick_dev_sdk/src/widgets/buttons/popup/overlay_popup_button.dart';
 export 'package:quick_dev_sdk/src/widgets/field/general/general_text_field.dart';

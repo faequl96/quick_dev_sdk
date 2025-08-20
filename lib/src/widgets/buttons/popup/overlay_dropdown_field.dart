@@ -1,21 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:quick_dev_sdk/quick_dev_sdk.dart';
 
-class OverlayDropdownButton<T> extends StatelessWidget {
-  const OverlayDropdownButton({
+class OverlayDropdownField extends StatefulWidget {
+  const OverlayDropdownField({
     super.key,
     this.parenContext,
-    this.width,
     this.height,
-    this.padding,
-    this.color,
-    this.hoveredColor,
-    this.splashColor,
-    this.useInitialElevation = false,
-    this.hoveredElevation,
-    this.borderRadius,
-    this.border,
-    this.clipBehavior = Clip.none,
+    this.width,
+    this.style = const TextStyle(fontSize: 16),
+    this.decoration,
     this.overlayDynamicWidth = false,
     this.overlayYOffset,
     this.overlayAlignment = OverlayAlign.center,
@@ -26,68 +19,85 @@ class OverlayDropdownButton<T> extends StatelessWidget {
     required this.dropdownItems,
     required this.dropdownItemBuilder,
     required this.onSelected,
-    required this.selectedValueBuilder,
   });
 
   final BuildContext? parenContext;
-  final double? width;
   final double? height;
-  final EdgeInsets? padding;
-  final Color? color;
-  final Color? hoveredColor;
-  final Color? splashColor;
-  final bool useInitialElevation;
-  final double? hoveredElevation;
-  final BorderRadius? borderRadius;
-  final BoxBorder? border;
-  final Clip clipBehavior;
+  final double? width;
+  final TextStyle style;
+  final FieldDecoration? decoration;
   final bool overlayDynamicWidth;
   final double? overlayYOffset;
   final OverlayAlign overlayAlignment;
   final OverlayDecoration? overlaydecoration;
   final DropdownItemDecoration? dropdownItemDecoration;
   final bool disabled;
-  final T? value;
-  final List<T> dropdownItems;
-  final Widget Function(T value) dropdownItemBuilder;
-  final void Function(T value) onSelected;
-  final Widget? Function(T? value) selectedValueBuilder;
+  final String? value;
+  final List<String> dropdownItems;
+  final Widget Function(String value) dropdownItemBuilder;
+  final void Function(String value) onSelected;
+
+  @override
+  State<OverlayDropdownField> createState() => _OverlayDropdownFieldState();
+}
+
+class _OverlayDropdownFieldState extends State<OverlayDropdownField> {
+  final _textEditingController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+
+    _textEditingController.text = widget.value ?? '';
+  }
+
+  @override
+  void didUpdateWidget(covariant OverlayDropdownField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    _textEditingController.text = widget.value ?? '';
+  }
+
+  @override
+  void dispose() {
+    _textEditingController.dispose();
+
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return OverlayPopupButton(
-      width: width,
-      height: height,
-      padding: padding,
-      color: color,
-      hoveredColor: hoveredColor,
-      splashColor: disabled ? null : splashColor,
-      useInitialElevation: useInitialElevation,
-      hoveredElevation: hoveredElevation,
-      borderRadius: borderRadius,
-      border: border,
-      clipBehavior: clipBehavior,
+      splashColor: Colors.grey.shade400,
+      borderRadius: widget.decoration?.enabledBorder.borderRadius,
       onTap: (handleShowOverlay, closeOverlay) {
-        if (disabled) return;
+        if (widget.disabled) return;
         handleShowOverlay(
-          context: parenContext ?? context,
-          dynamicWidth: overlayDynamicWidth,
-          alignment: overlayAlignment,
-          decoration: overlaydecoration?.copyWith(padding: EdgeInsets.zero),
-          yOffset: overlayYOffset,
+          context: widget.parenContext ?? context,
+          dynamicWidth: widget.overlayDynamicWidth,
+          alignment: widget.overlayAlignment,
+          decoration: widget.overlaydecoration?.copyWith(padding: EdgeInsets.zero),
+          yOffset: widget.overlayYOffset,
           contentBuilder: (_) => _Dropdowns(
-            overlayContentBorderRadius: overlaydecoration?.borderRadius ?? 0,
-            overlayPadding: overlaydecoration?.padding,
-            decoration: dropdownItemDecoration,
-            value: value,
-            items: dropdownItems,
-            dropdownItemBuilder: dropdownItemBuilder,
-            onSelected: onSelected,
+            overlayContentBorderRadius: widget.overlaydecoration?.borderRadius ?? 0,
+            overlayPadding: widget.overlaydecoration?.padding,
+            decoration: widget.dropdownItemDecoration,
+            value: widget.value,
+            items: widget.dropdownItems,
+            dropdownItemBuilder: widget.dropdownItemBuilder,
+            onSelected: widget.onSelected,
             closeOverlay: closeOverlay,
           ),
         );
       },
-      child: selectedValueBuilder(value),
+      child: GeneralTextField(
+        controller: _textEditingController,
+        height: widget.height,
+        width: widget.width,
+        enabled: false,
+        style: widget.style,
+        decoration: widget.decoration,
+      ),
     );
   }
 }
