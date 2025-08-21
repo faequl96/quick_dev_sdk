@@ -18,6 +18,7 @@ class OverlayMenuButton<T> extends StatelessWidget {
     this.clipBehavior = Clip.none,
     this.overlayDynamicWidth = false,
     this.overlayYOffset,
+    this.overlayBarrier,
     this.overlayAlignment = OverlayAlign.center,
     this.overlaydecoration,
     this.menuItemsBorderRadius = 4,
@@ -43,6 +44,7 @@ class OverlayMenuButton<T> extends StatelessWidget {
   final Clip clipBehavior;
   final bool overlayDynamicWidth;
   final double? overlayYOffset;
+  final ModalBarrier? overlayBarrier;
   final OverlayAlign overlayAlignment;
   final OverlayDecoration? overlaydecoration;
   final double menuItemsBorderRadius;
@@ -67,6 +69,7 @@ class OverlayMenuButton<T> extends StatelessWidget {
       borderRadius: borderRadius,
       border: border,
       clipBehavior: clipBehavior,
+      overlayBarrier: overlayBarrier,
       onTap: (handleShowOverlay, closeOverlay) => handleShowOverlay(
         context: parenContext ?? context,
         dynamicWidth: overlayDynamicWidth,

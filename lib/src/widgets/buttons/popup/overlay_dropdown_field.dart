@@ -11,6 +11,7 @@ class OverlayDropdownField extends StatefulWidget {
     this.decoration,
     this.overlayDynamicWidth = false,
     this.overlayYOffset,
+    this.overlayBarrier,
     this.overlayAlignment = OverlayAlign.center,
     this.overlaydecoration,
     this.dropdownItemDecoration,
@@ -28,6 +29,7 @@ class OverlayDropdownField extends StatefulWidget {
   final FieldDecoration? decoration;
   final bool overlayDynamicWidth;
   final double? overlayYOffset;
+  final ModalBarrier? overlayBarrier;
   final OverlayAlign overlayAlignment;
   final OverlayDecoration? overlaydecoration;
   final DropdownItemDecoration? dropdownItemDecoration;
@@ -70,6 +72,7 @@ class _OverlayDropdownFieldState extends State<OverlayDropdownField> {
     return OverlayPopupButton(
       splashColor: Colors.grey.shade400,
       borderRadius: widget.decoration?.enabledBorder.borderRadius,
+      overlayBarrier: widget.overlayBarrier,
       onTap: (handleShowOverlay, closeOverlay) {
         if (widget.disabled) return;
         handleShowOverlay(

@@ -21,6 +21,7 @@ class ShowOverlay {
     bool dynamicWidth = false,
     bool slideTransition = true,
     bool closeOnTapOutside = true,
+    ModalBarrier? barrier,
     double? yOffset,
     OverlayAlign alignment = OverlayAlign.center,
     OverlayDecoration? decoration,
@@ -49,6 +50,7 @@ class ShowOverlay {
       builder: (_) {
         return Stack(
           children: [
+            if (barrier != null) barrier,
             Positioned(
               width: dynamicWidth ? null : (buttonSize.width + 28),
               child: CompositedTransformFollower(

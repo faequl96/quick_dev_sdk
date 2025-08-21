@@ -16,10 +16,11 @@ class OverlayPopupButton extends StatefulWidget {
     this.border,
     this.clipBehavior = Clip.none,
     this.requestFocusOnHover = false,
+    this.closeOnUnHover = false,
+    this.closeOnTapOutside = true,
+    this.overlayBarrier,
     this.onTap,
     this.onHover,
-    this.closeOnTapOutside = true,
-    this.closeOnUnHover = false,
     this.onHoverChildBuilder,
     this.child,
   });
@@ -36,6 +37,9 @@ class OverlayPopupButton extends StatefulWidget {
   final BoxBorder? border;
   final Clip clipBehavior;
   final bool requestFocusOnHover;
+  final bool closeOnUnHover;
+  final bool closeOnTapOutside;
+  final ModalBarrier? overlayBarrier;
   final void Function(
     void Function({
       required BuildContext context,
@@ -63,8 +67,6 @@ class OverlayPopupButton extends StatefulWidget {
     handleShowOverlay,
   )?
   onHover;
-  final bool closeOnTapOutside;
-  final bool closeOnUnHover;
   final Widget Function(bool value)? onHoverChildBuilder;
   final Widget? child;
 
@@ -120,6 +122,7 @@ class _OverlayPopupButtonState extends State<OverlayPopupButton> {
             dynamicWidth: dynamicWidth,
             slideTransition: slideTransition,
             closeOnTapOutside: widget.closeOnTapOutside,
+            barrier: widget.overlayBarrier,
             yOffset: yOffset,
             alignment: alignment,
             decoration: decoration,
@@ -146,10 +149,11 @@ class _OverlayPopupButtonState extends State<OverlayPopupButton> {
                 context: context,
                 dynamicWidth: dynamicWidth,
                 slideTransition: slideTransition,
+                closeOnTapOutside: widget.closeOnTapOutside,
+                barrier: widget.overlayBarrier,
                 yOffset: yOffset,
                 alignment: alignment,
                 decoration: decoration,
-                closeOnTapOutside: widget.closeOnTapOutside,
                 onHoverInside: (value) {
                   if (widget.closeOnUnHover) _onHoverContentInside(value);
                 },
