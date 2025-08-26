@@ -5,8 +5,9 @@ class HeaderAction extends StatelessWidget {
     super.key,
     required this.actionIcon,
     this.iconSize = 28,
-    this.onHoverBackgroundColor,
+    this.iconColor,
     this.onHoverIconColor,
+    this.onHoverBackgroundColor,
     required this.onTap,
   });
 
@@ -16,8 +17,9 @@ class HeaderAction extends StatelessWidget {
 
   final IconData actionIcon;
   final double iconSize;
-  final Color? onHoverBackgroundColor;
+  final Color? iconColor;
   final Color? onHoverIconColor;
+  final Color? onHoverBackgroundColor;
   final void Function() onTap;
 
   @override
@@ -38,7 +40,7 @@ class HeaderAction extends StatelessWidget {
       borderRadius: BorderRadius.circular((iconSize + 4) / 2),
       hoveredColor: onHoverBackgroundColor ?? Colors.grey.shade200,
       splashColor: Colors.grey.shade200,
-      onHoverChildBuilder: (value) => Icon(actionIcon, size: iconSize, color: value ? onHoverIconColor : null),
+      onHoverChildBuilder: (value) => Icon(actionIcon, size: iconSize, color: value ? onHoverIconColor : iconColor),
     );
   }
 }
