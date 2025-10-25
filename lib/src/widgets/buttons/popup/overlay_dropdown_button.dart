@@ -122,24 +122,31 @@ class _Dropdowns<T> extends StatefulWidget {
 
 class _DropdownsState<T> extends State<_Dropdowns<T>> {
   final _listViewKey = GlobalKey();
-  double? _listViewHeight;
+  final _listViewHeight = ValueNotifier<double?>(null);
 
   @override
   void initState() {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _listViewHeight = (_listViewKey.currentContext?.size?.height ?? 0);
-      setState(() {});
+      _listViewHeight.value = (_listViewKey.currentContext?.size?.height ?? 0);
     });
+  }
+
+  @override
+  void dispose() {
+    _listViewHeight.dispose();
+
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(widget.overlayContentBorderRadius),
-      child: SizedBox(
-        height: _listViewHeight,
+      child: ValueListenableBuilder(
+        valueListenable: _listViewHeight,
+        builder: (_, value, child) => SizedBox(height: value, child: child ?? const SizedBox.shrink()),
         child: ListView.builder(
           key: _listViewKey,
           padding: widget.overlayPadding,

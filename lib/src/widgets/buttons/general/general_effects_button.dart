@@ -62,6 +62,7 @@ class _GeneralEffectsButtonState extends State<GeneralEffectsButton> {
       useInitialElevation: widget.useInitialElevation,
       hoveredElevation: widget.hoveredElevation,
       borderRadius: widget.borderRadius,
+      clipBehavior: widget.clipBehavior,
       rebuild: (onHover) => _onHoverParent = onHover,
       child: InkWell(
         onTap: widget.isDisabled ? () {} : () => widget.onTap(),
@@ -109,6 +110,7 @@ class _ExtendedStyle extends StatefulWidget {
     this.useInitialElevation = false,
     this.hoveredElevation,
     this.borderRadius,
+    required this.clipBehavior,
     this.rebuild,
     this.child,
   });
@@ -117,6 +119,7 @@ class _ExtendedStyle extends StatefulWidget {
   final bool useInitialElevation;
   final double? hoveredElevation;
   final BorderRadius? borderRadius;
+  final Clip clipBehavior;
   final void Function(void Function(bool value) onHover)? rebuild;
   final Widget? child;
 
@@ -148,7 +151,7 @@ class _ExtendedStyleState extends State<_ExtendedStyle> {
       color: widget.color ?? Colors.transparent,
       elevation: _elevation(),
       borderRadius: widget.borderRadius,
-      clipBehavior: Clip.none,
+      clipBehavior: widget.clipBehavior,
       child: widget.child,
     );
   }

@@ -183,3 +183,12 @@ class DropdownItemDecoration {
   final Color? splashColor;
   final double borderRadius;
 }
+
+class MenuItemDecoration {
+  const MenuItemDecoration({this.padding, this.hoveredColor, this.splashColor, this.borderRadius = 0});
+
+  final EdgeInsets? padding;
+  final Color? hoveredColor;
+  final Color? splashColor;
+  final double borderRadius;
+}

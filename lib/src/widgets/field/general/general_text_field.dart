@@ -46,7 +46,8 @@ class _GeneralTextFieldState extends State<GeneralTextField> {
   late final FocusNode _focusNode;
 
   Widget? _validateMessage;
-  PreSufFixIcon? _suffixIcon;
+  List<PreSufFixIcon> _prefixIcon = [];
+  List<PreSufFixIcon> _suffixIcon = [];
 
   String _lastText = '';
 
@@ -55,7 +56,8 @@ class _GeneralTextFieldState extends State<GeneralTextField> {
       _lastText = widget.controller.text;
 
       widget.onChanged?.call(widget.controller.text);
-      _suffixIcon = widget.decoration?.suffixIcon?.call();
+      _prefixIcon = widget.decoration?.prefixIcons?.call() ?? [];
+      _suffixIcon = widget.decoration?.suffixIcons?.call() ?? [];
       final validate = widget.validator?.call(widget.controller.text);
       if (validate?.isSuccess != true) {
         setState(() => _validateMessage = validate?.message);
@@ -71,22 +73,24 @@ class _GeneralTextFieldState extends State<GeneralTextField> {
 
     _focusNode = widget.focusNode ?? FocusNode();
 
-    _suffixIcon = widget.decoration?.suffixIcon?.call();
+    _prefixIcon = widget.decoration?.prefixIcons?.call() ?? [];
+    _suffixIcon = widget.decoration?.suffixIcons?.call() ?? [];
     widget.controller.addListener(_onChangeListener);
   }
 
   @override
   void dispose() {
     widget.controller.removeListener(_onChangeListener);
+    if (widget.focusNode == null) _focusNode.dispose();
 
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final usePrefixIcon = widget.decoration?.prefixIcon != null;
+    final usePrefixIcon = _prefixIcon.isNotEmpty;
     final useSuffixIcon =
-        widget.decoration?.suffixIcon != null &&
+        _suffixIcon.isNotEmpty &&
         (widget.decoration?.hideSuffixIconOnEmpty == false ||
             (widget.decoration?.hideSuffixIconOnEmpty == true && widget.controller.text.isNotEmpty));
     return Column(
@@ -113,7 +117,7 @@ class _GeneralTextFieldState extends State<GeneralTextField> {
               floatingLabelBehavior: widget.decoration?.floatingLabelBehavior,
               hintText: widget.decoration?.hintText,
               hintStyle: widget.decoration?.hintStyle,
-              prefixIcon: usePrefixIcon ? _preSuffix(widget.decoration?.prefixIcon) : null,
+              prefixIcon: usePrefixIcon ? _preSuffix(_prefixIcon) : null,
               suffixIcon: useSuffixIcon ? _preSuffix(_suffixIcon) : null,
               filled: widget.decoration?.filled,
               fillColor: widget.decoration?.fillColor,
@@ -158,22 +162,33 @@ class _GeneralTextFieldState extends State<GeneralTextField> {
     );
   }
 
-  Widget _preSuffix(PreSufFixIcon? preSuffixIcon) {
-    return Padding(
-      padding: EdgeInsets.only(left: 8, right: widget.decoration?.contentHorizontalPadding ?? 12),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          GeneralEffectsButton(
-            onTap: () => preSuffixIcon?.onTap.call(),
-            padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
-            color: preSuffixIcon?.backgroundColor,
-            hoveredColor: preSuffixIcon?.hoveredColor,
-            splashColor: preSuffixIcon?.splashColor,
-            borderRadius: BorderRadius.circular(40),
-            child: preSuffixIcon?.child,
-          ),
-        ],
+  Widget _preSuffix(List<PreSufFixIcon> preSuffixIcons) {
+    return SizedBox(
+      height: (widget.maxLines ?? 1) > 1 ? (widget.maxLines ?? 1) * 24 : null,
+      child: Padding(
+        padding: EdgeInsets.only(left: 8, right: widget.decoration?.contentHorizontalPadding ?? 12),
+        child: Column(
+          mainAxisAlignment: (widget.maxLines ?? 1) > 1 ? MainAxisAlignment.start : MainAxisAlignment.center,
+          children: [
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                for (int i = 0; i < preSuffixIcons.length; i++) ...[
+                  if (i != 0) const SizedBox(width: 6),
+                  GeneralEffectsButton(
+                    onTap: () => preSuffixIcons[i].onTap.call(),
+                    padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+                    color: preSuffixIcons[i].backgroundColor,
+                    hoveredColor: preSuffixIcons[i].hoveredColor,
+                    splashColor: preSuffixIcons[i].splashColor,
+                    borderRadius: BorderRadius.circular(40),
+                    child: preSuffixIcons[i].child,
+                  ),
+                ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -183,8 +198,8 @@ class FieldDecoration {
   FieldDecoration({
     this.contentVerticalPadding = 0,
     this.contentHorizontalPadding = 12,
-    this.prefixIcon,
-    this.suffixIcon,
+    this.prefixIcons,
+    this.suffixIcons,
     this.hideSuffixIconOnEmpty = false,
     this.enabledBorder = const OutlineInputBorder(
       borderSide: BorderSide(color: Colors.black26, width: 1),
@@ -211,8 +226,8 @@ class FieldDecoration {
 
   final double contentVerticalPadding;
   final double contentHorizontalPadding;
-  final PreSufFixIcon? prefixIcon;
-  final PreSufFixIcon? Function()? suffixIcon;
+  final List<PreSufFixIcon> Function()? prefixIcons;
+  final List<PreSufFixIcon> Function()? suffixIcons;
   final bool hideSuffixIconOnEmpty;
   final OutlineInputBorder enabledBorder;
   final OutlineInputBorder disabledBorder;

@@ -13,7 +13,7 @@ class BottomSheetHeader extends StatelessWidget {
       children: [
         if (useHandleBar == true)
           SizedBox(
-            height: 16 + 4 + (action?.iconSize ?? 4),
+            height: 16 + 4 + (action?.iconSize ?? 12),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -29,7 +29,7 @@ class BottomSheetHeader extends StatelessWidget {
             ),
           )
         else
-          SizedBox(height: 16 + 4 + (action?.iconSize ?? 4), width: double.maxFinite),
+          SizedBox(height: 16 + 4 + (action?.iconSize ?? 12), width: double.maxFinite),
         if (action != null) Positioned(top: 8, right: 14, child: action!),
       ],
     );

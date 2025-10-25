@@ -17,6 +17,7 @@ class OverlayDropdownField extends StatefulWidget {
     this.dropdownItemDecoration,
     this.disabled = false,
     required this.value,
+    this.valueDisplay,
     required this.dropdownItems,
     required this.dropdownItemBuilder,
     required this.onSelected,
@@ -35,6 +36,7 @@ class OverlayDropdownField extends StatefulWidget {
   final DropdownItemDecoration? dropdownItemDecoration;
   final bool disabled;
   final String? value;
+  final String? valueDisplay;
   final List<String> dropdownItems;
   final Widget Function(String value) dropdownItemBuilder;
   final void Function(String value) onSelected;
@@ -50,14 +52,14 @@ class _OverlayDropdownFieldState extends State<OverlayDropdownField> {
   void initState() {
     super.initState();
 
-    _textEditingController.text = widget.value ?? '';
+    _textEditingController.text = widget.valueDisplay ?? widget.value ?? '';
   }
 
   @override
   void didUpdateWidget(covariant OverlayDropdownField oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    _textEditingController.text = widget.value ?? '';
+    _textEditingController.text = widget.valueDisplay ?? widget.value ?? '';
   }
 
   @override
@@ -132,24 +134,31 @@ class _Dropdowns<T> extends StatefulWidget {
 
 class _DropdownsState<T> extends State<_Dropdowns<T>> {
   final _listViewKey = GlobalKey();
-  double? _listViewHeight;
+  final _listViewHeight = ValueNotifier<double?>(null);
 
   @override
   void initState() {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _listViewHeight = (_listViewKey.currentContext?.size?.height ?? 0);
-      setState(() {});
+      _listViewHeight.value = (_listViewKey.currentContext?.size?.height ?? 0);
     });
+  }
+
+  @override
+  void dispose() {
+    _listViewHeight.dispose();
+
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(widget.overlayContentBorderRadius),
-      child: SizedBox(
-        height: _listViewHeight,
+      child: ValueListenableBuilder(
+        valueListenable: _listViewHeight,
+        builder: (_, value, child) => SizedBox(height: value, child: child ?? const SizedBox.shrink()),
         child: ListView.builder(
           key: _listViewKey,
           padding: widget.overlayPadding,
