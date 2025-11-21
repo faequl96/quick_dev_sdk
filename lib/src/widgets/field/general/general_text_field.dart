@@ -114,6 +114,7 @@ class _GeneralTextFieldState extends State<GeneralTextField> {
             decoration: InputDecoration(
               labelText: widget.decoration?.labelText,
               labelStyle: widget.decoration?.labelStyle,
+              // floatingLabelStyle: widget.decoration?.labelStyle,
               floatingLabelBehavior: widget.decoration?.floatingLabelBehavior,
               hintText: widget.decoration?.hintText,
               hintStyle: widget.decoration?.hintStyle,
@@ -121,6 +122,7 @@ class _GeneralTextFieldState extends State<GeneralTextField> {
               suffixIcon: useSuffixIcon ? _preSuffix(_suffixIcon) : null,
               filled: widget.decoration?.filled,
               fillColor: widget.decoration?.fillColor,
+              counterText: '',
               contentPadding: EdgeInsets.symmetric(
                 horizontal: widget.decoration?.contentHorizontalPadding ?? 12,
                 vertical: widget.height != null ? 0 : 16 + (widget.decoration?.contentVerticalPadding ?? 0),
