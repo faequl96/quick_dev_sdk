@@ -28,7 +28,6 @@ class GeneralDatePicker extends StatefulWidget {
     this.currentDate,
     this.holidays = const [],
     required this.onDateChanged,
-    this.onDisplayedMonthChanged,
     this.initialCalendarMode = DatePickerMode.day,
     this.selectableDayPredicate,
   });
@@ -39,7 +38,6 @@ class GeneralDatePicker extends StatefulWidget {
   final DateTime? currentDate;
   final List<Holiday> holidays;
   final ValueChanged<DateTime> onDateChanged;
-  final ValueChanged<DateTime>? onDisplayedMonthChanged;
   final DatePickerMode initialCalendarMode;
   final SelectableDayPredicate? selectableDayPredicate;
 
@@ -48,32 +46,26 @@ class GeneralDatePicker extends StatefulWidget {
 }
 
 class _GeneralDatePickerState extends State<GeneralDatePicker> {
-  bool _announcedInitialDate = false;
   late DatePickerMode _mode;
   late DateTime _currentDisplayedMonthDate;
   late DateTime? _selectedDate;
   final GlobalKey _monthPickerKey = GlobalKey();
   final GlobalKey _yearPickerKey = GlobalKey();
   late MaterialLocalizations _localizations;
-  late TextDirection _textDirection;
   List<Holiday> _filteredMounthHoliday = [];
 
   @override
   void initState() {
     super.initState();
     _mode = widget.initialCalendarMode;
-    // _currentDisplayedMonthDate =
-    //     DateTime(widget.initialDate.year, widget.initialDate.month);
     _currentDisplayedMonthDate = widget.initialDate ?? DateTime.now();
     _selectedDate = widget.initialDate;
 
-    _filteredMounthHoliday = widget.holidays
-        .where(
-          (element) =>
-              DateTime(element.date.year, element.date.month) ==
-              DateTime(_currentDisplayedMonthDate.year, _currentDisplayedMonthDate.month),
-        )
-        .toList();
+    _filteredMounthHoliday = widget.holidays.where((element) {
+      final eDateTime = DateTime(element.date.year, element.date.month);
+      final cDateTime = DateTime(_currentDisplayedMonthDate.year, _currentDisplayedMonthDate.month);
+      return eDateTime == cDateTime;
+    }).toList();
   }
 
   @override
@@ -83,25 +75,8 @@ class _GeneralDatePickerState extends State<GeneralDatePicker> {
       _mode = widget.initialCalendarMode;
     }
     if (!DateUtils.isSameDay(widget.initialDate, oldWidget.initialDate)) {
-      // _currentDisplayedMonthDate =
-      //     DateTime(widget.initialDate.year, widget.initialDate.month);
-      // _currentDisplayedMonthDate = DateTime(2024, 2);
       _currentDisplayedMonthDate = widget.initialDate ?? DateTime.now();
       _selectedDate = widget.initialDate;
-    }
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    assert(debugCheckHasMaterial(context));
-    assert(debugCheckHasMaterialLocalizations(context));
-    assert(debugCheckHasDirectionality(context));
-    _localizations = MaterialLocalizations.of(context);
-    _textDirection = Directionality.of(context);
-    if (!_announcedInitialDate) {
-      _announcedInitialDate = true;
-      SemanticsService.announce(_localizations.formatFullDate(_selectedDate ?? DateTime.now()), _textDirection);
     }
   }
 
@@ -123,11 +98,6 @@ class _GeneralDatePickerState extends State<GeneralDatePicker> {
     _vibrate();
     setState(() {
       _mode = mode;
-      if (_mode == DatePickerMode.day) {
-        SemanticsService.announce(_localizations.formatMonthYear(_selectedDate ?? DateTime.now()), _textDirection);
-      } else {
-        SemanticsService.announce(_localizations.formatYear(_selectedDate ?? DateTime.now()), _textDirection);
-      }
     });
   }
 
@@ -135,15 +105,11 @@ class _GeneralDatePickerState extends State<GeneralDatePicker> {
     setState(() {
       if (_currentDisplayedMonthDate.year != date.year || _currentDisplayedMonthDate.month != date.month) {
         _currentDisplayedMonthDate = DateTime(date.year, date.month);
-        widget.onDisplayedMonthChanged?.call(_currentDisplayedMonthDate);
-
-        _filteredMounthHoliday = widget.holidays
-            .where(
-              (element) =>
-                  DateTime(element.date.year, element.date.month) ==
-                  DateTime(_currentDisplayedMonthDate.year, _currentDisplayedMonthDate.month),
-            )
-            .toList();
+        _filteredMounthHoliday = widget.holidays.where((element) {
+          final eDateTime = DateTime(element.date.year, element.date.month);
+          final cDateTime = DateTime(_currentDisplayedMonthDate.year, _currentDisplayedMonthDate.month);
+          return eDateTime == cDateTime;
+        }).toList();
       }
     });
   }
@@ -204,9 +170,6 @@ class _GeneralDatePickerState extends State<GeneralDatePicker> {
 
   @override
   Widget build(BuildContext context) {
-    assert(debugCheckHasMaterial(context));
-    assert(debugCheckHasMaterialLocalizations(context));
-    assert(debugCheckHasDirectionality(context));
     return Stack(
       children: [
         Column(
@@ -291,16 +254,13 @@ class _DatePickerModeToggleButtonState extends State<_DatePickerModeToggleButton
     final TextTheme textTheme = Theme.of(context).textTheme;
     final Color controlColor = colorScheme.onSurface.withValues(alpha: 0.60);
 
-    return Container(
-      padding: const EdgeInsetsDirectional.only(start: 16, end: 4),
+    return SizedBox(
       height: _subHeaderHeight,
-      child: Row(
-        children: <Widget>[
-          Flexible(
-            child: Semantics(
-              label: MaterialLocalizations.of(context).selectYearSemanticsLabel,
-              excludeSemantics: true,
-              button: true,
+      child: Padding(
+        padding: const EdgeInsetsDirectional.only(start: 16, end: 4),
+        child: Row(
+          children: [
+            Flexible(
               child: SizedBox(
                 height: _subHeaderHeight,
                 child: InkWell(
@@ -326,9 +286,9 @@ class _DatePickerModeToggleButtonState extends State<_DatePickerModeToggleButton
                 ),
               ),
             ),
-          ),
-          if (widget.mode == DatePickerMode.day) const SizedBox(width: _monthNavButtonsWidth),
-        ],
+            if (widget.mode == DatePickerMode.day) const SizedBox(width: _monthNavButtonsWidth),
+          ],
+        ),
       ),
     );
   }
@@ -373,7 +333,6 @@ class _MonthPickerState extends State<_MonthPicker> {
   late DateTime _currentMonth;
   late PageController _pageController;
   late MaterialLocalizations _localizations;
-  late TextDirection _textDirection;
   Map<ShortcutActivator, Intent>? _shortcutMap;
   Map<Type, Action<Intent>>? _actionMap;
   late FocusNode _dayGridFocus;
@@ -402,7 +361,6 @@ class _MonthPickerState extends State<_MonthPicker> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     _localizations = MaterialLocalizations.of(context);
-    _textDirection = Directionality.of(context);
   }
 
   @override
@@ -434,7 +392,6 @@ class _MonthPickerState extends State<_MonthPicker> {
         if (_focusedDay != null && !DateUtils.isSameMonth(_focusedDay, _currentMonth)) {
           _focusedDay = _focusableDayForMonth(_currentMonth, _focusedDay!.day);
         }
-        SemanticsService.announce(_localizations.formatMonthYear(_currentMonth), _textDirection);
       }
     });
   }
@@ -577,51 +534,49 @@ class _MonthPickerState extends State<_MonthPicker> {
   Widget build(BuildContext context) {
     final Color controlColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.60);
 
-    return Semantics(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            padding: const EdgeInsetsDirectional.only(start: 16, end: 4),
-            height: _subHeaderHeight,
-            child: Row(
-              children: <Widget>[
-                const Spacer(),
-                IconButton(
-                  icon: const Icon(Icons.chevron_left),
-                  color: controlColor,
-                  tooltip: _isDisplayingFirstMonth ? null : _localizations.previousMonthTooltip,
-                  onPressed: _isDisplayingFirstMonth ? null : _handlePreviousMonth,
-                ),
-                IconButton(
-                  icon: const Icon(Icons.chevron_right),
-                  color: controlColor,
-                  tooltip: _isDisplayingLastMonth ? null : _localizations.nextMonthTooltip,
-                  onPressed: _isDisplayingLastMonth ? null : _handleNextMonth,
-                ),
-              ],
-            ),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          padding: const EdgeInsetsDirectional.only(start: 16, end: 4),
+          height: _subHeaderHeight,
+          child: Row(
+            children: [
+              const Spacer(),
+              IconButton(
+                icon: const Icon(Icons.chevron_left),
+                color: controlColor,
+                tooltip: _isDisplayingFirstMonth ? null : _localizations.previousMonthTooltip,
+                onPressed: _isDisplayingFirstMonth ? null : _handlePreviousMonth,
+              ),
+              IconButton(
+                icon: const Icon(Icons.chevron_right),
+                color: controlColor,
+                tooltip: _isDisplayingLastMonth ? null : _localizations.nextMonthTooltip,
+                onPressed: _isDisplayingLastMonth ? null : _handleNextMonth,
+              ),
+            ],
           ),
-          Flexible(
-            child: FocusableActionDetector(
-              shortcuts: _shortcutMap,
-              actions: _actionMap,
-              focusNode: _dayGridFocus,
-              onFocusChange: _handleGridFocusChange,
-              child: _FocusedDate(
-                date: _dayGridFocus.hasFocus ? _focusedDay : null,
-                child: PageView.builder(
-                  key: _pageViewKey,
-                  controller: _pageController,
-                  itemBuilder: _buildItems,
-                  itemCount: DateUtils.monthDelta(widget.firstDate, widget.lastDate) + 1,
-                  onPageChanged: _handleMonthPageChanged,
-                ),
+        ),
+        Flexible(
+          child: FocusableActionDetector(
+            shortcuts: _shortcutMap,
+            actions: _actionMap,
+            focusNode: _dayGridFocus,
+            onFocusChange: _handleGridFocusChange,
+            child: _FocusedDate(
+              date: _dayGridFocus.hasFocus ? _focusedDay : null,
+              child: PageView.builder(
+                key: _pageViewKey,
+                controller: _pageController,
+                itemBuilder: _buildItems,
+                itemCount: DateUtils.monthDelta(widget.firstDate, widget.lastDate) + 1,
+                onPageChanged: _handleMonthPageChanged,
               ),
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
