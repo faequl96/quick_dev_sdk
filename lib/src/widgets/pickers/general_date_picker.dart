@@ -69,6 +69,12 @@ class _GeneralDatePickerState extends State<GeneralDatePicker> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _localizations = MaterialLocalizations.of(context);
+  }
+
+  @override
   void didUpdateWidget(GeneralDatePicker oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.initialCalendarMode != oldWidget.initialCalendarMode) {
