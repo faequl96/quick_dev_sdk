@@ -191,11 +191,17 @@ class _MainContentState<T> extends State<_MainContent<T>> {
         duration: widget.debouncer,
         callBack: () {
           widget.suggestions(keywords).then((value) {
-            _suggestions = value;
+            _suggestions = [...value];
             WidgetsBinding.instance.addPostFrameCallback((_) {
               _isLoading = false;
               if (_isDispose == false) setState(() {});
             });
+          });
+        },
+        onEmptyKeywords: () {
+          widget.suggestions(keywords).then((value) {
+            _suggestions = [...value];
+            if (_isDispose == false) setState(() {});
           });
         },
       );

@@ -5,6 +5,7 @@ class BottomSheetDecoration {
     this.height,
     this.constraints,
     this.color,
+    this.backgroundContentColor,
     this.borderSide = BorderSide.none,
     this.borderRadius = const BorderRadius.only(topLeft: Radius.circular(10), topRight: Radius.circular(10)),
     this.clipBehavior = Clip.hardEdge,
@@ -17,12 +18,14 @@ class BottomSheetDecoration {
     this.clipBehavior = Clip.none,
   }) : height = null,
        constraints = null,
-       draggable = true;
+       draggable = true,
+       backgroundContentColor = null;
 
   final bool draggable;
   final double? height;
   final BoxConstraints? constraints;
   final Color? color;
+  final Color? backgroundContentColor;
   final BorderSide borderSide;
   final BorderRadius borderRadius;
   final Clip clipBehavior;

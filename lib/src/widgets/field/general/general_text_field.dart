@@ -71,6 +71,8 @@ class _GeneralTextFieldState extends State<GeneralTextField> {
   void initState() {
     super.initState();
 
+    _lastText = widget.controller.text;
+
     _focusNode = widget.focusNode ?? FocusNode();
 
     _prefixIcon = widget.decoration?.prefixIcons?.call() ?? [];

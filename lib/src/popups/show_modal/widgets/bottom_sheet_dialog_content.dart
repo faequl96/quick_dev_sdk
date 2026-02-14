@@ -39,7 +39,24 @@ class BottomSheetDialogContent extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     if (header != null) header!,
-                    Flexible(child: contentBuilder(context)),
+                    Flexible(
+                      child: decoration?.backgroundContentColor != null
+                          ? DecoratedBox(
+                              decoration: BoxDecoration(
+                                color: decoration?.backgroundContentColor,
+                                boxShadow: [
+                                  BoxShadow(
+                                    offset: const Offset(0, -3),
+                                    color: Colors.black.withValues(alpha: .08),
+                                    blurRadius: 3,
+                                  ),
+                                ],
+                                borderRadius: decoration?.borderRadius,
+                              ),
+                              child: contentBuilder(context),
+                            )
+                          : contentBuilder(context),
+                    ),
                   ],
                 ),
               ),

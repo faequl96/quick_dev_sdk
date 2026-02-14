@@ -10,6 +10,7 @@ part 'models.dart';
 part 'widgets/bottom_sheet_header.dart';
 part 'widgets/dialog_header.dart';
 part 'widgets/header_action.dart';
+part 'widgets/header_title.dart';
 
 class ShowModal {
   ShowModal._();
