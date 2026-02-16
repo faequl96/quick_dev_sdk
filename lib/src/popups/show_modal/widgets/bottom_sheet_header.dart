@@ -9,7 +9,7 @@ class BottomSheetHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Stack(
-      alignment: AlignmentGeometry.centerRight,
+      alignment: .centerRight,
       children: [
         title ?? const SizedBox(width: .maxFinite),
         if (action != null) Padding(padding: const .symmetric(vertical: 8, horizontal: 16), child: action!),

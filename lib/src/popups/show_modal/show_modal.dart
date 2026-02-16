@@ -33,8 +33,7 @@ class ShowModal {
       barrierColor: barrierColor,
       shape: RoundedRectangleBorder(
         side: decoration?.borderSide ?? BorderSide.none,
-        borderRadius:
-            decoration?.borderRadius ?? const BorderRadius.only(topLeft: Radius.circular(10), topRight: Radius.circular(10)),
+        borderRadius: decoration?.borderRadius ?? const .only(topLeft: .circular(10), topRight: .circular(10)),
       ),
       isDismissible: dismissible,
       isScrollControlled: true,
@@ -44,7 +43,6 @@ class ShowModal {
       builder: (_) {
         if (decoration?.draggable == true) {
           return DraggableBottomSheetDialogContent(
-            parentContext: context,
             decoration: decoration,
             wallpapers: wallpapers,
             header: header,
@@ -52,7 +50,6 @@ class ShowModal {
           );
         }
         return BottomSheetDialogContent(
-          parentContext: context,
           decoration: decoration,
           wallpapers: wallpapers,
           header: header,
@@ -83,7 +80,7 @@ class ShowModal {
       elevation: decoration?.elevation ?? 24,
       shape: RoundedRectangleBorder(
         side: decoration?.borderSide ?? BorderSide.none,
-        borderRadius: decoration?.borderRadius ?? BorderRadius.circular(10.0),
+        borderRadius: decoration?.borderRadius ?? .circular(10.0),
       ),
       child: Stack(
         children: [
@@ -133,7 +130,7 @@ class ShowModal {
         position: const Position(top: -140, left: -184),
         child: DecoratedBox(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(150),
+            borderRadius: .circular(150),
             color: isError == true ? Colors.red.shade50 : Colors.blue.shade50,
           ),
         ),
@@ -143,7 +140,7 @@ class ShowModal {
         width: 110,
         position: const Position(top: -36, right: -28),
         child: DecoratedBox(
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(55), color: Colors.amber.shade100),
+          decoration: BoxDecoration(borderRadius: .circular(55), color: Colors.amber.shade100),
         ),
       ),
     ];

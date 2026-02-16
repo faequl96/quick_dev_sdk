@@ -125,7 +125,7 @@ class _GeneralTextFieldState extends State<GeneralTextField> {
               filled: widget.decoration?.filled,
               fillColor: widget.decoration?.fillColor,
               counterText: '',
-              contentPadding: EdgeInsets.symmetric(
+              contentPadding: .symmetric(
                 horizontal: widget.decoration?.contentHorizontalPadding ?? 12,
                 vertical: widget.height != null ? 0 : 16 + (widget.decoration?.contentVerticalPadding ?? 0),
               ),
@@ -133,19 +133,19 @@ class _GeneralTextFieldState extends State<GeneralTextField> {
                   widget.decoration?.enabledBorder ??
                   const OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.black26),
-                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                    borderRadius: .all(.circular(8)),
                   ),
               disabledBorder:
                   widget.decoration?.disabledBorder ??
                   const OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.black26),
-                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                    borderRadius: .all(.circular(8)),
                   ),
               focusedBorder:
                   widget.decoration?.focusedBorder ??
                   const OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.black26),
-                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                    borderRadius: .all(.circular(8)),
                   ),
             ),
             onTapOutside: (event) => _focusNode.unfocus(),
@@ -170,22 +170,22 @@ class _GeneralTextFieldState extends State<GeneralTextField> {
     return SizedBox(
       height: (widget.maxLines ?? 1) > 1 ? (widget.maxLines ?? 1) * 24 : null,
       child: Padding(
-        padding: EdgeInsets.only(left: 8, right: widget.decoration?.contentHorizontalPadding ?? 12),
+        padding: .only(left: 8, right: widget.decoration?.contentHorizontalPadding ?? 12),
         child: Column(
-          mainAxisAlignment: (widget.maxLines ?? 1) > 1 ? MainAxisAlignment.start : MainAxisAlignment.center,
+          mainAxisAlignment: (widget.maxLines ?? 1) > 1 ? .start : .center,
           children: [
             Row(
-              mainAxisSize: MainAxisSize.min,
+              mainAxisSize: .min,
               children: [
                 for (int i = 0; i < preSuffixIcons.length; i++) ...[
                   if (i != 0) const SizedBox(width: 6),
                   GeneralEffectsButton(
                     onTap: () => preSuffixIcons[i].onTap.call(),
-                    padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+                    padding: const .symmetric(horizontal: 2, vertical: 2),
                     color: preSuffixIcons[i].backgroundColor,
                     hoveredColor: preSuffixIcons[i].hoveredColor,
                     splashColor: preSuffixIcons[i].splashColor,
-                    borderRadius: BorderRadius.circular(40),
+                    borderRadius: .circular(40),
                     child: preSuffixIcons[i].child,
                   ),
                 ],
@@ -207,15 +207,15 @@ class FieldDecoration {
     this.hideSuffixIconOnEmpty = false,
     this.enabledBorder = const OutlineInputBorder(
       borderSide: BorderSide(color: Colors.black26, width: 1),
-      borderRadius: BorderRadius.all(Radius.circular(8)),
+      borderRadius: .all(.circular(8)),
     ),
     this.disabledBorder = const OutlineInputBorder(
       borderSide: BorderSide(color: Colors.black26, width: 1),
-      borderRadius: BorderRadius.all(Radius.circular(8)),
+      borderRadius: .all(.circular(8)),
     ),
     this.focusedBorder = const OutlineInputBorder(
       borderSide: BorderSide(color: Colors.black26, width: 1),
-      borderRadius: BorderRadius.all(Radius.circular(8)),
+      borderRadius: .all(.circular(8)),
     ),
     this.labelText,
     this.labelStyle,

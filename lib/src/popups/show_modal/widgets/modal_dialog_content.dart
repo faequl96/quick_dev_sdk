@@ -44,12 +44,12 @@ class _ModalDialogContentState extends State<ModalDialogContent> {
       width: widget.width,
       height: widget.height,
       child: Column(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisSize: .min,
         children: [
           if (widget.width == null) ...[
             if (widget.header != null && childWidth != 0) SizedBox(width: childWidth, child: widget.header),
           ] else ...[
-            if (widget.header != null) SizedBox(width: double.maxFinite, child: widget.header!),
+            if (widget.header != null) SizedBox(width: .maxFinite, child: widget.header!),
           ],
           Flexible(
             child: ConstrainedBox(

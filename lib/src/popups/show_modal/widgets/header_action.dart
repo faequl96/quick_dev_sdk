@@ -26,7 +26,7 @@ class HeaderAction extends StatelessWidget {
   Widget build(BuildContext context) {
     if (actionIcon == Icons.circle_outlined) {
       return Padding(
-        padding: const EdgeInsets.all(2),
+        padding: const .all(2),
         child: SizedBox(
           width: iconSize,
           height: iconSize,
@@ -36,8 +36,8 @@ class HeaderAction extends StatelessWidget {
     }
     return GeneralEffectsButton(
       onTap: () => onTap(),
-      padding: const EdgeInsets.all(2),
-      borderRadius: BorderRadius.circular((iconSize + 4) / 2),
+      padding: const .all(2),
+      borderRadius: .circular((iconSize + 4) / 2),
       hoveredColor: onHoverBackgroundColor ?? Colors.grey.shade200,
       splashColor: Colors.grey.shade200,
       onHoverChildBuilder: (value) => Icon(actionIcon, size: iconSize, color: value ? onHoverIconColor : iconColor),

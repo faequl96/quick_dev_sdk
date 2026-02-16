@@ -257,11 +257,11 @@ class _MainContentState<T> extends State<_MainContent<T>> {
 
   Widget _defaultCardStyle(Widget content) {
     return CardContainer(
-      width: double.maxFinite,
+      width: .maxFinite,
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
       color: widget.decoration?.color ?? Colors.white,
       borderRadius: widget.decoration?.borderRadius ?? 8,
-      border: widget.decoration?.border ?? const Border.fromBorderSide(BorderSide(color: Color.fromARGB(255, 224, 224, 224))),
+      border: widget.decoration?.border ?? const .fromBorderSide(BorderSide(color: Color.fromARGB(255, 224, 224, 224))),
       boxShadow: widget.decoration?.boxShadow ?? const BoxShadow(offset: Offset(0, 3), blurRadius: 2, color: Colors.black12),
       child: content,
     );
@@ -315,12 +315,12 @@ class _SuggestionsState<T> extends State<_Suggestions<T>> {
       builder: (_, value, child) {
         return CardContainer(
           height: value,
-          width: double.maxFinite,
+          width: .maxFinite,
           color: widget.decoration?.color ?? Colors.white,
           borderRadius: widget.decoration?.borderRadius ?? 8,
-          border: widget.decoration?.border ?? const Border.fromBorderSide(BorderSide(color: Color.fromARGB(255, 224, 224, 224))),
+          border: widget.decoration?.border ?? const .fromBorderSide(BorderSide(color: Color.fromARGB(255, 224, 224, 224))),
           boxShadow: widget.decoration?.boxShadow ?? const BoxShadow(offset: Offset(0, 3), blurRadius: 2, color: Colors.black12),
-          clipBehavior: widget.decoration?.clipBehavior ?? Clip.none,
+          clipBehavior: widget.decoration?.clipBehavior ?? .none,
           child: child ?? const SizedBox.shrink(),
         );
       },
@@ -333,7 +333,7 @@ class _SuggestionsState<T> extends State<_Suggestions<T>> {
         itemBuilder: (context, index) => GeneralEffectsButton(
           onTap: () => widget.onSelected(widget.suggestions[index]),
           padding: widget.suggestionItemDecoration?.padding,
-          borderRadius: BorderRadius.circular(widget.suggestionItemDecoration?.borderRadius ?? 0),
+          borderRadius: .circular(widget.suggestionItemDecoration?.borderRadius ?? 0),
           color: index % 2 == 1
               ? widget.suggestionItemDecoration?.evenColor ?? widget.suggestionItemDecoration?.color ?? Colors.transparent
               : widget.suggestionItemDecoration?.oddColor ?? widget.suggestionItemDecoration?.color ?? Colors.transparent,

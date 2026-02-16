@@ -60,7 +60,7 @@ class ShowOverlay {
                 targetAnchor: align,
                 followerAnchor: align,
                 child: Material(
-                  type: MaterialType.transparency,
+                  type: .transparency,
                   child: TapRegion(
                     onTapOutside: closeOnTapOutside ? (_) => remove() : null,
                     child: _OverlayContent(
@@ -170,7 +170,7 @@ class _OverlayContentState extends State<_OverlayContent> with TickerProviderSta
 
   Widget _contentWrapper(Widget content) {
     return Padding(
-      padding: const EdgeInsets.only(left: 14, right: 14, bottom: 18),
+      padding: const .only(left: 14, right: 14, bottom: 18),
       child: SlideTransition(
         position: Tween(
           begin: Offset(0, widget.slideTransition ? -1 : 0),
@@ -191,13 +191,13 @@ class _OverlayContentState extends State<_OverlayContent> with TickerProviderSta
       width: widget.decoration?.width,
       height: widget.decoration?.height,
       constraints: BoxConstraints(maxWidth: widget.maxWidth, maxHeight: widget.maxHeight <= 72 ? 72 : widget.maxHeight),
-      margin: EdgeInsets.only(top: (widget.yOffset ?? 0)),
-      padding: widget.decoration?.padding ?? EdgeInsets.zero,
+      margin: .only(top: (widget.yOffset ?? 0)),
+      padding: widget.decoration?.padding ?? .zero,
       color: widget.decoration?.color ?? Colors.white,
       borderRadius: widget.decoration?.borderRadius ?? 8,
-      border: widget.decoration?.border ?? const Border.fromBorderSide(BorderSide(color: Color.fromARGB(255, 224, 224, 224))),
+      border: widget.decoration?.border ?? const .fromBorderSide(BorderSide(color: Color.fromARGB(255, 224, 224, 224))),
       boxShadow: widget.decoration?.boxShadow ?? const BoxShadow(offset: Offset(0, 3), blurRadius: 2, color: Colors.black12),
-      clipBehavior: widget.decoration?.clipBehavior ?? Clip.none,
+      clipBehavior: widget.decoration?.clipBehavior ?? .none,
       child: widget.child,
     ),
   );
@@ -206,7 +206,7 @@ class _OverlayContentState extends State<_OverlayContent> with TickerProviderSta
     onEnter: (_) => widget.onHoverInside?.call(true),
     onExit: (_) => widget.onHoverInside?.call(false),
     child: Padding(
-      padding: EdgeInsets.only(top: (widget.yOffset ?? 0)),
+      padding: .only(top: (widget.yOffset ?? 0)),
       child: ConstrainedBox(
         constraints: BoxConstraints(maxWidth: widget.maxWidth, maxHeight: widget.maxHeight <= 72 ? 72 : widget.maxHeight),
         child: widget.child,
@@ -220,12 +220,12 @@ class OverlayDecoration {
     this.width,
     this.height,
     this.maxHeight,
-    this.padding = EdgeInsets.zero,
+    this.padding = .zero,
     this.color,
     this.borderRadius = 8,
-    this.border = const Border.fromBorderSide(BorderSide(color: Color.fromARGB(255, 224, 224, 224))),
+    this.border = const .fromBorderSide(BorderSide(color: Color.fromARGB(255, 224, 224, 224))),
     this.boxShadow = const BoxShadow(offset: Offset(0, 3), blurRadius: 2, color: Colors.black12),
-    this.clipBehavior = Clip.none,
+    this.clipBehavior = .none,
   }) : _isUnStyled = false;
 
   OverlayDecoration.unStyled({this.maxHeight}) : _isUnStyled = true;

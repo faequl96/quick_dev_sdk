@@ -2,16 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:quick_dev_sdk/quick_dev_sdk.dart';
 
 class BottomSheetDialogContent extends StatelessWidget {
-  const BottomSheetDialogContent({
-    super.key,
-    required this.parentContext,
-    this.decoration,
-    this.wallpapers,
-    this.header,
-    required this.contentBuilder,
-  });
+  const BottomSheetDialogContent({super.key, this.decoration, this.wallpapers, this.header, required this.contentBuilder});
 
-  final BuildContext parentContext;
   final BottomSheetDecoration? decoration;
   final List<Wallpaper>? wallpapers;
   final BottomSheetHeader? header;
@@ -19,14 +11,14 @@ class BottomSheetDialogContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(parentContext).size.height;
-    final statusBarHeight = MediaQuery.of(parentContext).padding.top;
-    final paddingBottom = MediaQuery.of(parentContext).viewInsets.bottom;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final statusBarHeight = MediaQuery.of(context).padding.top;
+    final paddingBottom = MediaQuery.of(context).viewInsets.bottom;
     final usableHeight = (screenHeight - statusBarHeight) - paddingBottom;
 
     return SafeArea(
       child: Padding(
-        padding: EdgeInsets.only(bottom: paddingBottom),
+        padding: .only(bottom: paddingBottom),
         child: Stack(
           children: [
             if (wallpapers != null) ...wallpapers!,
@@ -34,9 +26,9 @@ class BottomSheetDialogContent extends StatelessWidget {
               constraints: BoxConstraints(maxHeight: usableHeight),
               child: SizedBox(
                 height: decoration?.height,
-                width: double.maxFinite,
+                width: .maxFinite,
                 child: Column(
-                  mainAxisSize: MainAxisSize.min,
+                  mainAxisSize: .min,
                   children: [
                     if (header != null) header!,
                     Flexible(

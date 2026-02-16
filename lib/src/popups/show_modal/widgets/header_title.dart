@@ -76,7 +76,7 @@ class HeaderTitle extends StatelessWidget {
           const SizedBox(width: 10),
           Text(
             title,
-            style: TextStyle(fontSize: titleSize ?? 16, color: titleColor, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: titleSize ?? 16, color: titleColor, fontWeight: .bold),
           ),
         ],
       ),
