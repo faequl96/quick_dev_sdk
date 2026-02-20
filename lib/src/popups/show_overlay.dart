@@ -41,7 +41,7 @@ class ShowOverlay {
 
     final renderBox = _context.findRenderObject() as RenderBox;
     final buttonSize = renderBox.size;
-    final position = renderBox.localToGlobal(Offset.zero);
+    final position = renderBox.localToGlobal(.zero);
     final align = _getAlignment(alignment);
     final maxWidth = _getMaxWidth(alignment: alignment, size: size, buttonSize: buttonSize, position: position);
     final dynamicMaxHeight = (size.height - (position.dy + buttonSize.height + (yOffset ?? 0))) - (14 + paddingBottom);

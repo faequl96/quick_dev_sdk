@@ -147,7 +147,7 @@ class _ExtendedStyleState extends State<_ExtendedStyle> {
   @override
   Widget build(BuildContext context) {
     return Material(
-      type: MaterialType.canvas,
+      type: .canvas,
       color: widget.color ?? Colors.transparent,
       elevation: _elevation(),
       borderRadius: widget.borderRadius,

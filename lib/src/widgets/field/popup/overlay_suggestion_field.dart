@@ -43,9 +43,9 @@ class _OverlaySuggestionFieldState<T> extends State<OverlaySuggestionField<T>> {
   bool _isPointerInsideOverlay = false;
   bool _isOverlayUseInteraction = false;
 
-  final ShowOverlay _showOverlay = ShowOverlay.instance;
-  final GlobalKey _key = GlobalKey();
-  final LayerLink _layerLink = LayerLink();
+  final _showOverlay = ShowOverlay.instance;
+  final _key = GlobalKey();
+  final _layerLink = LayerLink();
 
   void Function(String keywords)? _rebuildOnChange;
   void Function(void Function() closeOverlay)? _closeOnFocusRemoved;
@@ -61,7 +61,7 @@ class _OverlaySuggestionFieldState<T> extends State<OverlaySuggestionField<T>> {
           context: widget.parenContext ?? context,
           slideTransition: false,
           closeOnTapOutside: false,
-          decoration: OverlayDecoration.unStyled(maxHeight: widget.decoration?.maxHeight),
+          decoration: .unStyled(maxHeight: widget.decoration?.maxHeight),
           yOffset: 6,
           contentBuilder: (_) => Listener(
             onPointerDown: (_) {
@@ -261,7 +261,7 @@ class _MainContentState<T> extends State<_MainContent<T>> {
       padding: const .symmetric(vertical: 10, horizontal: 14),
       color: widget.decoration?.color ?? Colors.white,
       borderRadius: widget.decoration?.borderRadius ?? 8,
-      border: widget.decoration?.border ?? const .fromBorderSide(BorderSide(color: Color.fromARGB(255, 224, 224, 224))),
+      border: widget.decoration?.border ?? const .fromBorderSide(BorderSide(color: .fromARGB(255, 224, 224, 224))),
       boxShadow: widget.decoration?.boxShadow ?? const BoxShadow(offset: Offset(0, 3), blurRadius: 2, color: Colors.black12),
       child: content,
     );
@@ -318,7 +318,7 @@ class _SuggestionsState<T> extends State<_Suggestions<T>> {
           width: .maxFinite,
           color: widget.decoration?.color ?? Colors.white,
           borderRadius: widget.decoration?.borderRadius ?? 8,
-          border: widget.decoration?.border ?? const .fromBorderSide(BorderSide(color: Color.fromARGB(255, 224, 224, 224))),
+          border: widget.decoration?.border ?? const .fromBorderSide(BorderSide(color: .fromARGB(255, 224, 224, 224))),
           boxShadow: widget.decoration?.boxShadow ?? const BoxShadow(offset: Offset(0, 3), blurRadius: 2, color: Colors.black12),
           clipBehavior: widget.decoration?.clipBehavior ?? .none,
           child: child ?? const SizedBox.shrink(),

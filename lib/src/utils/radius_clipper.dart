@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 
 class RadiusClipper extends CustomClipper<Path> {
-  RadiusClipper({
-    TextDirection? textDirection,
-    required this.borderRadius,
-  })  : textDirection = textDirection ?? TextDirection.ltr,
-        _decoration = BoxDecoration(borderRadius: borderRadius);
+  RadiusClipper({TextDirection? textDirection, required this.borderRadius})
+    : textDirection = textDirection ?? .ltr,
+      _decoration = BoxDecoration(borderRadius: borderRadius);
 
   final TextDirection textDirection;
   final BorderRadius borderRadius;
@@ -18,7 +16,6 @@ class RadiusClipper extends CustomClipper<Path> {
 
   @override
   bool shouldReclip(RadiusClipper oldClipper) {
-    return oldClipper._decoration != _decoration ||
-        oldClipper.textDirection != textDirection;
+    return oldClipper._decoration != _decoration || oldClipper.textDirection != textDirection;
   }
 }

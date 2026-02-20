@@ -26,7 +26,7 @@ class CurrencyTextInputFormatter extends TextInputFormatter {
   bool _isNegative = false;
 
   void _formatter(String newText) {
-    final NumberFormat format = NumberFormat.currency(
+    final format = NumberFormat.currency(
       locale: locale,
       name: name,
       symbol: symbol,
@@ -45,13 +45,8 @@ class CurrencyTextInputFormatter extends TextInputFormatter {
   }
 
   @override
-  TextEditingValue formatEditUpdate(
-    TextEditingValue oldValue,
-    TextEditingValue newValue,
-  ) {
-    final bool isRemovedCharacter =
-        oldValue.text.length - 1 == newValue.text.length &&
-            oldValue.text.startsWith(newValue.text);
+  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+    final bool isRemovedCharacter = oldValue.text.length - 1 == newValue.text.length && oldValue.text.startsWith(newValue.text);
 
     if (enableNegative) {
       _isNegative = newValue.text.startsWith('-');
@@ -71,13 +66,13 @@ class CurrencyTextInputFormatter extends TextInputFormatter {
     if (newText.trim() == '' || newText == '00' || newText == '000') {
       return TextEditingValue(
         text: _isNegative ? '-' : '',
-        selection: TextSelection.collapsed(offset: _isNegative ? 1 : 0),
+        selection: .collapsed(offset: _isNegative ? 1 : 0),
       );
     }
 
     return TextEditingValue(
       text: _newString,
-      selection: TextSelection.collapsed(offset: _newString.length),
+      selection: .collapsed(offset: _newString.length),
     );
   }
 
