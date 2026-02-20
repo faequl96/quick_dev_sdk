@@ -7,12 +7,12 @@ class CardContainer extends StatelessWidget {
     this.height,
     this.constraints,
     this.margin,
-    this.padding = EdgeInsets.zero,
+    this.padding = .zero,
     this.color,
     this.borderRadius = 8,
     this.border,
     this.boxShadow,
-    this.clipBehavior = Clip.none,
+    this.clipBehavior = .none,
     required this.child,
   });
 
@@ -38,18 +38,13 @@ class CardContainer extends StatelessWidget {
       padding: padding,
       decoration: BoxDecoration(
         color: color ?? Colors.white,
-        borderRadius: BorderRadius.circular(borderRadius),
+        borderRadius: .circular(borderRadius),
         border: border,
         boxShadow: [
           if (boxShadow != null)
             boxShadow!
           else
-            const BoxShadow(
-              offset: Offset(0, 2),
-              blurRadius: 6,
-              color: Colors.black12,
-              spreadRadius: 1,
-            ),
+            const BoxShadow(offset: Offset(0, 2), blurRadius: 6, color: Colors.black12, spreadRadius: 1),
         ],
       ),
       clipBehavior: clipBehavior,

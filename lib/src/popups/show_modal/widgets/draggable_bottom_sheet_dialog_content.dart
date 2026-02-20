@@ -22,7 +22,7 @@ class DraggableBottomSheetDialogContent extends StatelessWidget {
     final usableHeightRatio = (screenHeight - statusBarHeight) / screenHeight;
 
     return Padding(
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      padding: .only(bottom: MediaQuery.of(context).viewInsets.bottom),
       child: DraggableScrollableSheet(
         initialChildSize: .5,
         maxChildSize: usableHeightRatio,

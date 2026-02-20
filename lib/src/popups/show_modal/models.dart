@@ -6,16 +6,16 @@ class BottomSheetDecoration {
     this.constraints,
     this.color,
     this.backgroundContentColor,
-    this.borderSide = BorderSide.none,
-    this.borderRadius = const BorderRadius.only(topLeft: Radius.circular(10), topRight: Radius.circular(10)),
-    this.clipBehavior = Clip.hardEdge,
+    this.borderSide = .none,
+    this.borderRadius = const .only(topLeft: .circular(10), topRight: .circular(10)),
+    this.clipBehavior = .hardEdge,
   }) : draggable = false;
 
   BottomSheetDecoration.draggable({
     this.color,
-    this.borderSide = BorderSide.none,
-    this.borderRadius = const BorderRadius.only(topLeft: Radius.circular(10), topRight: Radius.circular(10)),
-    this.clipBehavior = Clip.none,
+    this.borderSide = .none,
+    this.borderRadius = const .only(topLeft: .circular(10), topRight: .circular(10)),
+    this.clipBehavior = .none,
   }) : height = null,
        constraints = null,
        draggable = true,
@@ -36,13 +36,13 @@ class DialogDecoration {
     this.width,
     this.height,
     this.constraints,
-    this.padding = EdgeInsets.zero,
+    this.padding = .zero,
     this.color = Colors.white,
     this.elevation = 24,
     this.shadowColor = Colors.black12,
-    this.borderSide = BorderSide.none,
-    this.borderRadius = const BorderRadius.all(Radius.circular(10)),
-    this.clipBehavior = Clip.hardEdge,
+    this.borderSide = .none,
+    this.borderRadius = const .all(.circular(10)),
+    this.clipBehavior = .hardEdge,
   });
 
   final double? width;

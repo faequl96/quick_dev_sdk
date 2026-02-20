@@ -6,7 +6,7 @@ class ModalDialogContent extends StatefulWidget {
     this.width,
     this.height,
     this.constraints,
-    this.padding = EdgeInsets.zero,
+    this.padding = .zero,
     this.header,
     required this.child,
   });

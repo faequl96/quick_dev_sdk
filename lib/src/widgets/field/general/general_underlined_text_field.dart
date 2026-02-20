@@ -114,7 +114,7 @@ class _GeneralUnderlineTextFieldState extends State<GeneralUnderlineTextField> {
         ),
         if (_validateMessage != null)
           SizedBox(
-            width: double.maxFinite,
+            width: .maxFinite,
             child: Row(
               children: [
                 const SizedBox(width: 1),
@@ -128,13 +128,13 @@ class _GeneralUnderlineTextFieldState extends State<GeneralUnderlineTextField> {
 
   Widget _preSuffix(PreSufFixIcon? preSuffixIcon) {
     return Padding(
-      padding: EdgeInsets.only(top: 16, left: 8, right: widget.decoration?.contentPadding?.right ?? 0),
+      padding: .only(top: 16, left: 8, right: widget.decoration?.contentPadding?.right ?? 0),
       child: GeneralEffectsButton(
         onTap: () => preSuffixIcon?.onTap.call(),
-        padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+        padding: const .symmetric(horizontal: 2, vertical: 2),
         hoveredColor: Colors.grey.shade300,
         splashColor: Colors.grey.shade400,
-        borderRadius: BorderRadius.circular(40),
+        borderRadius: .circular(40),
         child: preSuffixIcon?.child,
       ),
     );
@@ -152,7 +152,7 @@ class UnderlineFieldDecoration {
     this.focusedBorder,
     this.labelText,
     this.labelStyle,
-    this.floatingLabelBehavior = FloatingLabelBehavior.auto,
+    this.floatingLabelBehavior = .auto,
     this.hintText,
     this.hintStyle,
     this.obscuringCharacter = '•',

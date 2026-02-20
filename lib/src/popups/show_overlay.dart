@@ -23,7 +23,7 @@ class ShowOverlay {
     bool closeOnTapOutside = true,
     ModalBarrier? barrier,
     double? yOffset,
-    OverlayAlign alignment = OverlayAlign.center,
+    OverlayAlign alignment = .center,
     OverlayDecoration? decoration,
     void Function(bool value)? onHoverInside,
     required Widget Function(BuildContext context) contentBuilder,

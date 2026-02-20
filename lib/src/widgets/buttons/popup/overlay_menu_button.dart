@@ -15,15 +15,15 @@ class OverlayMenuButton<T> extends StatelessWidget {
     this.hoveredElevation,
     this.borderRadius,
     this.border,
-    this.clipBehavior = Clip.none,
+    this.clipBehavior = .none,
     this.overlayDynamicWidth = false,
     this.overlayYOffset,
     this.overlayBarrier,
-    this.overlayAlignment = OverlayAlign.center,
+    this.overlayAlignment = .center,
     this.overlaydecoration,
     this.menuItemDecoration,
     this.menuItemsBorderRadius = 4,
-    this.menuItemsPadding = const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+    this.menuItemsPadding = const .symmetric(horizontal: 8, vertical: 4),
     required this.menuItems,
     required this.menuItemBuilder,
     required this.onSelected,
@@ -76,7 +76,7 @@ class OverlayMenuButton<T> extends StatelessWidget {
         context: parenContext ?? context,
         dynamicWidth: overlayDynamicWidth,
         alignment: overlayAlignment,
-        decoration: overlaydecoration?.copyWith(padding: EdgeInsets.zero),
+        decoration: overlaydecoration?.copyWith(padding: .zero),
         yOffset: overlayYOffset,
         contentBuilder: (_) => _Menus(
           overlayContentBorderRadius: overlaydecoration?.borderRadius ?? 0,
@@ -140,7 +140,7 @@ class _MenusState<T> extends State<_Menus<T>> {
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(widget.overlayContentBorderRadius),
+      borderRadius: .circular(widget.overlayContentBorderRadius),
       child: ValueListenableBuilder(
         valueListenable: _listViewHeight,
         builder: (_, value, child) => SizedBox(height: value, child: child ?? const SizedBox.shrink()),
@@ -154,11 +154,11 @@ class _MenusState<T> extends State<_Menus<T>> {
             return GeneralEffectsButton(
               onTap: () async {
                 widget.onSelected(widget.items[index]);
-                await Future.delayed(const Duration(milliseconds: 120));
+                await Future<void>.delayed(const Duration(milliseconds: 120));
                 widget.closeOverlay();
               },
               padding: widget.decoration?.padding,
-              borderRadius: BorderRadius.circular(widget.decoration?.borderRadius ?? 0),
+              borderRadius: .circular(widget.decoration?.borderRadius ?? 0),
               color: Colors.transparent,
               hoveredColor: widget.decoration?.hoveredColor,
               splashColor: widget.decoration?.splashColor,

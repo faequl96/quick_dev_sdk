@@ -15,11 +15,11 @@ class OverlayDropdownButton<T> extends StatelessWidget {
     this.hoveredElevation,
     this.borderRadius,
     this.border,
-    this.clipBehavior = Clip.none,
+    this.clipBehavior = .none,
     this.overlayDynamicWidth = false,
     this.overlayYOffset,
     this.overlayBarrier,
-    this.overlayAlignment = OverlayAlign.center,
+    this.overlayAlignment = .center,
     this.overlaydecoration,
     this.dropdownItemDecoration,
     this.disabled = false,
@@ -76,7 +76,7 @@ class OverlayDropdownButton<T> extends StatelessWidget {
           context: parenContext ?? context,
           dynamicWidth: overlayDynamicWidth,
           alignment: overlayAlignment,
-          decoration: overlaydecoration?.copyWith(padding: EdgeInsets.zero),
+          decoration: overlaydecoration?.copyWith(padding: .zero),
           yOffset: overlayYOffset,
           contentBuilder: (_) => _Dropdowns(
             overlayContentBorderRadius: overlaydecoration?.borderRadius ?? 0,
@@ -143,7 +143,7 @@ class _DropdownsState<T> extends State<_Dropdowns<T>> {
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(widget.overlayContentBorderRadius),
+      borderRadius: .circular(widget.overlayContentBorderRadius),
       child: ValueListenableBuilder(
         valueListenable: _listViewHeight,
         builder: (_, value, child) => SizedBox(height: value, child: child ?? const SizedBox.shrink()),
@@ -157,11 +157,11 @@ class _DropdownsState<T> extends State<_Dropdowns<T>> {
             return GeneralEffectsButton(
               onTap: () async {
                 widget.onSelected(widget.items[index]);
-                await Future.delayed(const Duration(milliseconds: 120));
+                await Future<void>.delayed(const Duration(milliseconds: 120));
                 widget.closeOverlay();
               },
               padding: widget.decoration?.padding,
-              borderRadius: BorderRadius.circular(widget.decoration?.borderRadius ?? 0),
+              borderRadius: .circular(widget.decoration?.borderRadius ?? 0),
               color: widget.items[index] == widget.value ? widget.decoration?.selectedColor : Colors.transparent,
               hoveredColor: widget.decoration?.hoveredColor,
               splashColor: widget.decoration?.splashColor,

@@ -69,7 +69,7 @@ class _OverlaySuggestionFieldState<T> extends State<OverlaySuggestionField<T>> {
               _isPointerInsideOverlay = true;
             },
             onPointerUp: (_) async {
-              await Future.delayed(Duration.zero);
+              await Future<void>.delayed(.zero);
               if (!_isPointerInsideOverlay) return;
               _focusNode.requestFocus();
               _isPointerInsideOverlay = false;
@@ -210,7 +210,7 @@ class _MainContentState<T> extends State<_MainContent<T>> {
   }
 
   void _handleCloseOverlay(void Function() closeOverlay) async {
-    await Future.delayed(const Duration(milliseconds: 200));
+    await Future<void>.delayed(const Duration(milliseconds: 200));
     if (_isDispose == false) closeOverlay();
   }
 
@@ -258,7 +258,7 @@ class _MainContentState<T> extends State<_MainContent<T>> {
   Widget _defaultCardStyle(Widget content) {
     return CardContainer(
       width: .maxFinite,
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
+      padding: const .symmetric(vertical: 10, horizontal: 14),
       color: widget.decoration?.color ?? Colors.white,
       borderRadius: widget.decoration?.borderRadius ?? 8,
       border: widget.decoration?.border ?? const .fromBorderSide(BorderSide(color: Color.fromARGB(255, 224, 224, 224))),

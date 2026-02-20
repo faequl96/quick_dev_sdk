@@ -219,7 +219,7 @@ class FieldDecoration {
     ),
     this.labelText,
     this.labelStyle,
-    this.floatingLabelBehavior = FloatingLabelBehavior.auto,
+    this.floatingLabelBehavior = .auto,
     this.hintText,
     this.hintStyle,
     this.filled = false,

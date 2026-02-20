@@ -15,7 +15,7 @@ class GeneralEffectsButton extends StatefulWidget {
     this.hoveredElevation,
     this.borderRadius,
     this.border,
-    this.clipBehavior = Clip.none,
+    this.clipBehavior = .none,
     this.isDisabled = false,
     this.requestFocusOnHover = false,
     required this.onTap,
@@ -90,7 +90,7 @@ class _GeneralEffectsButtonState extends State<GeneralEffectsButton> {
           child: DecoratedBox(
             decoration: BoxDecoration(border: widget.border, borderRadius: widget.borderRadius),
             child: Padding(
-              padding: widget.padding ?? EdgeInsets.zero,
+              padding: widget.padding ?? .zero,
               child: _ChildWidget(
                 rebuild: (onHover) => _onHoverChild = onHover,
                 onHoverChildBuilder: widget.onHoverChildBuilder,

@@ -8,7 +8,7 @@ class DialogHeader extends StatelessWidget {
     this.iconColor,
     this.title,
     this.titleSize = 16,
-    this.titleFontWeight = FontWeight.bold,
+    this.titleFontWeight = .bold,
     this.action,
   });
 

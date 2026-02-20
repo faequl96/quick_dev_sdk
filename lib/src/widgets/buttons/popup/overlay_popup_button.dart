@@ -14,7 +14,7 @@ class OverlayPopupButton extends StatefulWidget {
     this.hoveredElevation,
     this.borderRadius,
     this.border,
-    this.clipBehavior = Clip.none,
+    this.clipBehavior = .none,
     this.requestFocusOnHover = false,
     this.closeOnUnHover = false,
     this.closeOnTapOutside = true,
@@ -83,7 +83,7 @@ class _OverlayPopupButtonState extends State<OverlayPopupButton> {
 
   void _onHoverContentInside(bool value) async {
     _isOverlayContentHovered = value;
-    await Future.delayed(Duration.zero);
+    await Future<void>.delayed(.zero);
     if (value == false) _showOverlay.remove();
   }
 
@@ -111,7 +111,7 @@ class _OverlayPopupButtonState extends State<OverlayPopupButton> {
           bool dynamicWidth = false,
           bool slideTransition = true,
           double? yOffset,
-          OverlayAlign alignment = OverlayAlign.center,
+          OverlayAlign alignment = .center,
           OverlayDecoration? decoration,
           required Widget Function(BuildContext) contentBuilder,
         }) async {
@@ -139,7 +139,7 @@ class _OverlayPopupButtonState extends State<OverlayPopupButton> {
               bool dynamicWidth = false,
               bool slideTransition = true,
               double? yOffset,
-              OverlayAlign alignment = OverlayAlign.center,
+              OverlayAlign alignment = .center,
               OverlayDecoration? decoration,
               required Widget Function(BuildContext) contentBuilder,
             }) {
@@ -162,7 +162,7 @@ class _OverlayPopupButtonState extends State<OverlayPopupButton> {
             });
           } else {
             if (widget.closeOnUnHover) {
-              await Future.delayed(Duration.zero);
+              await Future<void>.delayed(.zero);
               if (!_isOverlayContentHovered) _showOverlay.remove();
             }
           }

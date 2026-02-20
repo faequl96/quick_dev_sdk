@@ -32,14 +32,14 @@ class ShowModal {
       backgroundColor: decoration?.color ?? Colors.white,
       barrierColor: barrierColor,
       shape: RoundedRectangleBorder(
-        side: decoration?.borderSide ?? BorderSide.none,
+        side: decoration?.borderSide ?? .none,
         borderRadius: decoration?.borderRadius ?? const .only(topLeft: .circular(10), topRight: .circular(10)),
       ),
       isDismissible: dismissible,
       isScrollControlled: true,
       enableDrag: enableDrag,
       constraints: decoration?.constraints,
-      clipBehavior: decoration?.clipBehavior ?? Clip.hardEdge,
+      clipBehavior: decoration?.clipBehavior ?? .hardEdge,
       builder: (_) {
         if (decoration?.draggable == true) {
           return DraggableBottomSheetDialogContent(
@@ -74,12 +74,12 @@ class ShowModal {
     final completer = Completer<T>();
 
     final dialogContent = Dialog(
-      clipBehavior: decoration?.clipBehavior ?? Clip.hardEdge,
+      clipBehavior: decoration?.clipBehavior ?? .hardEdge,
       backgroundColor: decoration?.color ?? Colors.white,
       shadowColor: decoration?.shadowColor ?? Colors.black12,
       elevation: decoration?.elevation ?? 24,
       shape: RoundedRectangleBorder(
-        side: decoration?.borderSide ?? BorderSide.none,
+        side: decoration?.borderSide ?? .none,
         borderRadius: decoration?.borderRadius ?? .circular(10.0),
       ),
       child: Stack(
@@ -88,7 +88,7 @@ class ShowModal {
           ModalDialogContent(
             width: decoration?.width,
             height: decoration?.height,
-            padding: decoration?.padding ?? EdgeInsets.zero,
+            padding: decoration?.padding ?? .zero,
             header: header,
             child: contentBuilder(context),
           ),

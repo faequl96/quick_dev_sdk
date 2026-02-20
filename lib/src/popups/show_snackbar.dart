@@ -32,7 +32,7 @@ class ShowSnackbar {
         backgroundColor: decoration?.color,
         shape: decoration?.shape,
         elevation: decoration?.elevation,
-        clipBehavior: decoration?.clipBehavior ?? Clip.none,
+        clipBehavior: decoration?.clipBehavior ?? .none,
         duration: duration,
         content: contentBuilder(_context),
       ),
@@ -45,12 +45,12 @@ class ShowSnackbar {
 class SnackBarDecoration {
   SnackBarDecoration({
     this.width,
-    this.padding = EdgeInsets.zero,
+    this.padding = .zero,
     this.margin,
     this.color,
     this.shape,
     this.elevation,
-    this.clipBehavior = Clip.none,
+    this.clipBehavior = .none,
   });
 
   final double? width;

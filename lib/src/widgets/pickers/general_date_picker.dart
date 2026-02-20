@@ -160,7 +160,7 @@ class _GeneralDatePickerState extends State<GeneralDatePicker> {
         );
       case DatePickerMode.year:
         return Padding(
-          padding: const EdgeInsets.only(top: _subHeaderHeight),
+          padding: const .only(top: _subHeaderHeight),
           child: YearPicker(
             key: _yearPickerKey,
             currentDate: widget.currentDate ?? DateTime.now(),
@@ -179,23 +179,23 @@ class _GeneralDatePickerState extends State<GeneralDatePicker> {
     return Stack(
       children: [
         Column(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisSize: .min,
           children: [
             SizedBox(height: 450, child: _buildPicker()),
             ..._filteredMounthHoliday.map((item) {
               return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 16),
+                padding: const .symmetric(vertical: 2, horizontal: 16),
                 child: Row(
                   children: [
                     const Icon(Icons.circle, color: Colors.red, size: 8),
                     const SizedBox(width: 10),
                     Text(
                       '${_localizations.formatShortMonthDay(item.date)}, ',
-                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.red),
+                      style: const TextStyle(fontSize: 12, fontWeight: .bold, color: Colors.red),
                     ),
                     Text(
                       item.description,
-                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.red),
+                      style: const TextStyle(fontSize: 12, fontWeight: .bold, color: Colors.red),
                     ),
                   ],
                 ),
@@ -272,13 +272,13 @@ class _DatePickerModeToggleButtonState extends State<_DatePickerModeToggleButton
                 child: InkWell(
                   onTap: widget.onTitlePressed,
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    padding: const .symmetric(horizontal: 8),
                     child: Row(
                       children: <Widget>[
                         Flexible(
                           child: Text(
                             widget.title,
-                            overflow: TextOverflow.ellipsis,
+                            overflow: .ellipsis,
                             style: textTheme.titleSmall?.copyWith(color: controlColor),
                           ),
                         ),
@@ -350,10 +350,10 @@ class _MonthPickerState extends State<_MonthPicker> {
     _currentMonth = widget.initialMonth;
     _pageController = PageController(initialPage: DateUtils.monthDelta(widget.firstDate, _currentMonth));
     _shortcutMap = const <ShortcutActivator, Intent>{
-      SingleActivator(LogicalKeyboardKey.arrowLeft): DirectionalFocusIntent(TraversalDirection.left),
-      SingleActivator(LogicalKeyboardKey.arrowRight): DirectionalFocusIntent(TraversalDirection.right),
-      SingleActivator(LogicalKeyboardKey.arrowDown): DirectionalFocusIntent(TraversalDirection.down),
-      SingleActivator(LogicalKeyboardKey.arrowUp): DirectionalFocusIntent(TraversalDirection.up),
+      SingleActivator(.arrowLeft): DirectionalFocusIntent(.left),
+      SingleActivator(.arrowRight): DirectionalFocusIntent(.right),
+      SingleActivator(.arrowDown): DirectionalFocusIntent(.down),
+      SingleActivator(.arrowUp): DirectionalFocusIntent(.up),
     };
     _actionMap = <Type, Action<Intent>>{
       NextFocusIntent: CallbackAction<NextFocusIntent>(onInvoke: _handleGridNextFocus),
@@ -488,18 +488,18 @@ class _MonthPickerState extends State<_MonthPicker> {
   }
 
   static const Map<TraversalDirection, int> _directionOffset = <TraversalDirection, int>{
-    TraversalDirection.up: -DateTime.daysPerWeek,
-    TraversalDirection.right: 1,
-    TraversalDirection.down: DateTime.daysPerWeek,
-    TraversalDirection.left: -1,
+    .up: -DateTime.daysPerWeek,
+    .right: 1,
+    .down: DateTime.daysPerWeek,
+    .left: -1,
   };
 
   int _dayDirectionOffset(TraversalDirection traversalDirection, TextDirection textDirection) {
     if (textDirection == TextDirection.rtl) {
-      if (traversalDirection == TraversalDirection.left) {
-        traversalDirection = TraversalDirection.right;
-      } else if (traversalDirection == TraversalDirection.right) {
-        traversalDirection = TraversalDirection.left;
+      if (traversalDirection == .left) {
+        traversalDirection = .right;
+      } else if (traversalDirection == .right) {
+        traversalDirection = .left;
       }
     }
     return _directionOffset[traversalDirection]!;
@@ -541,7 +541,7 @@ class _MonthPickerState extends State<_MonthPicker> {
     final Color controlColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.60);
 
     return Column(
-      mainAxisSize: MainAxisSize.min,
+      mainAxisSize: .min,
       children: [
         Container(
           padding: const EdgeInsetsDirectional.only(start: 16, end: 4),
@@ -690,9 +690,9 @@ class _DayPickerState extends State<_DayPicker> {
     final MaterialLocalizations localizations = MaterialLocalizations.of(context);
     final TextTheme textTheme = Theme.of(context).textTheme;
     final List<TextStyle> headerStyle = [
-      const TextStyle(fontWeight: FontWeight.bold, color: Colors.black87),
-      TextStyle(fontWeight: FontWeight.bold, color: Colors.red[600]),
-      TextStyle(fontWeight: FontWeight.bold, color: Colors.greenAccent[700]),
+      const TextStyle(fontWeight: .bold, color: Colors.black87),
+      TextStyle(fontWeight: .bold, color: Colors.red[600]),
+      TextStyle(fontWeight: .bold, color: Colors.greenAccent[700]),
     ];
     final TextStyle dayStyle = textTheme.bodySmall!;
     final Color enabledDayColor = colorScheme.onSurface.withValues(alpha: 0.88);
@@ -705,8 +705,8 @@ class _DayPickerState extends State<_DayPicker> {
     final Color holidayColor = Colors.red[600]!;
     final Color holidayColorDisabled = Colors.red[600]!.withValues(alpha: 0.7);
 
-    const FontWeight enabledDayFontWeight = FontWeight.bold;
-    const FontWeight disabledDayFontWeight = FontWeight.normal;
+    const FontWeight enabledDayFontWeight = .bold;
+    const FontWeight disabledDayFontWeight = .normal;
 
     const double regularDayFontSize = 2;
     const double todayFontSize = 3;
@@ -748,7 +748,7 @@ class _DayPickerState extends State<_DayPicker> {
 
         if (isSelectedDay) {
           dayColor = selectedDayColor;
-          decoration = BoxDecoration(color: selectedDayBackground, shape: BoxShape.circle);
+          decoration = BoxDecoration(color: selectedDayBackground, shape: .circle);
         } else if (isToday) {
           dayColor = todayColor;
           dayFontSize = todayFontSize;
@@ -772,11 +772,7 @@ class _DayPickerState extends State<_DayPicker> {
           child: Center(
             child: Text(
               localizations.formatDecimal(day),
-              style: dayStyle.apply(
-                color: dayColor,
-                fontWeightDelta: dayFontWeight == FontWeight.bold ? 2 : 1,
-                fontSizeDelta: dayFontSize,
-              ),
+              style: dayStyle.apply(color: dayColor, fontWeightDelta: dayFontWeight == .bold ? 2 : 1, fontSizeDelta: dayFontSize),
             ),
           ),
         );
@@ -785,16 +781,16 @@ class _DayPickerState extends State<_DayPicker> {
           dayWidget = Container(
             decoration: decoration,
             child: Stack(
-              alignment: AlignmentDirectional.bottomCenter,
+              alignment: .bottomCenter,
               children: [
                 SizedBox(
-                  height: double.maxFinite,
+                  height: .maxFinite,
                   child: Center(
                     child: Text(
                       localizations.formatDecimal(day),
                       style: dayStyle.apply(
                         color: dayColor,
-                        fontWeightDelta: dayFontWeight == FontWeight.bold ? 2 : 1,
+                        fontWeightDelta: dayFontWeight == .bold ? 2 : 1,
                         fontSizeDelta: dayFontSize,
                       ),
                     ),
@@ -803,7 +799,7 @@ class _DayPickerState extends State<_DayPicker> {
                 if (!isSelectedDay)
                   Text(
                     Localizations.localeOf(context).toString() == 'id_ID' ? 'Hari ini' : 'Today',
-                    style: TextStyle(fontWeight: FontWeight.bold, color: dayColor, fontSize: 12),
+                    style: TextStyle(fontWeight: .bold, color: dayColor, fontSize: 12),
                   ),
               ],
             ),
@@ -814,16 +810,16 @@ class _DayPickerState extends State<_DayPicker> {
           dayWidget = Container(
             decoration: decoration,
             child: Stack(
-              alignment: AlignmentDirectional.bottomCenter,
+              alignment: .bottomCenter,
               children: [
                 SizedBox(
-                  height: double.maxFinite,
+                  height: .maxFinite,
                   child: Center(
                     child: Text(
                       localizations.formatDecimal(day),
                       style: dayStyle.apply(
                         color: dayColor,
-                        fontWeightDelta: dayFontWeight == FontWeight.bold ? 2 : 1,
+                        fontWeightDelta: dayFontWeight == .bold ? 2 : 1,
                         fontSizeDelta: dayFontSize,
                       ),
                     ),
@@ -852,7 +848,7 @@ class _DayPickerState extends State<_DayPicker> {
           dayWidget = ExcludeSemantics(child: dayWidget);
         } else {
           dayWidget = HoveredBackground(
-            boxShape: isToday ? null : BoxShape.circle,
+            boxShape: isToday ? null : .circle,
             hoveredColor: ColorConverter.lighten(const Color(0xFF09AB81), 90),
             child: InkResponse(
               focusNode: _dayFocusNodes[day - 1],
@@ -874,7 +870,7 @@ class _DayPickerState extends State<_DayPicker> {
     }
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: _monthPickerHorizontalPadding),
+      padding: const .symmetric(horizontal: _monthPickerHorizontalPadding),
       child: GridView.custom(
         physics: const ClampingScrollPhysics(),
         gridDelegate: _dayPickerGridDelegate,
@@ -985,25 +981,22 @@ class _YearPickerState extends State<YearPicker> {
 
     final FontWeight fontWeight;
     if (isDisabled) {
-      fontWeight = FontWeight.normal;
+      fontWeight = .normal;
     } else {
-      fontWeight = FontWeight.bold;
+      fontWeight = .bold;
     }
-    final TextStyle? itemStyle = textTheme.bodyLarge?.apply(
-      color: textColor,
-      fontWeightDelta: fontWeight == FontWeight.bold ? 2 : 1,
-    );
+    final TextStyle? itemStyle = textTheme.bodyLarge?.apply(color: textColor, fontWeightDelta: fontWeight == .bold ? 2 : 1);
 
     BoxDecoration? decoration;
     if (isSelected) {
-      decoration = BoxDecoration(color: colorScheme.primary, borderRadius: BorderRadius.circular(decorationHeight / 2));
+      decoration = BoxDecoration(color: colorScheme.primary, borderRadius: .circular(decorationHeight / 2));
     }
     // else if (isCurrentYear && !isDisabled) {
     //   decoration = BoxDecoration(
-    //     border: Border.all(
+    //     border: .all(
     //       color: colorScheme.primary,
     //     ),
-    //     borderRadius: BorderRadius.circular(decorationHeight / 2),
+    //     borderRadius: .circular(decorationHeight / 2),
     //   );
     // }
 
@@ -1043,7 +1036,7 @@ class _YearPickerState extends State<YearPicker> {
   Widget build(BuildContext context) {
     assert(debugCheckHasMaterial(context));
     return Column(
-      mainAxisSize: MainAxisSize.min,
+      mainAxisSize: .min,
       children: [
         const Divider(),
         Flexible(
@@ -1053,7 +1046,7 @@ class _YearPickerState extends State<YearPicker> {
             gridDelegate: _yearPickerGridDelegate,
             itemBuilder: _buildYearItem,
             itemCount: math.max(_itemCount, minYears),
-            padding: const EdgeInsets.symmetric(horizontal: _yearPickerPadding),
+            padding: const .symmetric(horizontal: _yearPickerPadding),
           ),
         ),
         const Divider(),
