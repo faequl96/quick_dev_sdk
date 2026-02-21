@@ -34,7 +34,7 @@ class HeaderTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     if (isHandleBar) {
       return SizedBox(
-        height: 20,
+        height: 32,
         width: .maxFinite,
         child: Row(
           crossAxisAlignment: .center,
