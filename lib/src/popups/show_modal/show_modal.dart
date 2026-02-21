@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:quick_dev_sdk/quick_dev_sdk.dart';
 import 'package:quick_dev_sdk/src/popups/show_modal/widgets/bottom_sheet_dialog_content.dart';
-import 'package:quick_dev_sdk/src/popups/show_modal/widgets/draggable_bottom_sheet_dialog_content.dart';
 import 'package:quick_dev_sdk/src/popups/show_modal/widgets/modal_dialog_content.dart';
 import 'package:flutter/material.dart';
 
@@ -18,6 +17,7 @@ class ShowModal {
   static Future<T> bottomSheet<T>(
     BuildContext context, {
     bool dismissible = true,
+    bool canPop = true,
     bool enableDrag = true,
     Color barrierColor = Colors.black26,
     BottomSheetDecoration? decoration,
@@ -40,22 +40,15 @@ class ShowModal {
       enableDrag: enableDrag,
       constraints: decoration?.constraints,
       clipBehavior: decoration?.clipBehavior ?? .hardEdge,
-      builder: (_) {
-        if (decoration?.draggable == true) {
-          return DraggableBottomSheetDialogContent(
-            decoration: decoration,
-            wallpapers: wallpapers,
-            header: header,
-            contentBuilder: contentBuilder,
-          );
-        }
-        return BottomSheetDialogContent(
+      builder: (_) => PopScope(
+        canPop: canPop,
+        child: BottomSheetDialogContent(
           decoration: decoration,
           wallpapers: wallpapers,
           header: header,
           contentBuilder: contentBuilder,
-        );
-      },
+        ),
+      ),
     ).then((value) => completer.complete(value));
 
     return await completer.future;

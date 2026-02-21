@@ -9,19 +9,8 @@ class BottomSheetDecoration {
     this.borderSide = .none,
     this.borderRadius = const .only(topLeft: .circular(10), topRight: .circular(10)),
     this.clipBehavior = .hardEdge,
-  }) : draggable = false;
+  });
 
-  BottomSheetDecoration.draggable({
-    this.color,
-    this.borderSide = .none,
-    this.borderRadius = const .only(topLeft: .circular(10), topRight: .circular(10)),
-    this.clipBehavior = .none,
-  }) : height = null,
-       constraints = null,
-       draggable = true,
-       backgroundContentColor = null;
-
-  final bool draggable;
   final double? height;
   final BoxConstraints? constraints;
   final Color? color;
