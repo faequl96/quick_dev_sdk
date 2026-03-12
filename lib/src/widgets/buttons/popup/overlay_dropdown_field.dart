@@ -9,6 +9,7 @@ class OverlayDropdownField extends StatefulWidget {
     this.width,
     this.style = const TextStyle(fontSize: 16),
     this.decoration,
+    this.splashColor,
     this.overlayDynamicWidth = false,
     this.overlayYOffset,
     this.overlayBarrier,
@@ -28,6 +29,7 @@ class OverlayDropdownField extends StatefulWidget {
   final double? width;
   final TextStyle style;
   final FieldDecoration? decoration;
+  final Color? splashColor;
   final bool overlayDynamicWidth;
   final double? overlayYOffset;
   final ModalBarrier? overlayBarrier;
@@ -72,7 +74,7 @@ class _OverlayDropdownFieldState extends State<OverlayDropdownField> {
   @override
   Widget build(BuildContext context) {
     return OverlayPopupButton(
-      splashColor: Colors.grey.shade400,
+      splashColor: widget.splashColor ?? Colors.grey.shade400,
       borderRadius: widget.decoration?.enabledBorder.borderRadius,
       overlayBarrier: widget.overlayBarrier,
       onTap: (handleShowOverlay, closeOverlay) {
