@@ -95,6 +95,12 @@ class _GeneralTextFieldState extends State<GeneralTextField> {
         _suffixIcon.isNotEmpty &&
         (widget.decoration?.hideSuffixIconOnEmpty == false ||
             (widget.decoration?.hideSuffixIconOnEmpty == true && widget.controller.text.isNotEmpty));
+
+    final defaultBorder = const OutlineInputBorder(
+      borderSide: BorderSide(color: Colors.black26),
+      borderRadius: .all(.circular(8)),
+    );
+
     return Column(
       children: [
         SizedBox(
@@ -129,24 +135,9 @@ class _GeneralTextFieldState extends State<GeneralTextField> {
                 horizontal: widget.decoration?.contentHorizontalPadding ?? 12,
                 vertical: widget.height != null ? 0 : 16 + (widget.decoration?.contentVerticalPadding ?? 0),
               ),
-              enabledBorder:
-                  widget.decoration?.enabledBorder ??
-                  const OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.black26),
-                    borderRadius: .all(.circular(8)),
-                  ),
-              disabledBorder:
-                  widget.decoration?.disabledBorder ??
-                  const OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.black26),
-                    borderRadius: .all(.circular(8)),
-                  ),
-              focusedBorder:
-                  widget.decoration?.focusedBorder ??
-                  const OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.black26),
-                    borderRadius: .all(.circular(8)),
-                  ),
+              enabledBorder: widget.decoration?.enabledBorder ?? defaultBorder,
+              disabledBorder: widget.decoration?.disabledBorder ?? defaultBorder,
+              focusedBorder: widget.decoration?.focusedBorder ?? defaultBorder,
             ),
             onTapOutside: (event) => _focusNode.unfocus(),
             onEditingComplete: widget.onEditingComplete,

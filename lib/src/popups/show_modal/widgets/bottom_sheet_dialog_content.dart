@@ -21,7 +21,7 @@ class BottomSheetDialogContent extends StatelessWidget {
         padding: .only(bottom: paddingBottom),
         child: Stack(
           children: [
-            if (wallpapers != null) ...wallpapers!,
+            ...?wallpapers,
             ConstrainedBox(
               constraints: BoxConstraints(maxHeight: usableHeight),
               child: SizedBox(
@@ -30,25 +30,22 @@ class BottomSheetDialogContent extends StatelessWidget {
                 child: Column(
                   mainAxisSize: .min,
                   children: [
-                    if (header != null) header!,
-                    Flexible(
-                      child: decoration?.backgroundContentColor != null
-                          ? DecoratedBox(
-                              decoration: BoxDecoration(
-                                color: decoration?.backgroundContentColor,
-                                boxShadow: [
-                                  BoxShadow(
-                                    offset: const Offset(0, -3),
-                                    color: Colors.black.withValues(alpha: .08),
-                                    blurRadius: 3,
-                                  ),
-                                ],
-                                borderRadius: decoration?.borderRadius,
-                              ),
-                              child: contentBuilder(context),
-                            )
-                          : contentBuilder(context),
-                    ),
+                    ?header,
+                    if (decoration?.backgroundContentColor != null)
+                      Flexible(
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: decoration?.backgroundContentColor,
+                            boxShadow: [
+                              BoxShadow(offset: const Offset(0, -3), color: Colors.black.withValues(alpha: .08), blurRadius: 3),
+                            ],
+                            borderRadius: decoration?.borderRadius,
+                          ),
+                          child: contentBuilder(context),
+                        ),
+                      )
+                    else
+                      Flexible(child: contentBuilder(context)),
                   ],
                 ),
               ),

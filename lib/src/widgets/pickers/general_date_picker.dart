@@ -28,7 +28,7 @@ class GeneralDatePicker extends StatefulWidget {
     this.currentDate,
     this.holidays = const [],
     required this.onDateChanged,
-    this.initialCalendarMode = DatePickerMode.day,
+    this.initialCalendarMode = .day,
     this.selectableDayPredicate,
   });
 
@@ -58,7 +58,7 @@ class _GeneralDatePickerState extends State<GeneralDatePicker> {
   void initState() {
     super.initState();
     _mode = widget.initialCalendarMode;
-    _currentDisplayedMonthDate = widget.initialDate ?? DateTime.now();
+    _currentDisplayedMonthDate = widget.initialDate ?? .now();
     _selectedDate = widget.initialDate;
 
     _filteredMounthHoliday = widget.holidays.where((element) {
@@ -81,21 +81,21 @@ class _GeneralDatePickerState extends State<GeneralDatePicker> {
       _mode = widget.initialCalendarMode;
     }
     if (!DateUtils.isSameDay(widget.initialDate, oldWidget.initialDate)) {
-      _currentDisplayedMonthDate = widget.initialDate ?? DateTime.now();
+      _currentDisplayedMonthDate = widget.initialDate ?? .now();
       _selectedDate = widget.initialDate;
     }
   }
 
   void _vibrate() {
     switch (Theme.of(context).platform) {
-      case TargetPlatform.android:
-      case TargetPlatform.fuchsia:
-      case TargetPlatform.linux:
-      case TargetPlatform.windows:
+      case .android:
+      case .fuchsia:
+      case .linux:
+      case .windows:
         HapticFeedback.vibrate();
         break;
-      case TargetPlatform.iOS:
-      case TargetPlatform.macOS:
+      case .iOS:
+      case .macOS:
         break;
     }
   }
@@ -130,7 +130,7 @@ class _GeneralDatePickerState extends State<GeneralDatePicker> {
     }
 
     setState(() {
-      _mode = DatePickerMode.day;
+      _mode = .day;
       _handleMonthChanged(value);
     });
   }
@@ -139,17 +139,17 @@ class _GeneralDatePickerState extends State<GeneralDatePicker> {
     _vibrate();
     setState(() {
       _selectedDate = value;
-      widget.onDateChanged(_selectedDate ?? DateTime.now());
+      widget.onDateChanged(_selectedDate ?? .now());
     });
   }
 
   Widget _buildPicker() {
     switch (_mode) {
-      case DatePickerMode.day:
+      case .day:
         return _MonthPicker(
           key: _monthPickerKey,
           initialMonth: _currentDisplayedMonthDate,
-          currentDate: widget.currentDate ?? DateTime.now(),
+          currentDate: widget.currentDate ?? .now(),
           firstDate: widget.firstDate,
           lastDate: widget.lastDate,
           selectedDate: _selectedDate,
@@ -158,12 +158,12 @@ class _GeneralDatePickerState extends State<GeneralDatePicker> {
           onDisplayedMonthChanged: _handleMonthChanged,
           selectableDayPredicate: widget.selectableDayPredicate,
         );
-      case DatePickerMode.year:
+      case .year:
         return Padding(
           padding: const .only(top: _subHeaderHeight),
           child: YearPicker(
             key: _yearPickerKey,
-            currentDate: widget.currentDate ?? DateTime.now(),
+            currentDate: widget.currentDate ?? .now(),
             firstDate: widget.firstDate,
             lastDate: widget.lastDate,
             initialDate: _currentDisplayedMonthDate,
@@ -191,11 +191,11 @@ class _GeneralDatePickerState extends State<GeneralDatePicker> {
                     const SizedBox(width: 10),
                     Text(
                       '${_localizations.formatShortMonthDay(item.date)}, ',
-                      style: const TextStyle(fontSize: 12, fontWeight: .bold, color: Colors.red),
+                      style: const TextStyle(fontSize: 12, fontWeight: .w600, color: Colors.red),
                     ),
                     Text(
                       item.description,
-                      style: const TextStyle(fontSize: 12, fontWeight: .bold, color: Colors.red),
+                      style: const TextStyle(fontSize: 12, fontWeight: .w600, color: Colors.red),
                     ),
                   ],
                 ),
@@ -207,7 +207,7 @@ class _GeneralDatePickerState extends State<GeneralDatePicker> {
           mode: _mode,
           title: _localizations.formatMonthYear(_currentDisplayedMonthDate),
           onTitlePressed: () {
-            _handleModeChanged(_mode == DatePickerMode.day ? DatePickerMode.year : DatePickerMode.day);
+            _handleModeChanged(_mode == .day ? .year : .day);
           },
         ),
       ],
@@ -233,7 +233,7 @@ class _DatePickerModeToggleButtonState extends State<_DatePickerModeToggleButton
   void initState() {
     super.initState();
     _controller = AnimationController(
-      value: widget.mode == DatePickerMode.year ? 0.5 : 0,
+      value: widget.mode == .year ? 0.5 : 0,
       upperBound: 0.5,
       duration: const Duration(milliseconds: 200),
       vsync: this,
@@ -247,7 +247,7 @@ class _DatePickerModeToggleButtonState extends State<_DatePickerModeToggleButton
       return;
     }
 
-    if (widget.mode == DatePickerMode.year) {
+    if (widget.mode == .year) {
       _controller.forward();
     } else {
       _controller.reverse();
@@ -292,7 +292,7 @@ class _DatePickerModeToggleButtonState extends State<_DatePickerModeToggleButton
                 ),
               ),
             ),
-            if (widget.mode == DatePickerMode.day) const SizedBox(width: _monthNavButtonsWidth),
+            if (widget.mode == .day) const SizedBox(width: _monthNavButtonsWidth),
           ],
         ),
       ),
@@ -690,9 +690,9 @@ class _DayPickerState extends State<_DayPicker> {
     final MaterialLocalizations localizations = MaterialLocalizations.of(context);
     final TextTheme textTheme = Theme.of(context).textTheme;
     final List<TextStyle> headerStyle = [
-      const TextStyle(fontWeight: .bold, color: Colors.black87),
-      TextStyle(fontWeight: .bold, color: Colors.red[600]),
-      TextStyle(fontWeight: .bold, color: Colors.greenAccent[700]),
+      const TextStyle(fontWeight: .w600, color: Colors.black87),
+      TextStyle(fontWeight: .w600, color: Colors.red[600]),
+      TextStyle(fontWeight: .w600, color: Colors.greenAccent[700]),
     ];
     final TextStyle dayStyle = textTheme.bodySmall!;
     final Color enabledDayColor = colorScheme.onSurface.withValues(alpha: 0.88);
@@ -705,7 +705,7 @@ class _DayPickerState extends State<_DayPicker> {
     final Color holidayColor = Colors.red[600]!;
     final Color holidayColorDisabled = Colors.red[600]!.withValues(alpha: 0.7);
 
-    const FontWeight enabledDayFontWeight = .bold;
+    const FontWeight enabledDayFontWeight = .w600;
     const FontWeight disabledDayFontWeight = .normal;
 
     const double regularDayFontSize = 2;
@@ -772,7 +772,7 @@ class _DayPickerState extends State<_DayPicker> {
           child: Center(
             child: Text(
               localizations.formatDecimal(day),
-              style: dayStyle.apply(color: dayColor, fontWeightDelta: dayFontWeight == .bold ? 2 : 1, fontSizeDelta: dayFontSize),
+              style: dayStyle.apply(color: dayColor, fontWeightDelta: dayFontWeight == .w600 ? 2 : 1, fontSizeDelta: dayFontSize),
             ),
           ),
         );
@@ -790,7 +790,7 @@ class _DayPickerState extends State<_DayPicker> {
                       localizations.formatDecimal(day),
                       style: dayStyle.apply(
                         color: dayColor,
-                        fontWeightDelta: dayFontWeight == .bold ? 2 : 1,
+                        fontWeightDelta: dayFontWeight == .w600 ? 2 : 1,
                         fontSizeDelta: dayFontSize,
                       ),
                     ),
@@ -799,7 +799,7 @@ class _DayPickerState extends State<_DayPicker> {
                 if (!isSelectedDay)
                   Text(
                     Localizations.localeOf(context).toString() == 'id_ID' ? 'Hari ini' : 'Today',
-                    style: TextStyle(fontWeight: .bold, color: dayColor, fontSize: 12),
+                    style: TextStyle(fontWeight: .w500, color: dayColor, fontSize: 12, height: 1),
                   ),
               ],
             ),
@@ -819,7 +819,7 @@ class _DayPickerState extends State<_DayPicker> {
                       localizations.formatDecimal(day),
                       style: dayStyle.apply(
                         color: dayColor,
-                        fontWeightDelta: dayFontWeight == .bold ? 2 : 1,
+                        fontWeightDelta: dayFontWeight == .w600 ? 2 : 1,
                         fontSizeDelta: dayFontSize,
                       ),
                     ),
@@ -833,7 +833,7 @@ class _DayPickerState extends State<_DayPicker> {
                         const SizedBox(width: 2),
                         Text(
                           Localizations.localeOf(context).toString() == 'id_ID' ? 'Hari ini' : 'Today',
-                          style: dayStyle.apply(color: dayColor, fontSizeDelta: 0.4),
+                          style: TextStyle(fontWeight: .w500, color: dayColor, fontSize: 12, height: 1),
                         ),
                       ],
                     )
@@ -935,14 +935,14 @@ class _YearPickerState extends State<YearPicker> {
   @override
   void initState() {
     super.initState();
-    _scrollController = ScrollController(initialScrollOffset: _scrollOffsetForYear(widget.selectedDate ?? DateTime.now()));
+    _scrollController = ScrollController(initialScrollOffset: _scrollOffsetForYear(widget.selectedDate ?? .now()));
   }
 
   @override
   void didUpdateWidget(YearPicker oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.selectedDate != oldWidget.selectedDate) {
-      _scrollController.jumpTo(_scrollOffsetForYear(widget.selectedDate ?? DateTime.now()));
+      _scrollController.jumpTo(_scrollOffsetForYear(widget.selectedDate ?? .now()));
     }
   }
 
@@ -983,13 +983,13 @@ class _YearPickerState extends State<YearPicker> {
     if (isDisabled) {
       fontWeight = .normal;
     } else {
-      fontWeight = .bold;
+      fontWeight = .w600;
     }
-    final TextStyle? itemStyle = textTheme.bodyLarge?.apply(color: textColor, fontWeightDelta: fontWeight == .bold ? 2 : 1);
+    final TextStyle? itemStyle = textTheme.bodyLarge?.apply(color: textColor, fontWeightDelta: fontWeight == .w600 ? 2 : 1);
 
     BoxDecoration? decoration;
     if (isSelected) {
-      decoration = BoxDecoration(color: colorScheme.primary, borderRadius: .circular(decorationHeight / 2));
+      decoration = BoxDecoration(color: Colors.greenAccent[700], borderRadius: .circular(decorationHeight / 2));
     }
     // else if (isCurrentYear && !isDisabled) {
     //   decoration = BoxDecoration(

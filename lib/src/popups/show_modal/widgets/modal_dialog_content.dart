@@ -23,7 +23,7 @@ class ModalDialogContent extends StatefulWidget {
 }
 
 class _ModalDialogContentState extends State<ModalDialogContent> {
-  final GlobalKey _childKey = GlobalKey();
+  final _childKey = GlobalKey();
 
   double childWidth = 0;
 

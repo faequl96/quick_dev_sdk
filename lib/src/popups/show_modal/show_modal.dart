@@ -17,6 +17,7 @@ class ShowModal {
   static Future<T> bottomSheet<T>(
     BuildContext context, {
     bool dismissible = true,
+    bool useSafeArea = true,
     bool canPop = true,
     bool enableDrag = true,
     Color barrierColor = Colors.black26,
@@ -36,6 +37,7 @@ class ShowModal {
         borderRadius: decoration?.borderRadius ?? const .only(topLeft: .circular(10), topRight: .circular(10)),
       ),
       isDismissible: dismissible,
+      useSafeArea: useSafeArea,
       isScrollControlled: true,
       enableDrag: enableDrag,
       constraints: decoration?.constraints,
@@ -77,7 +79,7 @@ class ShowModal {
       ),
       child: Stack(
         children: [
-          if (wallpapers != null) ...wallpapers,
+          ...?wallpapers,
           ModalDialogContent(
             width: decoration?.width,
             height: decoration?.height,

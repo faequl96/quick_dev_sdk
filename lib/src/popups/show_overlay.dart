@@ -97,23 +97,19 @@ class ShowOverlay {
     _overlayEntry = null;
   }
 
-  Alignment _getAlignment(OverlayAlign alignment) => {
-    OverlayAlign.left: Alignment.topLeft,
-    OverlayAlign.center: Alignment.topCenter,
-    OverlayAlign.right: Alignment.topRight,
-  }[alignment]!;
+  Alignment _getAlignment(OverlayAlign alignment) =>
+      <OverlayAlign, Alignment>{.left: .topLeft, .center: .topCenter, .right: .topRight}[alignment]!;
 
-  double _getAlignOffset(OverlayAlign alignment) =>
-      {OverlayAlign.left: -14.0, OverlayAlign.center: 0.0, OverlayAlign.right: 14.0}[alignment]!;
+  double _getAlignOffset(OverlayAlign alignment) => <OverlayAlign, double>{.left: -14.0, .center: 0.0, .right: 14.0}[alignment]!;
 
   double _getMaxWidth({required OverlayAlign alignment, required Size size, required Size buttonSize, required Offset position}) {
     double leftRemainder = position.dx;
     double rightRemainder = size.width - (position.dx + buttonSize.width);
     double minNumber = min(leftRemainder, rightRemainder);
-    return {
-      OverlayAlign.left: (rightRemainder + buttonSize.width) - 14,
-      OverlayAlign.center: (minNumber * 2 + buttonSize.width) - 28,
-      OverlayAlign.right: (leftRemainder + buttonSize.width) - 14,
+    return <OverlayAlign, double>{
+      .left: (rightRemainder + buttonSize.width) - 14,
+      .center: (minNumber * 2 + buttonSize.width) - 28,
+      .right: (leftRemainder + buttonSize.width) - 14,
     }[alignment]!;
   }
 }
