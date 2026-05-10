@@ -71,6 +71,7 @@ class _GeneralUnderlineTextFieldState extends State<GeneralUnderlineTextField> {
   @override
   void dispose() {
     widget.controller.removeListener(_onChangeListener);
+    if (widget.focusNode == null) _focusNode.dispose();
 
     super.dispose();
   }
@@ -82,6 +83,7 @@ class _GeneralUnderlineTextFieldState extends State<GeneralUnderlineTextField> {
         widget.decoration?.suffixIcon != null &&
         (widget.decoration?.hideSuffixIconOnEmpty == false ||
             (widget.decoration?.hideSuffixIconOnEmpty == true && widget.controller.text.isNotEmpty));
+
     return Column(
       children: [
         TextField(

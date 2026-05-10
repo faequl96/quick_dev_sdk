@@ -50,7 +50,7 @@ class ShowOverlay {
       builder: (_) {
         return Stack(
           children: [
-            if (barrier != null) barrier,
+            ?barrier,
             Positioned(
               width: dynamicWidth ? null : (buttonSize.width + 28),
               child: CompositedTransformFollower(
@@ -279,6 +279,7 @@ class _OverlayWrapperState extends State<OverlayWrapper> {
   @override
   void didUpdateWidget(OverlayWrapper oldWidget) {
     super.didUpdateWidget(oldWidget);
+
     _entry.markNeedsBuild();
   }
 

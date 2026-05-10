@@ -61,9 +61,9 @@ class _GeneralTextFieldState extends State<GeneralTextField> {
       final validate = widget.validator?.call(widget.controller.text);
       if (validate?.isSuccess != true) {
         setState(() => _validateMessage = validate?.message);
-        return;
+      } else {
+        setState(() => _validateMessage = null);
       }
-      setState(() => _validateMessage = null);
     }
   }
 
@@ -116,6 +116,7 @@ class _GeneralTextFieldState extends State<GeneralTextField> {
             inputFormatters: widget.inputFormatters,
             maxLines: widget.maxLines,
             maxLength: widget.maxLength,
+            expands: widget.maxLines == null ? true : false,
             obscureText: widget.decoration?.obscureText ?? false,
             obscuringCharacter: widget.decoration?.obscuringCharacter ?? '•',
             cursorHeight: (widget.style.fontSize ?? 16) + 10,

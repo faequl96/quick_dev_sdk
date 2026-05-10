@@ -54,6 +54,13 @@ class _GeneralEffectsButtonState extends State<GeneralEffectsButton> {
   final _focusNode = FocusNode();
 
   @override
+  void dispose() {
+    _focusNode.dispose();
+
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final unhoveredColor = (widget.color ?? Colors.transparent);
 
