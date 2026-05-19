@@ -1,0 +1,189 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:quick_dev_sdk/quick_dev_sdk.dart';
+
+class QuickUnderlineTextField extends StatefulWidget {
+  const QuickUnderlineTextField({
+    super.key,
+    required this.controller,
+    this.focusNode,
+    this.autofocus = false,
+    this.enabled,
+    this.style = const TextStyle(fontSize: 16),
+    this.useBuiltInFont = true,
+    this.decoration,
+    this.maxLength,
+    this.keyboardType,
+    this.inputFormatters,
+    this.onChanged,
+    this.validator,
+    this.onEditingComplete,
+  });
+
+  final TextEditingController controller;
+  final FocusNode? focusNode;
+  final bool autofocus;
+  final bool? enabled;
+  final TextStyle style;
+  final bool useBuiltInFont;
+  final UnderlineFieldDecoration? decoration;
+  final int? maxLength;
+  final TextInputType? keyboardType;
+  final List<TextInputFormatter>? inputFormatters;
+  final void Function(String value)? onChanged;
+  final TextFieldValidator Function(String value)? validator;
+  final void Function()? onEditingComplete;
+
+  @override
+  State<QuickUnderlineTextField> createState() => _QuickUnderlineTextFieldState();
+}
+
+class _QuickUnderlineTextFieldState extends State<QuickUnderlineTextField> {
+  late final FocusNode _focusNode;
+  bool _isLocalFocusNode = false;
+
+  Widget? _validateMessage;
+
+  String _lastText = '';
+
+  void _onChangeListener() {
+    if (widget.controller.text != _lastText) {
+      _lastText = widget.controller.text;
+
+      widget.onChanged?.call(widget.controller.text);
+      if (widget.validator != null) {
+        final validate = widget.validator!.call(_lastText);
+        final newMsg = (validate.isSuccess == false) ? validate.message : null;
+        if (_validateMessage != newMsg) _validateMessage = newMsg;
+      }
+      setState(() {});
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    _lastText = widget.controller.text;
+
+    if (widget.focusNode == null) {
+      _focusNode = FocusNode();
+      _isLocalFocusNode = true;
+    } else {
+      _focusNode = widget.focusNode!;
+    }
+
+    widget.controller.addListener(_onChangeListener);
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_onChangeListener);
+    if (_isLocalFocusNode) _focusNode.dispose();
+
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final usePrefixIcon = widget.decoration?.prefixIcon != null;
+    final useSuffixIcon =
+        widget.decoration?.suffixIcon != null &&
+        (widget.decoration?.hideSuffixIconOnEmpty == false ||
+            (widget.decoration?.hideSuffixIconOnEmpty == true &&
+                widget.controller.text.isNotEmpty));
+
+    return Column(
+      children: [
+        TextField(
+          controller: widget.controller,
+          focusNode: _focusNode,
+          autofocus: widget.autofocus,
+          enabled: widget.enabled,
+          style: widget.style.copyWith(fontSize: (widget.style.fontSize ?? 16)),
+          keyboardType: widget.keyboardType,
+          inputFormatters: widget.inputFormatters,
+          maxLength: widget.maxLength,
+          obscureText: widget.decoration?.obscureText ?? false,
+          obscuringCharacter: widget.decoration?.obscuringCharacter ?? '•',
+          cursorHeight: (widget.style.fontSize ?? 16) + 10,
+          decoration: InputDecoration(
+            labelText: widget.decoration?.labelText,
+            labelStyle: widget.decoration?.labelStyle,
+            floatingLabelBehavior: widget.decoration?.floatingLabelBehavior,
+            hintText: widget.decoration?.hintText,
+            hintStyle: widget.decoration?.hintStyle,
+            prefixIcon: usePrefixIcon ? _preSuffix(widget.decoration?.prefixIcon) : null,
+            suffixIcon: useSuffixIcon ? _preSuffix(widget.decoration?.suffixIcon) : null,
+            contentPadding: widget.decoration?.contentPadding,
+            enabledBorder: widget.decoration?.enabledBorder,
+            disabledBorder: widget.decoration?.disabledBorder,
+            focusedBorder: widget.decoration?.focusedBorder,
+          ),
+          onTapOutside: (event) => _focusNode.unfocus(),
+          onEditingComplete: widget.onEditingComplete,
+        ),
+        if (_validateMessage != null)
+          SizedBox(
+            width: .maxFinite,
+            child: Row(
+              children: [
+                const SizedBox(width: 1),
+                Flexible(child: _validateMessage!),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _preSuffix(PreSufFixIcon? preSuffixIcon) {
+    return Padding(
+      padding: .only(top: 16, left: 8, right: widget.decoration?.contentPadding?.right ?? 0),
+      child: QuickButton(
+        onTap: () => preSuffixIcon?.onTap.call(),
+        style: QuickButtonStyle(
+          padding: const .symmetric(horizontal: 2, vertical: 2),
+          hoveredColor: Colors.grey.shade300,
+          splashColor: Colors.grey.shade400,
+          borderRadius: .circular(40),
+        ),
+        child: preSuffixIcon?.child,
+      ),
+    );
+  }
+}
+
+class UnderlineFieldDecoration {
+  UnderlineFieldDecoration({
+    this.contentPadding,
+    this.prefixIcon,
+    this.suffixIcon,
+    this.hideSuffixIconOnEmpty = false,
+    this.enabledBorder,
+    this.disabledBorder,
+    this.focusedBorder,
+    this.labelText,
+    this.labelStyle,
+    this.floatingLabelBehavior = .auto,
+    this.hintText,
+    this.hintStyle,
+    this.obscuringCharacter = '•',
+    this.obscureText = false,
+  });
+
+  final EdgeInsets? contentPadding;
+  final PreSufFixIcon? prefixIcon;
+  final PreSufFixIcon? suffixIcon;
+  final bool hideSuffixIconOnEmpty;
+  final UnderlineInputBorder? enabledBorder;
+  final UnderlineInputBorder? disabledBorder;
+  final UnderlineInputBorder? focusedBorder;
+  final String? labelText;
+  final TextStyle? labelStyle;
+  final FloatingLabelBehavior floatingLabelBehavior;
+  final String? hintText;
+  final TextStyle? hintStyle;
+  final String obscuringCharacter;
+  final bool obscureText;
+}

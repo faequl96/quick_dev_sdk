@@ -1,13 +1,13 @@
-class Debouncer<T> {
-  late T _stop;
+import 'dart:async';
 
-  Future<void> onChange({
-    required T value,
-    Duration duration = const Duration(milliseconds: 300),
-    required void Function() callBack,
-  }) async {
-    _stop = value;
-    await Future<void>.delayed(duration);
-    if (_stop == value) callBack();
+class Debouncer {
+  static Timer? _timer;
+
+  static void run(void Function() action, {Duration duration = const Duration(milliseconds: 250)}) {
+    _timer?.cancel();
+    _timer = Timer(duration, () {
+      action();
+      _timer?.cancel();
+    });
   }
 }
