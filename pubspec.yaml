@@ -1,10 +1,10 @@
 name: quick_dev_sdk
 description: "A Flutter Software Development Kit."
-version: 0.2.0
+version: 0.2.1
 homepage:
 
 environment:
-  sdk: ^3.11.5
+  sdk: ^3.12.0
 
 dependencies:
   flutter:

@@ -29,18 +29,19 @@ class QuickDropdownField extends StatefulWidget {
       obscureText: false,
     ),
     this.splashColor,
-    this.overlayDynamicWidth = false,
-    this.overlayYOffset,
-    this.overlayAlignment = .center,
-    this.overlaydecoration = const OverlayDecoration(
+    this.overlaydecoration = const OverlayDecoration.fitToTargetWidth(
+      yOffset: 6,
+      marginY: 14,
+      marginX: 14,
       padding: .symmetric(vertical: 8),
       color: Color(0xFFFAFAFA),
       borderRadius: 8,
+      border: .fromBorderSide(BorderSide(width: 1, color: Colors.black12)),
       elevation: 1,
-      elevationType: .elevation,
-      clipBehavior: .none,
+      elevationType: .shadow,
+      slideTransition: true,
     ),
-    this.dropdownItemDecoration = const DropdownItemDecoration(
+    this.itemDecoration = const DropdownItemDecoration(
       padding: .symmetric(horizontal: 10, vertical: 8),
       margin: .symmetric(vertical: 2),
       selectedColor: Color(0xFFE0E0E0),
@@ -50,8 +51,8 @@ class QuickDropdownField extends StatefulWidget {
     this.disabled = false,
     required this.value,
     this.valueDisplay,
-    required this.dropdownItems,
-    required this.dropdownItemBuilder,
+    required this.items,
+    required this.itemBuilder,
     required this.onSelected,
   });
 
@@ -60,16 +61,13 @@ class QuickDropdownField extends StatefulWidget {
   final TextStyle style;
   final FieldDecoration decoration;
   final Color? splashColor;
-  final bool overlayDynamicWidth;
-  final double? overlayYOffset;
-  final OverlayAlign overlayAlignment;
   final OverlayDecoration overlaydecoration;
-  final DropdownItemDecoration dropdownItemDecoration;
+  final DropdownItemDecoration itemDecoration;
   final bool disabled;
   final String? value;
   final String? valueDisplay;
-  final List<String> dropdownItems;
-  final Widget Function(String value) dropdownItemBuilder;
+  final List<String> items;
+  final Widget Function(String value) itemBuilder;
   final void Function(String value) onSelected;
 
   @override
@@ -114,17 +112,14 @@ class _QuickDropdownFieldState extends State<QuickDropdownField> {
         if (widget.disabled) return;
         handleShowOverlay(
           context,
-          dynamicWidth: widget.overlayDynamicWidth,
-          alignment: widget.overlayAlignment,
           decoration: widget.overlaydecoration.copyWith(padding: .zero),
-          yOffset: widget.overlayYOffset,
-          contentBuilder: (_) => _Dropdowns(
-            overlayContentBorderRadius: widget.overlaydecoration.borderRadius,
+          contentBuilder: (_, {bool? isMeasuringWidth}) => _Dropdowns(
+            isMeasuringWidth: isMeasuringWidth,
             overlayPadding: widget.overlaydecoration.padding,
-            decoration: widget.dropdownItemDecoration,
+            decoration: widget.itemDecoration,
             value: widget.value,
-            items: widget.dropdownItems,
-            dropdownItemBuilder: widget.dropdownItemBuilder,
+            items: widget.items,
+            itemBuilder: widget.itemBuilder,
             onSelected: widget.onSelected,
             closeOverlay: closeOverlay,
           ),
@@ -152,56 +147,55 @@ class _QuickDropdownFieldState extends State<QuickDropdownField> {
 
 class _Dropdowns<T> extends StatelessWidget {
   const _Dropdowns({
-    required this.overlayContentBorderRadius,
+    this.isMeasuringWidth,
     this.overlayPadding,
     required this.decoration,
     this.value,
     required this.items,
-    required this.dropdownItemBuilder,
+    required this.itemBuilder,
     required this.onSelected,
     required this.closeOverlay,
   });
 
-  final double overlayContentBorderRadius;
+  final bool? isMeasuringWidth;
   final EdgeInsets? overlayPadding;
   final DropdownItemDecoration decoration;
   final T? value;
   final List<T> items;
-  final Widget Function(T value) dropdownItemBuilder;
+  final Widget Function(T value) itemBuilder;
   final void Function(T value) onSelected;
   final void Function() closeOverlay;
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: .circular(overlayContentBorderRadius),
-      child: ListView.builder(
-        padding: overlayPadding,
-        shrinkWrap: true,
-        cacheExtent: 2,
-        itemCount: items.length,
-        itemBuilder: (_, index) {
-          return Padding(
-            padding: decoration.margin,
-            child: QuickButton(
-              onTap: () async {
-                // await Future<void>.delayed(const Duration(milliseconds: 120));
-                closeOverlay();
-                onSelected(items[index]);
-              },
-              style: QuickButtonStyle.lite(
-                padding: decoration.padding,
-                borderRadius: .circular(decoration.borderRadius),
-                color: items[index] == value ? decoration.selectedColor : Colors.white,
-                hoveredColor: decoration.hoveredColor,
-                hoverDuration: const Duration(milliseconds: 100),
-                elevation: 0,
-              ),
-              child: dropdownItemBuilder(items[index]),
+    final itemCount = isMeasuringWidth == true ? 1 : items.length;
+
+    return ListView.builder(
+      padding: overlayPadding,
+      shrinkWrap: true,
+      cacheExtent: 2,
+      itemCount: itemCount,
+      itemBuilder: (_, index) {
+        return Padding(
+          padding: decoration.margin,
+          child: QuickButton(
+            onTap: () async {
+              // await Future<void>.delayed(const Duration(milliseconds: 120));
+              closeOverlay();
+              onSelected(items[index]);
+            },
+            style: QuickButtonStyle.lite(
+              padding: decoration.padding,
+              borderRadius: .circular(decoration.borderRadius),
+              color: items[index] == value ? decoration.selectedColor : Colors.white,
+              hoveredColor: decoration.hoveredColor,
+              hoverDuration: const Duration(milliseconds: 100),
+              elevation: 0,
             ),
-          );
-        },
-      ),
+            child: itemBuilder(items[index]),
+          ),
+        );
+      },
     );
   }
 }

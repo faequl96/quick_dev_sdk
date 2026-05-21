@@ -12,39 +12,36 @@ class QuickMenuButton<T> extends StatelessWidget {
       clipBehavior: .none,
       requestFocusOnHover: false,
     ),
-    this.overlayDynamicWidth = false,
-    this.overlayYOffset,
-    this.overlayAlignment = .center,
-    this.overlaydecoration = const OverlayDecoration(
+    this.overlaydecoration = const OverlayDecoration.fitToTargetWidth(
+      yOffset: 6,
+      marginY: 14,
+      marginX: 14,
       padding: .symmetric(vertical: 8),
       color: Color(0xFFFAFAFA),
       borderRadius: 8,
-      border: .fromBorderSide(BorderSide(width: .5, color: Colors.black12)),
+      border: .fromBorderSide(BorderSide(width: 1, color: Colors.black12)),
       elevation: 1,
-      elevationType: .elevation,
-      clipBehavior: .none,
+      elevationType: .shadow,
+      slideTransition: true,
     ),
-    this.menuItemDecoration = const MenuItemDecoration(
+    this.itemDecoration = const MenuItemDecoration(
       padding: .symmetric(horizontal: 10, vertical: 8),
       margin: .symmetric(vertical: 2),
       hoveredColor: Color(0xFFEEEEEE),
       borderRadius: 0,
     ),
-    required this.menuItems,
-    required this.menuItemBuilder,
+    required this.items,
+    required this.itemBuilder,
     required this.onSelected,
     this.onHoverChildBuilder,
     this.child,
   });
 
   final QuickButtonStyle buttonStyle;
-  final bool overlayDynamicWidth;
-  final double? overlayYOffset;
-  final OverlayAlign overlayAlignment;
   final OverlayDecoration overlaydecoration;
-  final MenuItemDecoration menuItemDecoration;
-  final List<T> menuItems;
-  final Widget Function(T value) menuItemBuilder;
+  final MenuItemDecoration itemDecoration;
+  final List<T> items;
+  final Widget Function(T value) itemBuilder;
   final void Function(T value) onSelected;
   final Widget Function(bool value)? onHoverChildBuilder;
   final Widget? child;
@@ -55,16 +52,13 @@ class QuickMenuButton<T> extends StatelessWidget {
       buttonStyle: buttonStyle,
       onTap: (handleShowOverlay, closeOverlay) => handleShowOverlay(
         context,
-        dynamicWidth: overlayDynamicWidth,
-        alignment: overlayAlignment,
         decoration: overlaydecoration.copyWith(padding: .zero),
-        yOffset: overlayYOffset,
-        contentBuilder: (_) => _Menus(
-          overlayContentBorderRadius: overlaydecoration.borderRadius,
+        contentBuilder: (_, {bool? isMeasuringWidth}) => _Menus(
+          isMeasuringWidth: isMeasuringWidth,
           overlayPadding: overlaydecoration.padding,
-          decoration: menuItemDecoration,
-          items: menuItems,
-          menuItemBuilder: menuItemBuilder,
+          decoration: itemDecoration,
+          items: items,
+          itemBuilder: itemBuilder,
           onSelected: onSelected,
           closeOverlay: closeOverlay,
         ),
@@ -77,54 +71,53 @@ class QuickMenuButton<T> extends StatelessWidget {
 
 class _Menus<T> extends StatelessWidget {
   const _Menus({
-    required this.overlayContentBorderRadius,
+    this.isMeasuringWidth,
     required this.overlayPadding,
     required this.decoration,
     required this.items,
-    required this.menuItemBuilder,
+    required this.itemBuilder,
     required this.onSelected,
     required this.closeOverlay,
   });
 
-  final double overlayContentBorderRadius;
+  final bool? isMeasuringWidth;
   final EdgeInsets overlayPadding;
   final MenuItemDecoration decoration;
   final List<T> items;
-  final Widget Function(T value) menuItemBuilder;
+  final Widget Function(T value) itemBuilder;
   final void Function(T value) onSelected;
   final void Function() closeOverlay;
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: .circular(overlayContentBorderRadius),
-      child: ListView.builder(
-        padding: overlayPadding,
-        shrinkWrap: true,
-        cacheExtent: 2,
-        itemCount: items.length,
-        itemBuilder: (_, index) {
-          return Padding(
-            padding: decoration.margin,
-            child: QuickButton(
-              onTap: () async {
-                // await Future<void>.delayed(const Duration(milliseconds: 120));
-                closeOverlay();
-                onSelected(items[index]);
-              },
-              style: QuickButtonStyle.lite(
-                padding: decoration.padding,
-                borderRadius: .circular(decoration.borderRadius),
-                color: Colors.white,
-                hoveredColor: decoration.hoveredColor,
-                elevation: 0,
-                hoverDuration: const Duration(milliseconds: 100),
-              ),
-              child: menuItemBuilder(items[index]),
+    final itemCount = isMeasuringWidth == true ? 1 : items.length;
+
+    return ListView.builder(
+      padding: overlayPadding,
+      shrinkWrap: true,
+      cacheExtent: 2,
+      itemCount: itemCount,
+      itemBuilder: (_, index) {
+        return Padding(
+          padding: decoration.margin,
+          child: QuickButton(
+            onTap: () async {
+              // await Future<void>.delayed(const Duration(milliseconds: 120));
+              closeOverlay();
+              onSelected(items[index]);
+            },
+            style: QuickButtonStyle.lite(
+              padding: decoration.padding,
+              borderRadius: .circular(decoration.borderRadius),
+              color: Colors.white,
+              hoveredColor: decoration.hoveredColor,
+              elevation: 0,
+              hoverDuration: const Duration(milliseconds: 100),
             ),
-          );
-        },
-      ),
+            child: itemBuilder(items[index]),
+          ),
+        );
+      },
     );
   }
 }

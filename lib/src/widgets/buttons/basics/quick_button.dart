@@ -121,7 +121,7 @@ class _QuickButtonState extends State<QuickButton> {
           ? Colors.grey.shade400
           : !_isHovered
           ? color
-          : style.hoveredColor ?? (color != null ? ColorUtil.darken(color, 25) : null);
+          : style.hoveredColor ?? (color != null ? ColorUtil.lighten(color, 20) : null);
       final elevation = _isHovered
           ? (style.elevation * style.hoveredElevationScale)
           : style.elevation;

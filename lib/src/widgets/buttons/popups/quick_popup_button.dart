@@ -12,6 +12,7 @@ class QuickPopupButton extends StatefulWidget {
       clipBehavior: .none,
       requestFocusOnHover: false,
     ),
+    this.disabled = false,
     this.closeOnUnHover = false,
     this.closeOnTapOutside = true,
     this.onTap,
@@ -21,17 +22,14 @@ class QuickPopupButton extends StatefulWidget {
   });
 
   final QuickButtonStyle buttonStyle;
+  final bool disabled;
   final bool closeOnUnHover;
   final bool closeOnTapOutside;
   final void Function(
     void Function(
       BuildContext context, {
-      required bool dynamicWidth,
-      bool slideTransition,
-      double? yOffset,
-      required OverlayAlign alignment,
       required OverlayDecoration decoration,
-      required Widget Function(BuildContext context) contentBuilder,
+      required Widget Function(BuildContext context, {bool? isMeasuringWidth}) contentBuilder,
     })
     handleShowOverlay,
     void Function() handleCloseOverlay,
@@ -40,12 +38,8 @@ class QuickPopupButton extends StatefulWidget {
   final void Function(
     void Function(
       BuildContext context, {
-      required bool dynamicWidth,
-      bool slideTransition,
-      double? yOffset,
-      required OverlayAlign alignment,
       required OverlayDecoration decoration,
-      required Widget Function(BuildContext context) contentBuilder,
+      required Widget Function(BuildContext context, {bool? isMeasuringWidth}) contentBuilder,
     })
     handleShowOverlay,
   )?
@@ -72,22 +66,16 @@ class _QuickPopupButtonState extends State<QuickPopupButton> {
 
   void _handleShowOverlay(
     BuildContext context, {
-    required bool dynamicWidth,
-    bool slideTransition = true,
-    double? yOffset,
-    required OverlayAlign alignment,
+    required bool closeOnTapTarget,
     required OverlayDecoration decoration,
-    required Widget Function(BuildContext context) contentBuilder,
+    required Widget Function(BuildContext context, {bool? isMeasuringWidth}) contentBuilder,
   }) {
     _overlay.create(
       context,
-      linkKey: _key,
+      targetKey: _key,
       link: _layerLink,
-      dynamicWidth: dynamicWidth,
-      slideTransition: slideTransition,
       closeOnTapOutside: widget.closeOnTapOutside,
-      yOffset: yOffset,
-      alignment: alignment,
+      closeOnTapTarget: closeOnTapTarget,
       decoration: decoration,
       onHoverInside: (value) {
         if (widget.closeOnUnHover) _onHoverContentInside(value);
@@ -110,22 +98,15 @@ class _QuickPopupButtonState extends State<QuickPopupButton> {
       child: QuickButton(
         key: _key,
         style: widget.buttonStyle,
-        disabled: widget.onTap == null,
+        disabled: widget.disabled,
         onTap: () => widget.onTap?.call((
           BuildContext context, {
-          required bool dynamicWidth,
-          bool slideTransition = true,
-          double? yOffset,
-          required OverlayAlign alignment,
           required OverlayDecoration decoration,
-          required Widget Function(BuildContext) contentBuilder,
+          required Widget Function(BuildContext, {bool? isMeasuringWidth}) contentBuilder,
         }) async {
           _handleShowOverlay(
             context,
-            dynamicWidth: dynamicWidth,
-            slideTransition: slideTransition,
-            yOffset: yOffset,
-            alignment: alignment,
+            closeOnTapTarget: true,
             decoration: decoration,
             contentBuilder: contentBuilder,
           );
@@ -134,19 +115,12 @@ class _QuickPopupButtonState extends State<QuickPopupButton> {
           if (value) {
             widget.onHover?.call((
               BuildContext context, {
-              required bool dynamicWidth,
-              bool slideTransition = true,
-              double? yOffset,
-              required OverlayAlign alignment,
               required OverlayDecoration decoration,
-              required Widget Function(BuildContext) contentBuilder,
+              required Widget Function(BuildContext, {bool? isMeasuringWidth}) contentBuilder,
             }) {
               _handleShowOverlay(
                 context,
-                dynamicWidth: dynamicWidth,
-                slideTransition: slideTransition,
-                yOffset: yOffset,
-                alignment: alignment,
+                closeOnTapTarget: false,
                 decoration: decoration,
                 contentBuilder: contentBuilder,
               );

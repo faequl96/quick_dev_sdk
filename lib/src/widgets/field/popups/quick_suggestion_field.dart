@@ -5,15 +5,19 @@ import 'package:quick_dev_sdk/quick_dev_sdk.dart';
 class QuickSuggestionField<T> extends StatefulWidget {
   const QuickSuggestionField({
     super.key,
-    this.decoration = const OverlayDecoration(
-      padding: .symmetric(vertical: 8),
+    this.decoration = const OverlayDecoration.fitToTargetWidth(
+      yOffset: 6,
+      marginY: 14,
+      marginX: 14,
       color: Color(0xFFFAFAFA),
+      padding: .symmetric(vertical: 8),
       borderRadius: 8,
+      border: .fromBorderSide(BorderSide(width: 1, color: Colors.black12)),
       elevation: 1,
-      elevationType: .elevation,
-      clipBehavior: .hardEdge,
+      elevationType: .shadow,
+      slideTransition: true,
     ),
-    this.suggestionItemDecoration = const SuggestionItemDecoration(
+    this.itemDecoration = const SuggestionItemDecoration(
       padding: .symmetric(horizontal: 10, vertical: 8),
       margin: .symmetric(vertical: 2),
       evenColor: Colors.white,
@@ -34,10 +38,9 @@ class QuickSuggestionField<T> extends StatefulWidget {
   });
 
   final OverlayDecoration decoration;
-  final SuggestionItemDecoration suggestionItemDecoration;
+  final SuggestionItemDecoration itemDecoration;
   final Duration debouncer;
-  final Widget Function(BuildContext context, TextEditingController controller, FocusNode focusNode)
-  fieldBuilder;
+  final Widget Function(BuildContext context, TextEditingController controller, FocusNode focusNode) fieldBuilder;
   final bool dispose;
   final TextEditingController controller;
   final FocusNode? focusNode;
@@ -70,14 +73,12 @@ class _QuickSuggestionFieldState<T> extends State<QuickSuggestionField<T>> {
       if (!_isOverlayUseInteraction) {
         _overlay.create(
           context,
-          linkKey: _key,
+          targetKey: _key,
           link: _layerLink,
-          slideTransition: false,
           closeOnTapOutside: false,
-          closeOnTapLink: false,
-          decoration: .unStyled(maxHeight: widget.decoration.maxHeight),
-          yOffset: 6,
-          contentBuilder: (_) => Listener(
+          closeOnTapTarget: false,
+          decoration: widget.decoration.copyWith(padding: .zero),
+          contentBuilder: (_, {bool? isMeasuringWidth}) => Listener(
             onPointerDown: (_) {
               _isOverlayUseInteraction = true;
               _isPointerInsideOverlay = true;
@@ -89,11 +90,11 @@ class _QuickSuggestionFieldState<T> extends State<QuickSuggestionField<T>> {
               _isPointerInsideOverlay = false;
             },
             child: _MainContent<T>(
-              decoration: widget.decoration,
-              suggestionItemDecoration: widget.suggestionItemDecoration,
-              debouncer: widget.debouncer,
+              overlayPadding: widget.decoration.padding,
+              itemDecoration: widget.itemDecoration,
               focusNode: _focusNode,
               controller: widget.controller,
+              debouncer: widget.debouncer,
               suggestions: widget.suggestions,
               textStream: _textStreamController.stream,
               onSelected: (value) {
@@ -168,11 +169,11 @@ class _QuickSuggestionFieldState<T> extends State<QuickSuggestionField<T>> {
 class _MainContent<T> extends StatefulWidget {
   const _MainContent({
     super.key,
-    required this.decoration,
-    required this.suggestionItemDecoration,
-    required this.debouncer,
+    required this.overlayPadding,
+    required this.itemDecoration,
     required this.focusNode,
     required this.controller,
+    required this.debouncer,
     required this.suggestions,
     required this.textStream,
     required this.onSelected,
@@ -181,11 +182,11 @@ class _MainContent<T> extends StatefulWidget {
     this.loadingBuilder,
   });
 
-  final Duration debouncer;
-  final OverlayDecoration decoration;
-  final SuggestionItemDecoration suggestionItemDecoration;
+  final EdgeInsets overlayPadding;
+  final SuggestionItemDecoration itemDecoration;
   final FocusNode focusNode;
   final TextEditingController controller;
+  final Duration debouncer;
   final Stream<String> textStream;
   final void Function(T value) onSelected;
   final Future<List<T>> Function(String value) suggestions;
@@ -239,13 +240,14 @@ class _MainContentState<T> extends State<_MainContent<T>> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return _defaultCardStyle(widget.loadingBuilder?.call(context) ?? const SizedBox(height: 24));
+      if (widget.loadingBuilder == null) return const SizedBox.shrink();
+      return Padding(padding: widget.overlayPadding, child: widget.loadingBuilder!.call(context));
     }
 
     if (_suggestions.isNotEmpty) {
       return _Suggestions<T>(
-        decoration: widget.decoration,
-        suggestionItemDecoration: widget.suggestionItemDecoration,
+        overlayPadding: widget.overlayPadding,
+        itemDecoration: widget.itemDecoration,
         onSelected: widget.onSelected,
         suggestions: _suggestions,
         itemBuilder: widget.itemBuilder,
@@ -254,80 +256,48 @@ class _MainContentState<T> extends State<_MainContent<T>> {
 
     if (widget.controller.text.isNotEmpty) {
       if (widget.emptyBuilder == null) return const SizedBox.shrink();
-      return _defaultCardStyle(widget.emptyBuilder!(context));
+      return Padding(padding: widget.overlayPadding, child: widget.emptyBuilder!.call(context));
     }
 
     return const SizedBox.shrink();
-  }
-
-  Widget _defaultCardStyle(Widget content) {
-    return Container(
-      width: .maxFinite,
-      padding: const .symmetric(vertical: 10, horizontal: 14),
-      decoration: BoxDecoration(
-        color: widget.decoration.color,
-        borderRadius: .circular(widget.decoration.borderRadius),
-        border: widget.decoration.border,
-        boxShadow: DecorationUtils.elevation(
-          widget.decoration.elevation,
-          elevationType: widget.decoration.elevationType,
-        ),
-      ),
-      child: content,
-    );
   }
 }
 
 class _Suggestions<T> extends StatelessWidget {
   const _Suggestions({
-    required this.decoration,
-    required this.suggestionItemDecoration,
+    required this.overlayPadding,
+    required this.itemDecoration,
     required this.onSelected,
     required this.suggestions,
     required this.itemBuilder,
   });
 
-  final OverlayDecoration decoration;
-  final SuggestionItemDecoration suggestionItemDecoration;
+  final EdgeInsets overlayPadding;
+  final SuggestionItemDecoration itemDecoration;
   final void Function(T value) onSelected;
   final List<T> suggestions;
   final Widget Function(BuildContext context, T value) itemBuilder;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: .maxFinite,
-      decoration: BoxDecoration(
-        color: decoration.color,
-        borderRadius: .circular(decoration.borderRadius),
-        border: decoration.border,
-        boxShadow: DecorationUtils.elevation(
-          decoration.elevation,
-          elevationType: decoration.elevationType,
-        ),
-      ),
-      clipBehavior: decoration.clipBehavior,
-      child: ListView.builder(
-        padding: decoration.padding,
-        shrinkWrap: true,
-        cacheExtent: 2,
-        itemCount: suggestions.length,
-        itemBuilder: (context, index) => Padding(
-          padding: suggestionItemDecoration.margin,
-          child: QuickButton(
-            onTap: () => onSelected(suggestions[index]),
-            style: QuickButtonStyle.lite(
-              padding: suggestionItemDecoration.padding,
-              borderRadius: .circular(suggestionItemDecoration.borderRadius),
-              color: index % 2 == 1
-                  ? suggestionItemDecoration.evenColor
-                  : suggestionItemDecoration.oddColor,
-              hoveredColor: suggestionItemDecoration.hoveredColor,
-              hoverDuration: const Duration(milliseconds: 100),
-              elevation: 0,
-            ),
-            child: itemBuilder(context, suggestions[index]),
+    return ListView.builder(
+      scrollCacheExtent: const .pixels(2),
+      padding: overlayPadding,
+      shrinkWrap: true,
+      itemCount: suggestions.length,
+      itemBuilder: (context, index) => Padding(
+        padding: itemDecoration.margin,
+        child: QuickButton(
+          onTap: () => onSelected(suggestions[index]),
+          style: QuickButtonStyle.lite(
+            padding: itemDecoration.padding,
+            borderRadius: .circular(itemDecoration.borderRadius),
+            color: index % 2 == 1 ? itemDecoration.evenColor : itemDecoration.oddColor,
+            hoveredColor: itemDecoration.hoveredColor,
+            hoverDuration: const Duration(milliseconds: 100),
+            elevation: 0,
           ),
+          child: itemBuilder(context, suggestions[index]),
         ),
       ),
     );

@@ -9,6 +9,7 @@ class CardContainer extends StatelessWidget {
     this.margin,
     this.padding = .zero,
     this.color,
+    this.gradientColor,
     this.borderRadius = 8,
     this.border,
     this.boxShadow,
@@ -22,6 +23,7 @@ class CardContainer extends StatelessWidget {
   final EdgeInsets? margin;
   final EdgeInsets padding;
   final Color? color;
+  final LinearGradient? gradientColor;
   final double borderRadius;
   final BoxBorder? border;
   final BoxShadow? boxShadow;
