@@ -16,6 +16,7 @@ class QuickButtonStyle {
     this.borderRadius,
     this.border,
     this.requestFocusOnHover = false,
+    this.clipBehavior = .none,
   }) : isLite = false,
        elevationType = .elevation;
 
@@ -31,6 +32,7 @@ class QuickButtonStyle {
     this.elevationType = .elevation,
     this.borderRadius,
     this.border,
+    this.clipBehavior = .none,
   }) : isLite = true,
        splashColor = null,
        splashFactory = InkSparkle.splashFactory,
@@ -51,6 +53,7 @@ class QuickButtonStyle {
   final BorderRadius? borderRadius;
   final BoxBorder? border;
   final bool requestFocusOnHover;
+  final Clip clipBehavior;
 }
 
 class QuickButton extends StatefulWidget {
@@ -141,7 +144,7 @@ class _QuickButtonState extends State<QuickButton> {
                   ? DecorationUtils.elevation(elevation, elevationType: style.elevationType)
                   : null,
             ),
-            clipBehavior: .antiAlias,
+            clipBehavior: style.clipBehavior,
             child: widget.onHoverChildBuilder?.call(_isHovered) ?? widget.child,
           ),
         ),
@@ -158,7 +161,7 @@ class _QuickButtonState extends State<QuickButton> {
       color: widget.disabled ? Colors.grey.shade400 : style.color,
       elevation: widget.disabled ? 0 : elevation,
       borderRadius: style.borderRadius,
-      clipBehavior: .antiAlias,
+      clipBehavior: style.clipBehavior,
       child: InkWell(
         onTap: widget.disabled ? null : widget.onTap,
         focusNode: _focusNode,

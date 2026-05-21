@@ -10,6 +10,7 @@ class QuickMenuButton<T> extends StatelessWidget {
       elevation: 1,
       hoveredElevationScale: 1,
       requestFocusOnHover: false,
+      clipBehavior: .none,
     ),
     this.overlaydecoration = const .fitToTargetWidth(
       yOffset: 6,
@@ -26,7 +27,6 @@ class QuickMenuButton<T> extends StatelessWidget {
     this.itemDecoration = const MenuItemDecoration(
       padding: .symmetric(horizontal: 10, vertical: 8),
       margin: .symmetric(vertical: 2),
-      hoveredColor: Color(0xFFEEEEEE),
       borderRadius: 0,
     ),
     required this.items,
@@ -105,10 +105,10 @@ class _Menus<T> extends StatelessWidget {
               closeOverlay();
               onSelected(items[index]);
             },
-            style: QuickButtonStyle.lite(
+            style: .lite(
               padding: decoration.padding,
               borderRadius: .circular(decoration.borderRadius),
-              color: Colors.white,
+              color: decoration.color,
               hoveredColor: decoration.hoveredColor,
               elevation: 0,
               hoverDuration: const Duration(milliseconds: 100),

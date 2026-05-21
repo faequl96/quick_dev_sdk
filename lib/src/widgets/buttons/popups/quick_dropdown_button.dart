@@ -10,6 +10,7 @@ class QuickDropdownButton<T> extends StatelessWidget {
       elevation: 1,
       hoveredElevationScale: 1,
       requestFocusOnHover: false,
+      clipBehavior: .none,
     ),
     this.overlaydecoration = const .fitToTargetWidth(
       yOffset: 6,
@@ -26,8 +27,6 @@ class QuickDropdownButton<T> extends StatelessWidget {
     this.itemDecoration = const DropdownItemDecoration(
       padding: .symmetric(horizontal: 10, vertical: 8),
       margin: .symmetric(vertical: 2),
-      selectedColor: Color(0xFFE0E0E0),
-      hoveredColor: Color(0xFFEEEEEE),
       borderRadius: 0,
     ),
     this.disabled = false,
@@ -113,10 +112,10 @@ class _Dropdowns<T> extends StatelessWidget {
               closeOverlay();
               onSelected(items[index]);
             },
-            style: QuickButtonStyle.lite(
+            style: .lite(
               padding: decoration.padding,
               borderRadius: .circular(decoration.borderRadius),
-              color: items[index] == value ? decoration.selectedColor : Colors.white,
+              color: items[index] == value ? decoration.selectedColor : decoration.color,
               hoveredColor: decoration.hoveredColor,
               hoverDuration: const Duration(milliseconds: 100),
               elevation: 0,

@@ -461,7 +461,8 @@ class _AnimationLayerState extends State<_AnimationLayer> with SingleTickerProvi
 
     return SizeTransition(
       sizeFactor: _animation!,
-      alignment: widget.isTopOverlay ? .topCenter : .bottomCenter,
+      axisAlignment: widget.isTopOverlay ? 1 : -1,
+      // alignment: widget.isTopOverlay ? .topCenter : .bottomCenter,
       child: Padding(padding: padding, child: widget.child),
     );
   }

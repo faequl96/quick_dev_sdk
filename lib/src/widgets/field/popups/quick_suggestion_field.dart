@@ -20,9 +20,6 @@ class QuickSuggestionField<T> extends StatefulWidget {
     this.itemDecoration = const SuggestionItemDecoration(
       padding: .symmetric(horizontal: 10, vertical: 8),
       margin: .symmetric(vertical: 2),
-      evenColor: Colors.white,
-      oddColor: Colors.white,
-      hoveredColor: Color(0xFFEEEEEE),
       borderRadius: 0,
     ),
     this.debouncer = const Duration(milliseconds: 250),
@@ -290,7 +287,7 @@ class _Suggestions<T> extends StatelessWidget {
         padding: itemDecoration.margin,
         child: QuickButton(
           onTap: () => onSelected(suggestions[index]),
-          style: QuickButtonStyle.lite(
+          style: .lite(
             padding: itemDecoration.padding,
             borderRadius: .circular(itemDecoration.borderRadius),
             color: index % 2 == 1 ? itemDecoration.evenColor : itemDecoration.oddColor,

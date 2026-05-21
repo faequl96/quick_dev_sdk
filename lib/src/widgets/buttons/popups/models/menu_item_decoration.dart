@@ -4,12 +4,14 @@ class MenuItemDecoration {
   const MenuItemDecoration({
     this.padding = const .symmetric(horizontal: 10, vertical: 8),
     this.margin = const .symmetric(vertical: 2),
-    this.hoveredColor = const Color(0xFFEEEEEE),
+    this.color,
+    this.hoveredColor,
     this.borderRadius = 0,
   });
 
   final EdgeInsets padding;
   final EdgeInsets margin;
-  final Color hoveredColor;
+  final Color? color;
+  final Color? hoveredColor;
   final double borderRadius;
 }
