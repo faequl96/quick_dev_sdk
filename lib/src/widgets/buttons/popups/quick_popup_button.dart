@@ -9,7 +9,6 @@ class QuickPopupButton extends StatefulWidget {
       hoverDuration: Duration(milliseconds: 250),
       elevation: 1,
       hoveredElevationScale: 1,
-      clipBehavior: .none,
       requestFocusOnHover: false,
     ),
     this.disabled = false,

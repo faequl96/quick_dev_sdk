@@ -15,7 +15,6 @@ class QuickButtonStyle {
     this.hoveredElevationScale = 3,
     this.borderRadius,
     this.border,
-    this.clipBehavior = .none,
     this.requestFocusOnHover = false,
   }) : isLite = false,
        elevationType = .elevation;
@@ -35,7 +34,6 @@ class QuickButtonStyle {
   }) : isLite = true,
        splashColor = null,
        splashFactory = InkSparkle.splashFactory,
-       clipBehavior = .none,
        requestFocusOnHover = false;
 
   final bool isLite;
@@ -52,7 +50,6 @@ class QuickButtonStyle {
   final ElevationType elevationType;
   final BorderRadius? borderRadius;
   final BoxBorder? border;
-  final Clip clipBehavior;
   final bool requestFocusOnHover;
 }
 
@@ -63,7 +60,6 @@ class QuickButton extends StatefulWidget {
       hoverDuration: Duration(milliseconds: 250),
       elevation: 1,
       hoveredElevationScale: 3,
-      clipBehavior: .none,
       requestFocusOnHover: false,
     ),
     this.disabled = false,
@@ -145,6 +141,7 @@ class _QuickButtonState extends State<QuickButton> {
                   ? DecorationUtils.elevation(elevation, elevationType: style.elevationType)
                   : null,
             ),
+            clipBehavior: .antiAlias,
             child: widget.onHoverChildBuilder?.call(_isHovered) ?? widget.child,
           ),
         ),
@@ -157,15 +154,18 @@ class _QuickButtonState extends State<QuickButton> {
         : style.elevation;
 
     return Material(
+      type: color != null ? .canvas : .transparency,
       color: widget.disabled ? Colors.grey.shade400 : style.color,
       elevation: widget.disabled ? 0 : elevation,
       borderRadius: style.borderRadius,
-      clipBehavior: style.clipBehavior,
+      clipBehavior: .antiAlias,
       child: InkWell(
         onTap: widget.disabled ? null : widget.onTap,
         focusNode: _focusNode,
         onHover: (value) => _handleHover(value),
-        hoverColor: style.hoveredColor ?? (color != null ? ColorUtil.lighten(color, 25) : null),
+        hoverColor:
+            style.hoveredColor ??
+            (color != null ? ColorUtil.lighten(color, 25) : Colors.transparent),
         splashColor: style.splashColor ?? color,
         splashFactory: style.splashFactory,
         focusColor: Colors.transparent,
