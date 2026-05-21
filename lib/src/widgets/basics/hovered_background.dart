@@ -44,7 +44,11 @@ class _HoveredBackgroundState extends State<HoveredBackground> {
   bool _isHovered = false;
   Widget? _childHovered;
 
-  final _initialBoxShadow = const BoxShadow(offset: Offset(0, 1), blurRadius: 1, color: .fromARGB(10, 0, 0, 0));
+  final _initialBoxShadow = const BoxShadow(
+    offset: Offset(0, 1),
+    blurRadius: 1,
+    color: .fromARGB(10, 0, 0, 0),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -56,10 +60,16 @@ class _HoveredBackgroundState extends State<HoveredBackground> {
       decoration: BoxDecoration(
         borderRadius: widget.borderRadius,
         border: widget.border,
-        color: _isHovered ? widget.hoveredColor ?? Colors.transparent : widget.unhoveredColor ?? Colors.transparent,
+        color: _isHovered
+            ? widget.hoveredColor ?? Colors.transparent
+            : widget.unhoveredColor ?? Colors.transparent,
         boxShadow: [
           if (widget.hoveredBoxShadow != null) ...[
-            if (_isHovered) widget.hoveredBoxShadow! else ...[if (widget.useInitialBoxShadow) _initialBoxShadow],
+            if (_isHovered)
+              widget.hoveredBoxShadow!
+            else ...[
+              if (widget.useInitialBoxShadow) _initialBoxShadow,
+            ],
           ] else ...[
             if (widget.useInitialBoxShadow) _initialBoxShadow,
           ],

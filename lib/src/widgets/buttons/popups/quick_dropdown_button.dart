@@ -12,7 +12,7 @@ class QuickDropdownButton<T> extends StatelessWidget {
       clipBehavior: .none,
       requestFocusOnHover: false,
     ),
-    this.overlaydecoration = const OverlayDecoration.fitToTargetWidth(
+    this.overlaydecoration = const .fitToTargetWidth(
       yOffset: 6,
       marginY: 14,
       marginX: 14,
@@ -101,9 +101,9 @@ class _Dropdowns<T> extends StatelessWidget {
     final itemCount = isMeasuringWidth == true ? 1 : items.length;
 
     return ListView.builder(
+      scrollCacheExtent: const .pixels(2),
       padding: overlayPadding,
       shrinkWrap: true,
-      cacheExtent: 2,
       itemCount: itemCount,
       itemBuilder: (_, index) {
         return Padding(

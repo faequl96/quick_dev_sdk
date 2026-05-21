@@ -5,7 +5,7 @@ import 'package:quick_dev_sdk/quick_dev_sdk.dart';
 class QuickSuggestionField<T> extends StatefulWidget {
   const QuickSuggestionField({
     super.key,
-    this.decoration = const OverlayDecoration.fitToTargetWidth(
+    this.decoration = const .fitToTargetWidth(
       yOffset: 6,
       marginY: 14,
       marginX: 14,
@@ -40,7 +40,8 @@ class QuickSuggestionField<T> extends StatefulWidget {
   final OverlayDecoration decoration;
   final SuggestionItemDecoration itemDecoration;
   final Duration debouncer;
-  final Widget Function(BuildContext context, TextEditingController controller, FocusNode focusNode) fieldBuilder;
+  final Widget Function(BuildContext context, TextEditingController controller, FocusNode focusNode)
+  fieldBuilder;
   final bool dispose;
   final TextEditingController controller;
   final FocusNode? focusNode;

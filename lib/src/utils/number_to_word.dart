@@ -136,7 +136,18 @@ class NumberToWord {
     'sembilan belas',
   ];
 
-  static const _tensEN = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+  static const _tensEN = [
+    '',
+    '',
+    'twenty',
+    'thirty',
+    'forty',
+    'fifty',
+    'sixty',
+    'seventy',
+    'eighty',
+    'ninety',
+  ];
 
   static const _tensID = [
     '',

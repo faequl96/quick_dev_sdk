@@ -46,7 +46,8 @@ class CurrencyTextInputFormatter extends TextInputFormatter {
 
   @override
   TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
-    final bool isRemovedCharacter = oldValue.text.length - 1 == newValue.text.length && oldValue.text.startsWith(newValue.text);
+    final bool isRemovedCharacter =
+        oldValue.text.length - 1 == newValue.text.length && oldValue.text.startsWith(newValue.text);
 
     if (enableNegative) {
       _isNegative = newValue.text.startsWith('-');

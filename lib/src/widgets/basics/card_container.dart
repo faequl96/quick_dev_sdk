@@ -46,7 +46,12 @@ class CardContainer extends StatelessWidget {
           if (boxShadow != null)
             boxShadow!
           else
-            const BoxShadow(offset: Offset(0, 2), blurRadius: 6, color: Colors.black12, spreadRadius: 1),
+            const BoxShadow(
+              offset: Offset(0, 2),
+              blurRadius: 6,
+              color: Colors.black12,
+              spreadRadius: 1,
+            ),
         ],
       ),
       clipBehavior: clipBehavior,

@@ -75,7 +75,7 @@ class OverlayDecoration {
     bool? slideTransition,
   }) {
     if (_fitToTargetWidth) {
-      return OverlayDecoration.fitToTargetWidth(
+      return .fitToTargetWidth(
         height: height ?? this.height,
         maxHeight: maxHeight ?? this.maxHeight,
         yOffset: yOffset ?? this.yOffset,
@@ -124,7 +124,7 @@ class StickyOverlay {
     required LayerLink link,
     bool closeOnTapOutside = true,
     bool closeOnTapTarget = true,
-    OverlayDecoration decoration = const OverlayDecoration.fitToTargetWidth(
+    OverlayDecoration decoration = const .fitToTargetWidth(
       yOffset: 6,
       marginY: 14,
       marginX: 14,
@@ -260,15 +260,19 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     final size = mediaQuery.size;
     final paddingBottom = mediaQuery.padding.bottom;
     final bottomMaxHeight =
-        (size.height - (targetPosition.dy + _targetSize.height + _decoration.yOffset)) - (_decoration.marginY + paddingBottom);
+        (size.height - (targetPosition.dy + _targetSize.height + _decoration.yOffset)) -
+        (_decoration.marginY + paddingBottom);
     _isTopOverlay = bottomMaxHeight < (_minTopOverlay - 10);
     final paddingTop = mediaQuery.padding.top;
-    final topMaxHeight = (targetPosition.dy - _decoration.yOffset) - (_decoration.marginY + paddingTop);
+    final topMaxHeight =
+        (targetPosition.dy - _decoration.yOffset) - (_decoration.marginY + paddingTop);
 
     _maxHeight = (_isTopOverlay ? topMaxHeight : bottomMaxHeight);
     _maxWidth = _getMaxWidth(_decoration.alignment, size, _targetSize, targetPosition);
 
-    _alignmentYOffset = _isTopOverlay ? -(_targetSize.height - _elevationSurfaceY) : _targetSize.height - _elevationSurfaceY;
+    _alignmentYOffset = _isTopOverlay
+        ? -(_targetSize.height - _elevationSurfaceY)
+        : _targetSize.height - _elevationSurfaceY;
     _alignmentXOffset = switch (_decoration.alignment) {
       .left => -_elevationSurfaceX,
       .center => 0,
@@ -295,7 +299,10 @@ class _OverlayLayerState extends State<_OverlayLayer> {
             child: SizedBox(
               key: _contentKey,
               child: ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: _maxWidth + (_elevationSurfaceX * 2), maxHeight: 100),
+                constraints: BoxConstraints(
+                  maxWidth: _maxWidth + (_elevationSurfaceX * 2),
+                  maxHeight: 100,
+                ),
                 child: Padding(
                   padding: .only(
                     top: _elevationSurfaceY + border.top.width + padding.top,
@@ -315,8 +322,12 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     final surfaceWidth = _maxWidth < _targetSize.width
         ? (_targetSize.width + (_elevationSurfaceX * 2))
         : (_staticOverlaySurfaceWidth ?? 0);
-    final dynamicWidth = _decoration.width != null ? (_decoration.width! + (_elevationSurfaceX * 2)) : surfaceWidth;
-    final width = !_decoration._fitToTargetWidth ? dynamicWidth : _targetSize.width + (_elevationSurfaceX * 2);
+    final dynamicWidth = _decoration.width != null
+        ? (_decoration.width! + (_elevationSurfaceX * 2))
+        : surfaceWidth;
+    final width = !_decoration._fitToTargetWidth
+        ? dynamicWidth
+        : _targetSize.width + (_elevationSurfaceX * 2);
 
     // print('_maxWidth: $_maxWidth');
     // print('_targetSize.width: ${_targetSize.width}');
@@ -418,7 +429,10 @@ class _AnimationLayerState extends State<_AnimationLayer> with SingleTickerProvi
 
     if (!widget.slideTransition) return;
 
-    _animationController = AnimationController(vsync: this, duration: const Duration(milliseconds: 400));
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+    );
     _animation = CurvedAnimation(parent: _animationController!, curve: Curves.easeOutCubic);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _animationController!.forward();
@@ -631,7 +645,10 @@ class _RenderDecoratedOverlay extends RenderProxyBox {
         color: _decoration.color,
         borderRadius: .circular(_decoration.borderRadius),
         border: _decoration.border,
-        boxShadow: DecorationUtils.elevation(_decoration.elevation, elevationType: _decoration.elevationType),
+        boxShadow: DecorationUtils.elevation(
+          _decoration.elevation,
+          elevationType: _decoration.elevationType,
+        ),
       );
 
       _cachedPainter ??= texturizedDecoration.createBoxPainter(markNeedsPaint);
@@ -654,7 +671,10 @@ class _RenderDecoratedOverlay extends RenderProxyBox {
       final childX = offset.dx + totalInternalPadding.left;
       final childY = offset.dy + totalInternalPadding.top;
 
-      context.pushClipRRect(needsCompositing, .zero, clipRect, innerRRect, (PaintingContext innerContext, Offset innerOffset) {
+      context.pushClipRRect(needsCompositing, .zero, clipRect, innerRRect, (
+        PaintingContext innerContext,
+        Offset innerOffset,
+      ) {
         innerContext.paintChild(child!, Offset(childX, childY));
       });
     } else if (child != null) {
@@ -673,7 +693,11 @@ class OverlayWrapper extends StatefulWidget {
 }
 
 class _OverlayWrapperState extends State<OverlayWrapper> {
-  late final _entry = OverlayEntry(canSizeOverlay: true, opaque: true, builder: (BuildContext context) => widget.child);
+  late final _entry = OverlayEntry(
+    canSizeOverlay: true,
+    opaque: true,
+    builder: (BuildContext context) => widget.child,
+  );
 
   @override
   void didUpdateWidget(OverlayWrapper oldWidget) {
