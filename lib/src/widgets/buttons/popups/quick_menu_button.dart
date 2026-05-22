@@ -4,6 +4,7 @@ import 'package:quick_dev_sdk/quick_dev_sdk.dart';
 class QuickMenuButton<T> extends StatelessWidget {
   const QuickMenuButton({
     super.key,
+    required this.onSelected,
     this.buttonStyle = const QuickButtonStyle(
       splashFactory: InkSparkle.splashFactory,
       hoverDuration: Duration(milliseconds: 250),
@@ -31,37 +32,36 @@ class QuickMenuButton<T> extends StatelessWidget {
     ),
     required this.items,
     required this.itemBuilder,
-    required this.onSelected,
     this.onHoverChildBuilder,
     this.child,
   });
 
+  final void Function(T value) onSelected;
   final QuickButtonStyle buttonStyle;
   final OverlayDecoration overlaydecoration;
   final MenuItemDecoration itemDecoration;
   final List<T> items;
-  final Widget Function(T value) itemBuilder;
-  final void Function(T value) onSelected;
-  final Widget Function(bool value)? onHoverChildBuilder;
+  final Widget Function(BuildContext context, T value) itemBuilder;
+  final Widget Function(BuildContext context, bool value)? onHoverChildBuilder;
   final Widget? child;
 
   @override
   Widget build(BuildContext context) {
-    return QuickPopupButton(
-      buttonStyle: buttonStyle,
+    return QuickStickyOverlayButton(
       onTap: (handleShowOverlay, closeOverlay) => handleShowOverlay(
         context,
         decoration: overlaydecoration.copyWith(padding: .zero),
-        contentBuilder: (_, {bool? isMeasuringWidth}) => _Menus(
+        contentBuilder: (_, {isMeasuringWidth}) => _Menus(
+          onSelected: onSelected,
           isMeasuringWidth: isMeasuringWidth,
           overlayPadding: overlaydecoration.padding,
           decoration: itemDecoration,
           items: items,
           itemBuilder: itemBuilder,
-          onSelected: onSelected,
           closeOverlay: closeOverlay,
         ),
       ),
+      buttonStyle: buttonStyle,
       onHoverChildBuilder: onHoverChildBuilder,
       child: child,
     );
@@ -70,21 +70,21 @@ class QuickMenuButton<T> extends StatelessWidget {
 
 class _Menus<T> extends StatelessWidget {
   const _Menus({
+    required this.onSelected,
     this.isMeasuringWidth,
     required this.overlayPadding,
     required this.decoration,
     required this.items,
     required this.itemBuilder,
-    required this.onSelected,
     required this.closeOverlay,
   });
 
+  final void Function(T value) onSelected;
   final bool? isMeasuringWidth;
   final EdgeInsets overlayPadding;
   final MenuItemDecoration decoration;
   final List<T> items;
-  final Widget Function(T value) itemBuilder;
-  final void Function(T value) onSelected;
+  final Widget Function(BuildContext context, T value) itemBuilder;
   final void Function() closeOverlay;
 
   @override
@@ -96,14 +96,14 @@ class _Menus<T> extends StatelessWidget {
       padding: overlayPadding,
       shrinkWrap: true,
       itemCount: itemCount,
-      itemBuilder: (_, index) {
+      itemBuilder: (context, index) {
+        final item = items[index];
         return Padding(
           padding: decoration.margin,
           child: QuickButton(
-            onTap: () async {
-              // await Future<void>.delayed(const Duration(milliseconds: 120));
+            onTap: () {
               closeOverlay();
-              onSelected(items[index]);
+              onSelected(item);
             },
             style: .lite(
               padding: decoration.padding,
@@ -113,7 +113,7 @@ class _Menus<T> extends StatelessWidget {
               elevation: 0,
               hoverDuration: const Duration(milliseconds: 100),
             ),
-            child: itemBuilder(items[index]),
+            child: itemBuilder(context, item),
           ),
         );
       },

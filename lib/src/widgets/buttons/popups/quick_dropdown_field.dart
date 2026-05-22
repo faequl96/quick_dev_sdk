@@ -4,6 +4,7 @@ import 'package:quick_dev_sdk/quick_dev_sdk.dart';
 class QuickDropdownField extends StatefulWidget {
   const QuickDropdownField({
     super.key,
+    required this.onSelected,
     this.height,
     this.width,
     this.style = const TextStyle(fontSize: 16),
@@ -51,9 +52,9 @@ class QuickDropdownField extends StatefulWidget {
     this.valueDisplay,
     required this.items,
     required this.itemBuilder,
-    required this.onSelected,
   });
 
+  final void Function(String value) onSelected;
   final double? height;
   final double? width;
   final TextStyle style;
@@ -65,8 +66,7 @@ class QuickDropdownField extends StatefulWidget {
   final String? value;
   final String? valueDisplay;
   final List<String> items;
-  final Widget Function(String value) itemBuilder;
-  final void Function(String value) onSelected;
+  final Widget Function(BuildContext context, String value) itemBuilder;
 
   @override
   State<QuickDropdownField> createState() => _QuickDropdownFieldState();
@@ -98,7 +98,24 @@ class _QuickDropdownFieldState extends State<QuickDropdownField> {
 
   @override
   Widget build(BuildContext context) {
-    return QuickPopupButton(
+    return QuickStickyOverlayButton(
+      onTap: (handleShowOverlay, closeOverlay) {
+        if (widget.disabled) return;
+        handleShowOverlay(
+          context,
+          decoration: widget.overlaydecoration.copyWith(padding: .zero),
+          contentBuilder: (_, {isMeasuringWidth}) => _Dropdowns(
+            onSelected: widget.onSelected,
+            isMeasuringWidth: isMeasuringWidth,
+            overlayPadding: widget.overlaydecoration.padding,
+            decoration: widget.itemDecoration,
+            value: widget.value,
+            items: widget.items,
+            itemBuilder: widget.itemBuilder,
+            closeOverlay: closeOverlay,
+          ),
+        );
+      },
       buttonStyle: QuickButtonStyle(
         height: widget.height,
         width: widget.width,
@@ -106,23 +123,6 @@ class _QuickDropdownFieldState extends State<QuickDropdownField> {
         borderRadius: widget.decoration.enabledBorder.borderRadius,
         elevation: 0,
       ),
-      onTap: (handleShowOverlay, closeOverlay) {
-        if (widget.disabled) return;
-        handleShowOverlay(
-          context,
-          decoration: widget.overlaydecoration.copyWith(padding: .zero),
-          contentBuilder: (_, {bool? isMeasuringWidth}) => _Dropdowns(
-            isMeasuringWidth: isMeasuringWidth,
-            overlayPadding: widget.overlaydecoration.padding,
-            decoration: widget.itemDecoration,
-            value: widget.value,
-            items: widget.items,
-            itemBuilder: widget.itemBuilder,
-            onSelected: widget.onSelected,
-            closeOverlay: closeOverlay,
-          ),
-        );
-      },
       child: Stack(
         children: [
           QuickTextField(
@@ -145,23 +145,23 @@ class _QuickDropdownFieldState extends State<QuickDropdownField> {
 
 class _Dropdowns<T> extends StatelessWidget {
   const _Dropdowns({
+    required this.onSelected,
     this.isMeasuringWidth,
     this.overlayPadding,
     required this.decoration,
     this.value,
     required this.items,
     required this.itemBuilder,
-    required this.onSelected,
     required this.closeOverlay,
   });
 
+  final void Function(T value) onSelected;
   final bool? isMeasuringWidth;
   final EdgeInsets? overlayPadding;
   final DropdownItemDecoration decoration;
   final T? value;
   final List<T> items;
-  final Widget Function(T value) itemBuilder;
-  final void Function(T value) onSelected;
+  final Widget Function(BuildContext context, T value) itemBuilder;
   final void Function() closeOverlay;
 
   @override
@@ -173,24 +173,24 @@ class _Dropdowns<T> extends StatelessWidget {
       padding: overlayPadding,
       shrinkWrap: true,
       itemCount: itemCount,
-      itemBuilder: (_, index) {
+      itemBuilder: (context, index) {
+        final item = items[index];
         return Padding(
           padding: decoration.margin,
           child: QuickButton(
-            onTap: () async {
-              // await Future<void>.delayed(const Duration(milliseconds: 120));
+            onTap: () {
               closeOverlay();
-              onSelected(items[index]);
+              onSelected(item);
             },
             style: .lite(
               padding: decoration.padding,
               borderRadius: .circular(decoration.borderRadius),
-              color: items[index] == value ? decoration.selectedColor : decoration.color,
+              color: item == value ? decoration.selectedColor : decoration.color,
               hoveredColor: decoration.hoveredColor,
               hoverDuration: const Duration(milliseconds: 100),
               elevation: 0,
             ),
-            child: itemBuilder(items[index]),
+            child: itemBuilder(context, item),
           ),
         );
       },

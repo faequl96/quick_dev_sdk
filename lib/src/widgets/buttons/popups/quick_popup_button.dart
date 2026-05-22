@@ -1,7 +1,7 @@
 import 'package:quick_dev_sdk/quick_dev_sdk.dart';
 import 'package:flutter/material.dart';
 
-class QuickPopupButton extends StatefulWidget {
+class QuickPopupButton extends StatelessWidget {
   const QuickPopupButton({
     super.key,
     this.buttonStyle = const QuickButtonStyle(
@@ -12,129 +12,73 @@ class QuickPopupButton extends StatefulWidget {
       requestFocusOnHover: false,
       clipBehavior: .none,
     ),
+    this.overlaydecoration = const OverlayDecoration(
+      yOffset: 6,
+      marginY: 14,
+      marginX: 14,
+      padding: .symmetric(vertical: 8),
+      color: Color(0xFFFAFAFA),
+      borderRadius: 8,
+      border: .fromBorderSide(BorderSide(width: 1, color: Colors.black12)),
+      elevation: 1,
+      elevationType: .shadow,
+      slideTransition: true,
+    ),
     this.disabled = false,
+    this.showOnHover = false,
     this.closeOnUnHover = false,
     this.closeOnTapOutside = true,
-    this.onTap,
-    this.onHover,
+    required this.contentBuilder,
     this.onHoverChildBuilder,
     this.child,
   });
 
   final QuickButtonStyle buttonStyle;
+  final OverlayDecoration overlaydecoration;
   final bool disabled;
+  final bool showOnHover;
   final bool closeOnUnHover;
   final bool closeOnTapOutside;
-  final void Function(
-    void Function(
-      BuildContext context, {
-      required OverlayDecoration decoration,
-      required Widget Function(BuildContext context, {bool? isMeasuringWidth}) contentBuilder,
-    })
-    handleShowOverlay,
-    void Function() handleCloseOverlay,
-  )?
-  onTap;
-  final void Function(
-    void Function(
-      BuildContext context, {
-      required OverlayDecoration decoration,
-      required Widget Function(BuildContext context, {bool? isMeasuringWidth}) contentBuilder,
-    })
-    handleShowOverlay,
-  )?
-  onHover;
-  final Widget Function(bool value)? onHoverChildBuilder;
+  final Widget Function(
+    BuildContext context, {
+    void Function()? closeOverlay,
+    bool? isMeasuringWidth,
+  })
+  contentBuilder;
+  final Widget Function(BuildContext context, bool value)? onHoverChildBuilder;
   final Widget? child;
 
   @override
-  State<QuickPopupButton> createState() => _QuickPopupButtonState();
-}
-
-class _QuickPopupButtonState extends State<QuickPopupButton> {
-  final _overlay = StickyOverlay.instance;
-  final _key = GlobalKey();
-  final _layerLink = LayerLink();
-
-  bool _isOverlayContentHovered = false;
-
-  void _onHoverContentInside(bool value) async {
-    _isOverlayContentHovered = value;
-    await Future<void>.delayed(.zero);
-    if (value == false) _overlay.remove();
-  }
-
-  void _handleShowOverlay(
-    BuildContext context, {
-    required bool closeOnTapTarget,
-    required OverlayDecoration decoration,
-    required Widget Function(BuildContext context, {bool? isMeasuringWidth}) contentBuilder,
-  }) {
-    _overlay.create(
-      context,
-      targetKey: _key,
-      link: _layerLink,
-      closeOnTapOutside: widget.closeOnTapOutside,
-      closeOnTapTarget: closeOnTapTarget,
-      decoration: decoration,
-      onHoverInside: (value) {
-        if (widget.closeOnUnHover) _onHoverContentInside(value);
-      },
-      contentBuilder: contentBuilder,
-    );
-  }
-
-  @override
-  void dispose() {
-    _overlay.remove();
-
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return CompositedTransformTarget(
-      link: _layerLink,
-      child: QuickButton(
-        key: _key,
-        style: widget.buttonStyle,
-        disabled: widget.disabled,
-        onTap: () => widget.onTap?.call((
-          BuildContext context, {
-          required OverlayDecoration decoration,
-          required Widget Function(BuildContext, {bool? isMeasuringWidth}) contentBuilder,
-        }) async {
-          _handleShowOverlay(
+    return QuickStickyOverlayButton(
+      onTap: (handleShowOverlay, closeOverlay) => handleShowOverlay(
+        context,
+        decoration: overlaydecoration,
+        contentBuilder: (context, {isMeasuringWidth}) {
+          return contentBuilder(
             context,
-            closeOnTapTarget: true,
-            decoration: decoration,
-            contentBuilder: contentBuilder,
+            isMeasuringWidth: isMeasuringWidth,
+            closeOverlay: closeOverlay,
           );
-        }, () => _overlay.remove()),
-        onHover: (value) async {
-          if (value) {
-            widget.onHover?.call((
-              BuildContext context, {
-              required OverlayDecoration decoration,
-              required Widget Function(BuildContext, {bool? isMeasuringWidth}) contentBuilder,
-            }) {
-              _handleShowOverlay(
-                context,
-                closeOnTapTarget: false,
-                decoration: decoration,
-                contentBuilder: contentBuilder,
-              );
-            });
-          } else {
-            if (widget.closeOnUnHover) {
-              await Future<void>.delayed(.zero);
-              if (!_isOverlayContentHovered) _overlay.remove();
-            }
-          }
         },
-        onHoverChildBuilder: widget.onHoverChildBuilder,
-        child: widget.child,
       ),
+      onHover: showOnHover
+          ? (handleShowOverlay, closeOverlay) => handleShowOverlay(
+              context,
+              decoration: overlaydecoration,
+              contentBuilder: (context, {isMeasuringWidth}) => contentBuilder(
+                context,
+                isMeasuringWidth: isMeasuringWidth,
+                closeOverlay: closeOverlay,
+              ),
+            )
+          : null,
+      buttonStyle: buttonStyle,
+      disabled: disabled,
+      closeOnUnHover: closeOnUnHover,
+      closeOnTapOutside: closeOnTapOutside,
+      onHoverChildBuilder: onHoverChildBuilder,
+      child: child,
     );
   }
 }

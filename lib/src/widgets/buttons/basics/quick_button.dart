@@ -59,6 +59,8 @@ class QuickButtonStyle {
 class QuickButton extends StatefulWidget {
   const QuickButton({
     super.key,
+    required this.onTap,
+    this.onHover,
     this.style = const QuickButtonStyle(
       hoverDuration: Duration(milliseconds: 250),
       elevation: 1,
@@ -66,17 +68,15 @@ class QuickButton extends StatefulWidget {
       requestFocusOnHover: false,
     ),
     this.disabled = false,
-    required this.onTap,
-    this.onHover,
     this.onHoverChildBuilder,
     this.child,
   });
 
-  final QuickButtonStyle style;
-  final bool disabled;
   final void Function() onTap;
   final void Function(bool value)? onHover;
-  final Widget Function(bool value)? onHoverChildBuilder;
+  final QuickButtonStyle style;
+  final bool disabled;
+  final Widget Function(BuildContext context, bool value)? onHoverChildBuilder;
   final Widget? child;
 
   @override
@@ -145,7 +145,7 @@ class _QuickButtonState extends State<QuickButton> {
                   : null,
             ),
             clipBehavior: style.clipBehavior,
-            child: widget.onHoverChildBuilder?.call(_isHovered) ?? widget.child,
+            child: widget.onHoverChildBuilder?.call(context, _isHovered) ?? widget.child,
           ),
         ),
       );
@@ -164,8 +164,8 @@ class _QuickButtonState extends State<QuickButton> {
       clipBehavior: style.clipBehavior,
       child: InkWell(
         onTap: widget.disabled ? null : widget.onTap,
-        focusNode: _focusNode,
         onHover: (value) => _handleHover(value),
+        focusNode: _focusNode,
         hoverColor:
             style.hoveredColor ??
             (color != null ? ColorUtil.lighten(color, 25) : Colors.transparent),
@@ -183,7 +183,7 @@ class _QuickButtonState extends State<QuickButton> {
             decoration: BoxDecoration(border: style.border, borderRadius: style.borderRadius),
             child: Padding(
               padding: style.padding ?? .zero,
-              child: widget.onHoverChildBuilder?.call(_isHovered) ?? widget.child,
+              child: widget.onHoverChildBuilder?.call(context, _isHovered) ?? widget.child,
             ),
           ),
         ),

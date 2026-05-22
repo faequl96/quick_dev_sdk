@@ -19,6 +19,7 @@ export 'package:quick_dev_sdk/src/widgets/buttons/popups/quick_dropdown_button.d
 export 'package:quick_dev_sdk/src/widgets/buttons/popups/quick_dropdown_field.dart';
 export 'package:quick_dev_sdk/src/widgets/buttons/popups/quick_menu_button.dart';
 export 'package:quick_dev_sdk/src/widgets/buttons/popups/quick_popup_button.dart';
+export 'package:quick_dev_sdk/src/widgets/buttons/popups/quick_sticky_overlay_button.dart';
 
 export 'package:quick_dev_sdk/src/widgets/field/basics/quick_text_field.dart';
 export 'package:quick_dev_sdk/src/widgets/field/basics/quick_underlined_text_field.dart';

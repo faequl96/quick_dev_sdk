@@ -45,7 +45,7 @@ class HeaderAction extends StatelessWidget {
         hoveredColor: onHoverBackgroundColor ?? Colors.grey.shade200,
         splashColor: Colors.grey.shade200,
       ),
-      onHoverChildBuilder: (value) =>
+      onHoverChildBuilder: (_, value) =>
           Icon(actionIcon, size: iconSize, color: value ? onHoverIconColor : iconColor),
     );
   }

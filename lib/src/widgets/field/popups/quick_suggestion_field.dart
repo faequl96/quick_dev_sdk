@@ -4,6 +4,7 @@ import 'package:quick_dev_sdk/quick_dev_sdk.dart';
 
 class QuickSuggestionField<T> extends StatefulWidget {
   const QuickSuggestionField({
+    required this.onSelected,
     super.key,
     this.decoration = const .fitToTargetWidth(
       yOffset: 6,
@@ -22,27 +23,24 @@ class QuickSuggestionField<T> extends StatefulWidget {
       margin: .symmetric(vertical: 2),
       borderRadius: 0,
     ),
-    this.debouncer = const Duration(milliseconds: 250),
-    required this.fieldBuilder,
-    this.dispose = true,
     required this.controller,
     this.focusNode,
-    required this.onSelected,
+    this.debouncer = const Duration(milliseconds: 250),
+    required this.fieldBuilder,
     required this.suggestions,
     required this.itemBuilder,
     this.emptyBuilder,
     this.loadingBuilder,
   });
 
+  final void Function(T value) onSelected;
   final OverlayDecoration decoration;
   final SuggestionItemDecoration itemDecoration;
+  final TextEditingController controller;
+  final FocusNode? focusNode;
   final Duration debouncer;
   final Widget Function(BuildContext context, TextEditingController controller, FocusNode focusNode)
   fieldBuilder;
-  final bool dispose;
-  final TextEditingController controller;
-  final FocusNode? focusNode;
-  final void Function(T value) onSelected;
   final Future<List<T>> Function(String value) suggestions;
   final Widget Function(BuildContext context, T value) itemBuilder;
   final Widget Function(BuildContext context)? emptyBuilder;
@@ -76,7 +74,7 @@ class _QuickSuggestionFieldState<T> extends State<QuickSuggestionField<T>> {
           closeOnTapOutside: false,
           closeOnTapTarget: false,
           decoration: widget.decoration.copyWith(padding: .zero),
-          contentBuilder: (_, {bool? isMeasuringWidth}) => Listener(
+          contentBuilder: (_, {isMeasuringWidth}) => Listener(
             onPointerDown: (_) {
               _isOverlayUseInteraction = true;
               _isPointerInsideOverlay = true;
@@ -88,19 +86,19 @@ class _QuickSuggestionFieldState<T> extends State<QuickSuggestionField<T>> {
               _isPointerInsideOverlay = false;
             },
             child: _MainContent<T>(
-              overlayPadding: widget.decoration.padding,
-              itemDecoration: widget.itemDecoration,
-              focusNode: _focusNode,
-              controller: widget.controller,
-              debouncer: widget.debouncer,
-              suggestions: widget.suggestions,
-              textStream: _textStreamController.stream,
               onSelected: (value) {
-                widget.onSelected(value);
                 _overlay.remove();
                 _isPointerInsideOverlay = false;
                 _isOverlayUseInteraction = false;
+                widget.onSelected(value);
               },
+              overlayPadding: widget.decoration.padding,
+              itemDecoration: widget.itemDecoration,
+              controller: widget.controller,
+              focusNode: _focusNode,
+              debouncer: widget.debouncer,
+              suggestions: widget.suggestions,
+              textStream: _textStreamController.stream,
               itemBuilder: widget.itemBuilder,
               emptyBuilder: widget.emptyBuilder,
               loadingBuilder: widget.loadingBuilder,
@@ -147,7 +145,6 @@ class _QuickSuggestionFieldState<T> extends State<QuickSuggestionField<T>> {
     _textStreamController.close();
 
     if (!_isFocusNodeExternal) _focusNode.dispose();
-    if (widget.dispose) widget.controller.dispose();
 
     _overlay.remove();
 
@@ -167,26 +164,26 @@ class _QuickSuggestionFieldState<T> extends State<QuickSuggestionField<T>> {
 class _MainContent<T> extends StatefulWidget {
   const _MainContent({
     super.key,
+    required this.onSelected,
     required this.overlayPadding,
     required this.itemDecoration,
-    required this.focusNode,
     required this.controller,
+    required this.focusNode,
     required this.debouncer,
     required this.suggestions,
     required this.textStream,
-    required this.onSelected,
     required this.itemBuilder,
     this.emptyBuilder,
     this.loadingBuilder,
   });
 
+  final void Function(T value) onSelected;
   final EdgeInsets overlayPadding;
   final SuggestionItemDecoration itemDecoration;
-  final FocusNode focusNode;
   final TextEditingController controller;
+  final FocusNode focusNode;
   final Duration debouncer;
   final Stream<String> textStream;
-  final void Function(T value) onSelected;
   final Future<List<T>> Function(String value) suggestions;
   final Widget Function(BuildContext context, T value) itemBuilder;
   final Widget Function(BuildContext context)? emptyBuilder;
@@ -283,21 +280,24 @@ class _Suggestions<T> extends StatelessWidget {
       padding: overlayPadding,
       shrinkWrap: true,
       itemCount: suggestions.length,
-      itemBuilder: (context, index) => Padding(
-        padding: itemDecoration.margin,
-        child: QuickButton(
-          onTap: () => onSelected(suggestions[index]),
-          style: .lite(
-            padding: itemDecoration.padding,
-            borderRadius: .circular(itemDecoration.borderRadius),
-            color: index % 2 == 1 ? itemDecoration.evenColor : itemDecoration.oddColor,
-            hoveredColor: itemDecoration.hoveredColor,
-            hoverDuration: const Duration(milliseconds: 100),
-            elevation: 0,
+      itemBuilder: (context, index) {
+        final suggestion = suggestions[index];
+        return Padding(
+          padding: itemDecoration.margin,
+          child: QuickButton(
+            onTap: () => onSelected(suggestion),
+            style: .lite(
+              padding: itemDecoration.padding,
+              borderRadius: .circular(itemDecoration.borderRadius),
+              color: index % 2 == 1 ? itemDecoration.evenColor : itemDecoration.oddColor,
+              hoveredColor: itemDecoration.hoveredColor,
+              hoverDuration: const Duration(milliseconds: 100),
+              elevation: 0,
+            ),
+            child: itemBuilder(context, suggestion),
           ),
-          child: itemBuilder(context, suggestions[index]),
-        ),
-      ),
+        );
+      },
     );
   }
 }
