@@ -13,7 +13,7 @@ class QuickMenuButton<T> extends StatelessWidget {
       requestFocusOnHover: false,
       clipBehavior: .none,
     ),
-    this.overlaydecoration = const .fitToTargetWidth(
+    this.overlaydecoration = const .dynamicWidth(
       yOffset: 6,
       marginY: 14,
       marginX: 14,

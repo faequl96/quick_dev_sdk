@@ -8,11 +8,11 @@ import 'package:quick_dev_sdk/quick_dev_sdk.dart';
 enum OverlayAlign { left, center, right }
 
 class OverlayDecoration {
-  const OverlayDecoration({
+  const OverlayDecoration.dynamicWidth({
     this.height,
     this.maxHeight,
-    this.width,
     this.yOffset = 6,
+    this.xOffset = 8,
     this.marginY = 14,
     this.marginX = 14,
     this.alignment = .center,
@@ -23,7 +23,26 @@ class OverlayDecoration {
     this.elevation = 1,
     this.elevationType = .shadow,
     this.slideTransition = true,
-  }) : _fitToTargetWidth = false;
+  }) : _id = 1,
+       width = 280;
+
+  const OverlayDecoration.staticWidth({
+    this.height,
+    this.maxHeight,
+    this.width = 280,
+    this.yOffset = 6,
+    this.xOffset = 8,
+    this.marginY = 14,
+    this.marginX = 14,
+    this.alignment = .center,
+    this.padding = const .symmetric(vertical: 8),
+    this.color = Colors.white,
+    this.borderRadius = 8,
+    this.border = const .fromBorderSide(BorderSide(width: 1, color: Colors.black12)),
+    this.elevation = 1,
+    this.elevationType = .shadow,
+    this.slideTransition = true,
+  }) : _id = 2;
 
   const OverlayDecoration.fitToTargetWidth({
     this.height,
@@ -38,15 +57,17 @@ class OverlayDecoration {
     this.elevation = 1,
     this.elevationType = .shadow,
     this.slideTransition = true,
-  }) : _fitToTargetWidth = true,
-       width = null,
+  }) : _id = 3,
+       width = 280,
+       xOffset = 0,
        alignment = .center;
 
+  final int _id;
   final double? height;
   final double? maxHeight;
-  final double? width;
-  final bool _fitToTargetWidth;
+  final double width;
   final double yOffset;
+  final double xOffset;
   final OverlayAlign alignment;
   final double marginY;
   final double marginX;
@@ -63,6 +84,7 @@ class OverlayDecoration {
     double? maxHeight,
     double? width,
     double? yOffset,
+    double? xOffset,
     double? marginY,
     double? marginX,
     OverlayAlign? alignment,
@@ -74,7 +96,7 @@ class OverlayDecoration {
     ElevationType? elevationType,
     bool? slideTransition,
   }) {
-    if (_fitToTargetWidth) {
+    if (_id == 3) {
       return .fitToTargetWidth(
         height: height ?? this.height,
         maxHeight: maxHeight ?? this.maxHeight,
@@ -91,10 +113,29 @@ class OverlayDecoration {
       );
     }
 
-    return OverlayDecoration(
+    if (_id == 2) {
+      return .staticWidth(
+        height: height ?? this.height,
+        maxHeight: maxHeight ?? this.maxHeight,
+        width: width ?? this.width,
+        yOffset: yOffset ?? this.yOffset,
+        xOffset: xOffset ?? this.xOffset,
+        marginY: marginY ?? this.marginY,
+        marginX: marginX ?? this.marginX,
+        alignment: alignment ?? this.alignment,
+        padding: padding ?? this.padding,
+        color: color ?? this.color,
+        borderRadius: borderRadius ?? this.borderRadius,
+        border: border ?? this.border,
+        elevation: elevation ?? this.elevation,
+        elevationType: elevationType ?? this.elevationType,
+        slideTransition: slideTransition ?? this.slideTransition,
+      );
+    }
+
+    return .dynamicWidth(
       height: height ?? this.height,
       maxHeight: maxHeight ?? this.maxHeight,
-      width: width ?? this.width,
       yOffset: yOffset ?? this.yOffset,
       marginY: marginY ?? this.marginY,
       marginX: marginX ?? this.marginX,
@@ -197,8 +238,8 @@ class _OverlayLayer extends StatefulWidget {
 class _OverlayLayerState extends State<_OverlayLayer> {
   GlobalKey? _contentKey;
   double? _staticOverlaySurfaceWidth;
-  OverlayDecoration _decoration = const OverlayDecoration();
-  bool get _useDynamicWidth => !_decoration._fitToTargetWidth && _decoration.width == null;
+  late OverlayDecoration _decoration;
+  // bool get _useDynamicWidth => !_decoration._fitToTargetWidth && _decoration.width == null;
 
   final double _minTopOverlay = 80;
   final double _elevationSurfaceY = 72;
@@ -222,9 +263,10 @@ class _OverlayLayerState extends State<_OverlayLayer> {
 
     _set();
 
-    if (_useDynamicWidth) {
+    if (_decoration._id == 1) {
       _contentKey = GlobalKey();
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        await Future.delayed(const Duration(seconds: 1));
         if (mounted) {
           setState(() => _staticOverlaySurfaceWidth = _contentKey?.currentContext?.size?.width);
         }
@@ -274,9 +316,9 @@ class _OverlayLayerState extends State<_OverlayLayer> {
         ? -(_targetSize.height - _elevationSurfaceY)
         : _targetSize.height - _elevationSurfaceY;
     _alignmentXOffset = switch (_decoration.alignment) {
-      .left => -_elevationSurfaceX,
+      .left => -_elevationSurfaceX - _decoration.xOffset,
       .center => 0,
-      .right => _elevationSurfaceX,
+      .right => _elevationSurfaceX + _decoration.xOffset,
     };
     _anchorAlignment = switch (_decoration.alignment) {
       .left => _isTopOverlay ? .bottomLeft : .topLeft,
@@ -289,7 +331,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
 
   @override
   Widget build(BuildContext context) {
-    if (_useDynamicWidth && _staticOverlaySurfaceWidth == null) {
+    if (_decoration._id == 1 && _staticOverlaySurfaceWidth == null) {
       final border = _decoration.border;
       final padding = _decoration.padding;
       return Stack(
@@ -297,7 +339,8 @@ class _OverlayLayerState extends State<_OverlayLayer> {
           Opacity(
             opacity: 1,
             child: Material(
-              type: .transparency,
+              // type: .transparency,
+              color: Colors.amber,
               child: SizedBox(
                 key: _contentKey,
                 child: ConstrainedBox(
@@ -322,15 +365,17 @@ class _OverlayLayerState extends State<_OverlayLayer> {
       );
     }
 
-    final surfaceWidth = _maxWidth < _targetSize.width
+    final dynamicWidth = _maxWidth < _targetSize.width
         ? (_targetSize.width + (_elevationSurfaceX * 2))
         : (_staticOverlaySurfaceWidth ?? 0);
-    final dynamicWidth = _decoration.width != null
-        ? (_decoration.width! + (_elevationSurfaceX * 2))
-        : surfaceWidth;
-    final width = !_decoration._fitToTargetWidth
-        ? dynamicWidth
-        : _targetSize.width + (_elevationSurfaceX * 2);
+    final staticWidth = _decoration.width + (_elevationSurfaceX * 2);
+    final fitToTargetWidth = _targetSize.width + (_elevationSurfaceX * 2);
+    final width = switch (_decoration._id) {
+      1 => dynamicWidth,
+      2 => staticWidth,
+      3 => fitToTargetWidth,
+      int() => dynamicWidth,
+    };
 
     // print('_maxWidth: $_maxWidth');
     // print('_targetSize.width: ${_targetSize.width}');
@@ -364,29 +409,33 @@ class _OverlayLayerState extends State<_OverlayLayer> {
           ),
         Positioned(
           width: width,
-          child: CompositedTransformFollower(
-            link: widget.link,
-            showWhenUnlinked: false,
-            offset: Offset(_alignmentXOffset, _alignmentYOffset),
-            targetAnchor: _anchorAlignment,
-            followerAnchor: _anchorAlignment,
-            child: Material(
-              type: .transparency,
-              child: _AnimationLayer(
-                isTopOverlay: _isTopOverlay,
-                elevationSurfaceY: _elevationSurfaceY,
-                elevationSurfaceX: _elevationSurfaceX,
-                slideTransition: _decoration.slideTransition,
-                child: _OverlayContent(
+          child: ColoredBox(
+            color: Colors.blue,
+            child: CompositedTransformFollower(
+              link: widget.link,
+              showWhenUnlinked: false,
+              offset: Offset(_alignmentXOffset, _alignmentYOffset),
+              targetAnchor: _anchorAlignment,
+              followerAnchor: _anchorAlignment,
+              child: Material(
+                type: .transparency,
+                // color: Colors.amber,
+                child: _AnimationLayer(
                   isTopOverlay: _isTopOverlay,
-                  maxWidth: _maxWidth < _targetSize.width ? _targetSize.width : _maxWidth,
-                  maxHeight: _decoration.maxHeight ?? _maxHeight,
-                  yOffset: _decoration.yOffset,
-                  closeOnTapOutside: widget.closeOnTapOutside,
-                  decoration: _decoration,
-                  onRemove: widget.onRemove,
-                  onHoverInside: widget.onHoverInside,
-                  child: widget.contentBuilder(context),
+                  elevationSurfaceY: _elevationSurfaceY,
+                  elevationSurfaceX: _elevationSurfaceX,
+                  slideTransition: _decoration.slideTransition,
+                  child: _OverlayContent(
+                    isTopOverlay: _isTopOverlay,
+                    maxWidth: _maxWidth < _targetSize.width ? _targetSize.width : _maxWidth,
+                    maxHeight: _decoration.maxHeight ?? _maxHeight,
+                    yOffset: _decoration.yOffset,
+                    closeOnTapOutside: widget.closeOnTapOutside,
+                    decoration: _decoration,
+                    onRemove: widget.onRemove,
+                    onHoverInside: widget.onHoverInside,
+                    child: widget.contentBuilder(context),
+                  ),
                 ),
               ),
             ),
@@ -514,7 +563,7 @@ class _OverlayContent extends StatelessWidget {
             child: _DecoratedOverlay(
               decoration: _OverlayDecoration(
                 height: decoration.height,
-                width: decoration.width,
+                width: decoration._id == 2 ? decoration.width : null,
                 padding: decoration.padding,
                 color: decoration.color,
                 borderRadius: decoration.borderRadius,

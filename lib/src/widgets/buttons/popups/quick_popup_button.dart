@@ -12,7 +12,7 @@ class QuickPopupButton extends StatelessWidget {
       requestFocusOnHover: false,
       clipBehavior: .none,
     ),
-    this.overlaydecoration = const OverlayDecoration(
+    this.overlaydecoration = const .dynamicWidth(
       yOffset: 6,
       marginY: 14,
       marginX: 14,
