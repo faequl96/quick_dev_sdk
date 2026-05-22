@@ -296,21 +296,24 @@ class _OverlayLayerState extends State<_OverlayLayer> {
         children: [
           Opacity(
             opacity: 1,
-            child: SizedBox(
-              key: _contentKey,
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxWidth: _maxWidth + (_elevationSurfaceX * 2),
-                  maxHeight: 100,
-                ),
-                child: Padding(
-                  padding: .only(
-                    top: _elevationSurfaceY + border.top.width + padding.top,
-                    left: _elevationSurfaceX + border.left.width + padding.left,
-                    right: _elevationSurfaceX + border.right.width + padding.right,
-                    bottom: _elevationSurfaceY + border.bottom.width + padding.bottom,
+            child: Material(
+              type: .transparency,
+              child: SizedBox(
+                key: _contentKey,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: _maxWidth + (_elevationSurfaceX * 2),
+                    maxHeight: 100,
                   ),
-                  child: widget.contentBuilder(widget.targetContext, isMeasuringWidth: true),
+                  child: Padding(
+                    padding: .only(
+                      top: _elevationSurfaceY + border.top.width + padding.top,
+                      left: _elevationSurfaceX + border.left.width + padding.left,
+                      right: _elevationSurfaceX + border.right.width + padding.right,
+                      bottom: _elevationSurfaceY + border.bottom.width + padding.bottom,
+                    ),
+                    child: widget.contentBuilder(widget.targetContext, isMeasuringWidth: true),
+                  ),
                 ),
               ),
             ),
