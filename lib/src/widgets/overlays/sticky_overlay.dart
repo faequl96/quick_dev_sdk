@@ -334,6 +334,12 @@ class _OverlayLayerState extends State<_OverlayLayer> {
 
     // print('_maxWidth: $_maxWidth');
     // print('_targetSize.width: ${_targetSize.width}');
+    // print(
+    //   'elevationSurfaceLeft: ${_elevationSurfaceX + _decoration.border.left.width + _decoration.padding.left}',
+    // );
+    // print(
+    //   'elevationSurfaceRight ${_elevationSurfaceX + _decoration.border.right.width + _decoration.padding.right}',
+    // );
     // print('_staticOverlaySurfaceWidth: $_staticOverlaySurfaceWidth');
     // print('surfaceWidth: $surfaceWidth');
     // print('dynamicWidth: $dynamicWidth');

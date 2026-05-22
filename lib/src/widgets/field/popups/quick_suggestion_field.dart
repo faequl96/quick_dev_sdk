@@ -21,6 +21,9 @@ class QuickSuggestionField<T> extends StatefulWidget {
     this.itemDecoration = const SuggestionItemDecoration(
       padding: .symmetric(horizontal: 10, vertical: 8),
       margin: .symmetric(vertical: 2),
+      evenColor: Colors.white,
+      oddColor: Colors.white,
+      hoveredColor: Color(0xFFF5F5F5),
       borderRadius: 0,
     ),
     required this.controller,

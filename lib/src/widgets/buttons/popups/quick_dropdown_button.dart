@@ -28,6 +28,8 @@ class QuickDropdownButton<T> extends StatelessWidget {
     this.itemDecoration = const DropdownItemDecoration(
       padding: .symmetric(horizontal: 10, vertical: 8),
       margin: .symmetric(vertical: 2),
+      color: Colors.white,
+      hoveredColor: Color(0xFFF5F5F5),
       borderRadius: 0,
     ),
     this.disabled = false,
