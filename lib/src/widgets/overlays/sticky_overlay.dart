@@ -254,9 +254,6 @@ class _OverlayLayerState extends State<_OverlayLayer> {
   double _maxHeight = 0;
   double _maxWidth = 0;
   bool _isTopOverlay = false;
-  double _alignmentYOffset = 0;
-  double _alignmentXOffset = 0;
-  Alignment _anchorAlignment = .topCenter;
 
   @override
   void didChangeDependencies() {
@@ -343,20 +340,6 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     _maxHeight = _isTopOverlay ? topMaxHeight : bottomMaxHeight;
     _maxWidth = _getMaxWidth(_decoration.alignment, size, _targetSize, targetPosition);
 
-    _alignmentYOffset = _isTopOverlay
-        ? -(_targetSize.height - _elevationSurfaceY)
-        : _targetSize.height - _elevationSurfaceY;
-    _alignmentXOffset = switch (_decoration.alignment) {
-      .left => -_elevationSurfaceX - _decoration.xOffset,
-      .center => 0,
-      .right => _elevationSurfaceX + _decoration.xOffset,
-    };
-    _anchorAlignment = switch (_decoration.alignment) {
-      .left => _isTopOverlay ? .bottomLeft : .topLeft,
-      .center => _isTopOverlay ? .bottomCenter : .topCenter,
-      .right => _isTopOverlay ? .bottomRight : .topRight,
-    };
-
     if (!isInitial && mounted) setState(() {});
   }
 
@@ -395,8 +378,9 @@ class _OverlayLayerState extends State<_OverlayLayer> {
         ],
       );
     }
+    final useTargetSizeWidth = _maxWidth - (_decoration.xOffset * 2) < _targetSize.width;
 
-    final dynamicWidth = _maxWidth < _targetSize.width
+    final dynamicWidth = useTargetSizeWidth
         ? (_targetSize.width + (_elevationSurfaceX * 2))
         : (_staticOverlaySurfaceWidth ?? 0);
     final staticWidth = _decoration.width + (_elevationSurfaceX * 2);
@@ -417,9 +401,24 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     //   'elevationSurfaceRight ${_elevationSurfaceX + _decoration.border.right.width + _decoration.padding.right}',
     // );
     // print('_staticOverlaySurfaceWidth: $_staticOverlaySurfaceWidth');
-    // print('surfaceWidth: $surfaceWidth');
     // print('dynamicWidth: $dynamicWidth');
+    // print('staticWidth: $staticWidth');
+    // print('fitToTargetWidth: $fitToTargetWidth');
     // print('width: $width');
+
+    final alignmentYOffset = _isTopOverlay
+        ? -(_targetSize.height - _elevationSurfaceY)
+        : _targetSize.height - _elevationSurfaceY;
+    final alignmentXOffset = switch (_decoration.alignment) {
+      .left => -(_elevationSurfaceX + (useTargetSizeWidth ? 0 : _decoration.xOffset)),
+      .center => .0,
+      .right => _elevationSurfaceX + (useTargetSizeWidth ? 0 : _decoration.xOffset),
+    };
+    final Alignment anchorAlignment = switch (_decoration.alignment) {
+      .left => _isTopOverlay ? .bottomLeft : .topLeft,
+      .center => _isTopOverlay ? .bottomCenter : .topCenter,
+      .right => _isTopOverlay ? .bottomRight : .topRight,
+    };
 
     return Stack(
       children: [
@@ -443,9 +442,9 @@ class _OverlayLayerState extends State<_OverlayLayer> {
           child: CompositedTransformFollower(
             link: widget.link,
             showWhenUnlinked: false,
-            offset: Offset(_alignmentXOffset, _alignmentYOffset),
-            targetAnchor: _anchorAlignment,
-            followerAnchor: _anchorAlignment,
+            offset: Offset(alignmentXOffset, alignmentYOffset),
+            targetAnchor: anchorAlignment,
+            followerAnchor: anchorAlignment,
             child: Material(
               type: .transparency,
               // color: Colors.amber,
@@ -479,9 +478,9 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     final minSide = min(leftRemainder, rightRemainder);
 
     return switch (alignment) {
-      .left => (rightRemainder + buttonSize.width) - _decoration.marginX,
+      .left => ((rightRemainder + buttonSize.width) - _decoration.marginX) + _decoration.xOffset,
       .center => (minSide * 2 + buttonSize.width) - (_decoration.marginX * 2),
-      .right => (leftRemainder + buttonSize.width) - _decoration.marginX,
+      .right => ((leftRemainder + buttonSize.width) - _decoration.marginX) + _decoration.xOffset,
     };
   }
 }
