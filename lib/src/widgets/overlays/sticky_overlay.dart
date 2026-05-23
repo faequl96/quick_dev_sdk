@@ -165,10 +165,12 @@ class StickyOverlay {
     required LayerLink link,
     bool closeOnTapOutside = true,
     bool closeOnTapTarget = true,
-    OverlayDecoration decoration = const .fitToTargetWidth(
+    OverlayDecoration decoration = const .dynamicWidth(
       yOffset: 6,
+      xOffset: 8,
       marginY: 14,
       marginX: 14,
+      alignment: .center,
       padding: .symmetric(vertical: 8),
       color: Colors.white,
       borderRadius: 8,
@@ -236,10 +238,11 @@ class _OverlayLayer extends StatefulWidget {
 }
 
 class _OverlayLayerState extends State<_OverlayLayer> {
+  bool _isInitial = true;
+
   GlobalKey? _contentKey;
   double? _staticOverlaySurfaceWidth;
   late OverlayDecoration _decoration;
-  // bool get _useDynamicWidth => !_decoration._fitToTargetWidth && _decoration.width == null;
 
   final double _minTopOverlay = 80;
   final double _elevationSurfaceY = 72;
@@ -259,24 +262,52 @@ class _OverlayLayerState extends State<_OverlayLayer> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    _decoration = widget.decoration;
-
-    _set();
-
-    if (_decoration._id == 1) {
-      _contentKey = GlobalKey();
+    if (_isInitial) {
+      _decoration = widget.decoration;
+      _set();
+      if (_decoration._id == 1) _contentKey = GlobalKey();
       WidgetsBinding.instance.addPostFrameCallback((_) async {
-        await Future.delayed(const Duration(seconds: 1));
-        if (mounted) {
-          setState(() => _staticOverlaySurfaceWidth = _contentKey?.currentContext?.size?.width);
+        if (_decoration._id != 1) {
+          await Future<void>.delayed(const Duration(milliseconds: 100));
+          _scrollObserver?.removeListener(_handleScrollNotification);
+          _scrollObserver = widget.targetContext.mounted
+              ? ScrollNotificationObserver.maybeOf(widget.targetContext)
+              : null;
+          _scrollObserver?.addListener(_handleScrollNotification);
+        } else {
+          // await Future.delayed(const Duration(seconds: 1));
+          if (mounted) {
+            setState(() => _staticOverlaySurfaceWidth = _contentKey?.currentContext?.size?.width);
+          }
+          await Future<void>.delayed(const Duration(milliseconds: 100));
+          _scrollObserver?.removeListener(_handleScrollNotification);
+          _scrollObserver = widget.targetContext.mounted
+              ? ScrollNotificationObserver.maybeOf(widget.targetContext)
+              : null;
+          _scrollObserver?.addListener(_handleScrollNotification);
+          _isInitial = false;
         }
       });
+    } else {
+      Debouncer.run(() {
+        _staticOverlaySurfaceWidth = null;
+        _set(isInitial: false);
+        _scrollObserver?.removeListener(_handleScrollNotification);
+        _scrollObserver = null;
+        if (_decoration._id == 1) {
+          WidgetsBinding.instance.addPostFrameCallback((_) async {
+            if (mounted) {
+              setState(() => _staticOverlaySurfaceWidth = _contentKey?.currentContext?.size?.width);
+            }
+            await Future<void>.delayed(const Duration(milliseconds: 100));
+            _scrollObserver = widget.targetContext.mounted
+                ? ScrollNotificationObserver.maybeOf(widget.targetContext)
+                : null;
+            _scrollObserver?.addListener(_handleScrollNotification);
+          });
+        }
+      }, duration: const Duration(milliseconds: 150));
     }
-
-    _scrollObserver?.removeListener(_handleScrollNotification);
-
-    _scrollObserver = ScrollNotificationObserver.maybeOf(widget.targetContext);
-    _scrollObserver?.addListener(_handleScrollNotification);
   }
 
   @override
@@ -309,7 +340,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     final topMaxHeight =
         (targetPosition.dy - _decoration.yOffset) - (_decoration.marginY + paddingTop);
 
-    _maxHeight = (_isTopOverlay ? topMaxHeight : bottomMaxHeight);
+    _maxHeight = _isTopOverlay ? topMaxHeight : bottomMaxHeight;
     _maxWidth = _getMaxWidth(_decoration.alignment, size, _targetSize, targetPosition);
 
     _alignmentYOffset = _isTopOverlay
@@ -337,10 +368,10 @@ class _OverlayLayerState extends State<_OverlayLayer> {
       return Stack(
         children: [
           Opacity(
-            opacity: 1,
+            opacity: 0,
             child: Material(
-              // type: .transparency,
-              color: Colors.amber,
+              type: .transparency,
+              // color: Colors.amber,
               child: SizedBox(
                 key: _contentKey,
                 child: ConstrainedBox(
@@ -409,33 +440,30 @@ class _OverlayLayerState extends State<_OverlayLayer> {
           ),
         Positioned(
           width: width,
-          child: ColoredBox(
-            color: Colors.blue,
-            child: CompositedTransformFollower(
-              link: widget.link,
-              showWhenUnlinked: false,
-              offset: Offset(_alignmentXOffset, _alignmentYOffset),
-              targetAnchor: _anchorAlignment,
-              followerAnchor: _anchorAlignment,
-              child: Material(
-                type: .transparency,
-                // color: Colors.amber,
-                child: _AnimationLayer(
+          child: CompositedTransformFollower(
+            link: widget.link,
+            showWhenUnlinked: false,
+            offset: Offset(_alignmentXOffset, _alignmentYOffset),
+            targetAnchor: _anchorAlignment,
+            followerAnchor: _anchorAlignment,
+            child: Material(
+              type: .transparency,
+              // color: Colors.amber,
+              child: _AnimationLayer(
+                isTopOverlay: _isTopOverlay,
+                elevationSurfaceY: _elevationSurfaceY,
+                elevationSurfaceX: _elevationSurfaceX,
+                slideTransition: _isInitial ? _decoration.slideTransition : false,
+                child: _OverlayContent(
                   isTopOverlay: _isTopOverlay,
-                  elevationSurfaceY: _elevationSurfaceY,
-                  elevationSurfaceX: _elevationSurfaceX,
-                  slideTransition: _decoration.slideTransition,
-                  child: _OverlayContent(
-                    isTopOverlay: _isTopOverlay,
-                    maxWidth: _maxWidth < _targetSize.width ? _targetSize.width : _maxWidth,
-                    maxHeight: _decoration.maxHeight ?? _maxHeight,
-                    yOffset: _decoration.yOffset,
-                    closeOnTapOutside: widget.closeOnTapOutside,
-                    decoration: _decoration,
-                    onRemove: widget.onRemove,
-                    onHoverInside: widget.onHoverInside,
-                    child: widget.contentBuilder(context),
-                  ),
+                  maxWidth: _maxWidth < _targetSize.width ? _targetSize.width : _maxWidth,
+                  maxHeight: _decoration.maxHeight ?? _maxHeight,
+                  yOffset: _decoration.yOffset,
+                  closeOnTapOutside: widget.closeOnTapOutside,
+                  decoration: _decoration,
+                  onRemove: widget.onRemove,
+                  onHoverInside: widget.onHoverInside,
+                  child: widget.contentBuilder(context),
                 ),
               ),
             ),
