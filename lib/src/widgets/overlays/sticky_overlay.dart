@@ -137,6 +137,7 @@ class OverlayDecoration {
       height: height ?? this.height,
       maxHeight: maxHeight ?? this.maxHeight,
       offsetY: offsetY ?? this.offsetY,
+      offsetX: offsetX ?? this.offsetX,
       marginY: marginY ?? this.marginY,
       marginX: marginX ?? this.marginX,
       alignment: alignment ?? this.alignment,
@@ -268,22 +269,14 @@ class _OverlayLayerState extends State<_OverlayLayer> {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         if (_decoration._id != 1) {
           await Future<void>.delayed(const Duration(milliseconds: 100));
-          _scrollObserver?.removeListener(_handleScrollNotification);
-          _scrollObserver = widget.targetContext.mounted
-              ? ScrollNotificationObserver.maybeOf(widget.targetContext)
-              : null;
-          _scrollObserver?.addListener(_handleScrollNotification);
+          _scrollObserver?.removeListener(_scrollNotification);
+          _initScrollObserver();
         } else {
           // await Future.delayed(const Duration(seconds: 1));
-          if (mounted) {
-            setState(() => _staticOverlaySurfaceWidth = _contentKey?.currentContext?.size?.width);
-          }
+          _setStaticOverlaySurfaceWidth();
           await Future<void>.delayed(const Duration(milliseconds: 100));
-          _scrollObserver?.removeListener(_handleScrollNotification);
-          _scrollObserver = widget.targetContext.mounted
-              ? ScrollNotificationObserver.maybeOf(widget.targetContext)
-              : null;
-          _scrollObserver?.addListener(_handleScrollNotification);
+          _scrollObserver?.removeListener(_scrollNotification);
+          _initScrollObserver();
           _isInitial = false;
         }
       });
@@ -291,18 +284,13 @@ class _OverlayLayerState extends State<_OverlayLayer> {
       Debouncer.run(() {
         _staticOverlaySurfaceWidth = null;
         _set(isInitial: false);
-        _scrollObserver?.removeListener(_handleScrollNotification);
+        _scrollObserver?.removeListener(_scrollNotification);
         _scrollObserver = null;
         if (_decoration._id == 1) {
           WidgetsBinding.instance.addPostFrameCallback((_) async {
-            if (mounted) {
-              setState(() => _staticOverlaySurfaceWidth = _contentKey?.currentContext?.size?.width);
-            }
+            _setStaticOverlaySurfaceWidth();
             await Future<void>.delayed(const Duration(milliseconds: 100));
-            _scrollObserver = widget.targetContext.mounted
-                ? ScrollNotificationObserver.maybeOf(widget.targetContext)
-                : null;
-            _scrollObserver?.addListener(_handleScrollNotification);
+            _initScrollObserver();
           });
         }
       }, duration: const Duration(milliseconds: 150));
@@ -311,16 +299,29 @@ class _OverlayLayerState extends State<_OverlayLayer> {
 
   @override
   void dispose() {
-    _scrollObserver?.removeListener(_handleScrollNotification);
+    _scrollObserver?.removeListener(_scrollNotification);
 
     super.dispose();
   }
 
-  void _handleScrollNotification(ScrollNotification notification) {
+  void _scrollNotification(ScrollNotification notification) {
     if (notification is ScrollUpdateNotification || notification is OverscrollNotification) {
       Debouncer.run(() {
         if (mounted) _set(isInitial: false);
       }, duration: const Duration(milliseconds: 150));
+    }
+  }
+
+  void _initScrollObserver() {
+    _scrollObserver = widget.targetContext.mounted
+        ? ScrollNotificationObserver.maybeOf(widget.targetContext)
+        : null;
+    _scrollObserver?.addListener(_scrollNotification);
+  }
+
+  void _setStaticOverlaySurfaceWidth() {
+    if (mounted) {
+      setState(() => _staticOverlaySurfaceWidth = _contentKey?.currentContext?.size?.width);
     }
   }
 
