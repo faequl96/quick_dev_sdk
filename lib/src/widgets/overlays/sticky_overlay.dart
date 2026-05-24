@@ -378,10 +378,24 @@ class _OverlayLayerState extends State<_OverlayLayer> {
         ],
       );
     }
-    final useTargetSizeWidth = _maxWidth - (_decoration.xOffset * 2) < _targetSize.width;
 
+    final useTargetSizeWidth = _decoration.alignment == .center
+        ? _maxWidth < _targetSize.width
+        : _maxWidth - (_decoration.xOffset * 2) < _targetSize.width;
+
+    print('_maxWidth: $_maxWidth');
+    print('_targetSize.width: ${_targetSize.width}');
+
+    final widthAdjustment =
+        (_decoration.xOffset * 2) -
+        ((_targetSize.width - (_maxWidth - (_decoration.xOffset * 2))) * 2);
+    print(
+      '${_decoration.xOffset * 2} - ${(_targetSize.width - (_maxWidth - (_decoration.xOffset * 2))) * 2} = $widthAdjustment',
+    );
+    final finalWidthAdjustment = widthAdjustment > (_decoration.marginX) ? widthAdjustment : 0;
+    print(finalWidthAdjustment);
     final dynamicWidth = useTargetSizeWidth
-        ? (_targetSize.width + (_elevationSurfaceX * 2))
+        ? (_targetSize.width + (_elevationSurfaceX * 2)) + finalWidthAdjustment
         : (_staticOverlaySurfaceWidth ?? 0);
     final staticWidth = _decoration.width + (_elevationSurfaceX * 2);
     final fitToTargetWidth = _targetSize.width + (_elevationSurfaceX * 2);
@@ -409,10 +423,11 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     final alignmentYOffset = _isTopOverlay
         ? -(_targetSize.height - _elevationSurfaceY)
         : _targetSize.height - _elevationSurfaceY;
+    final offsetAdjustment = (useTargetSizeWidth ? finalWidthAdjustment / 2 : _decoration.xOffset);
     final alignmentXOffset = switch (_decoration.alignment) {
-      .left => -(_elevationSurfaceX + (useTargetSizeWidth ? 0 : _decoration.xOffset)),
+      .left => -(_elevationSurfaceX + offsetAdjustment),
       .center => .0,
-      .right => _elevationSurfaceX + (useTargetSizeWidth ? 0 : _decoration.xOffset),
+      .right => _elevationSurfaceX + offsetAdjustment,
     };
     final Alignment anchorAlignment = switch (_decoration.alignment) {
       .left => _isTopOverlay ? .bottomLeft : .topLeft,
