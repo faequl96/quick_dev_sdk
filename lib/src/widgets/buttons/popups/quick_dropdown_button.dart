@@ -14,7 +14,7 @@ class QuickDropdownButton<T> extends StatelessWidget {
       clipBehavior: .none,
     ),
     this.overlaydecoration = const .fitToTargetWidth(
-      yOffset: 6,
+      offsetY: 6,
       marginY: 14,
       marginX: 14,
       padding: .symmetric(vertical: 8),

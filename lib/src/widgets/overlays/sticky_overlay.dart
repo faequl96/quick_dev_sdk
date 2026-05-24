@@ -5,14 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:quick_dev_sdk/quick_dev_sdk.dart';
 
-enum OverlayAlign { left, center, right }
+enum OverlayAlignment { left, center, right }
 
 class OverlayDecoration {
   const OverlayDecoration.dynamicWidth({
     this.height,
     this.maxHeight,
-    this.yOffset = 6,
-    this.xOffset = 8,
+    this.offsetY = 6,
+    this.offsetX = 8,
     this.marginY = 14,
     this.marginX = 14,
     this.alignment = .center,
@@ -30,8 +30,8 @@ class OverlayDecoration {
     this.height,
     this.maxHeight,
     this.width = 280,
-    this.yOffset = 6,
-    this.xOffset = 8,
+    this.offsetY = 6,
+    this.offsetX = 8,
     this.marginY = 14,
     this.marginX = 14,
     this.alignment = .center,
@@ -47,7 +47,7 @@ class OverlayDecoration {
   const OverlayDecoration.fitToTargetWidth({
     this.height,
     this.maxHeight,
-    this.yOffset = 6,
+    this.offsetY = 6,
     this.marginY = 14,
     this.marginX = 14,
     this.padding = const .symmetric(vertical: 8),
@@ -59,16 +59,16 @@ class OverlayDecoration {
     this.slideTransition = true,
   }) : _id = 3,
        width = 280,
-       xOffset = 0,
+       offsetX = 0,
        alignment = .center;
 
   final int _id;
   final double? height;
   final double? maxHeight;
   final double width;
-  final double yOffset;
-  final double xOffset;
-  final OverlayAlign alignment;
+  final double offsetY;
+  final double offsetX;
+  final OverlayAlignment alignment;
   final double marginY;
   final double marginX;
   final EdgeInsets padding;
@@ -83,11 +83,11 @@ class OverlayDecoration {
     double? height,
     double? maxHeight,
     double? width,
-    double? yOffset,
-    double? xOffset,
+    double? offsetY,
+    double? offsetX,
     double? marginY,
     double? marginX,
-    OverlayAlign? alignment,
+    OverlayAlignment? alignment,
     EdgeInsets? padding,
     Color? color,
     double? borderRadius,
@@ -100,7 +100,7 @@ class OverlayDecoration {
       return .fitToTargetWidth(
         height: height ?? this.height,
         maxHeight: maxHeight ?? this.maxHeight,
-        yOffset: yOffset ?? this.yOffset,
+        offsetY: offsetY ?? this.offsetY,
         marginY: marginY ?? this.marginY,
         marginX: marginX ?? this.marginX,
         padding: padding ?? this.padding,
@@ -118,8 +118,8 @@ class OverlayDecoration {
         height: height ?? this.height,
         maxHeight: maxHeight ?? this.maxHeight,
         width: width ?? this.width,
-        yOffset: yOffset ?? this.yOffset,
-        xOffset: xOffset ?? this.xOffset,
+        offsetY: offsetY ?? this.offsetY,
+        offsetX: offsetX ?? this.offsetX,
         marginY: marginY ?? this.marginY,
         marginX: marginX ?? this.marginX,
         alignment: alignment ?? this.alignment,
@@ -136,7 +136,7 @@ class OverlayDecoration {
     return .dynamicWidth(
       height: height ?? this.height,
       maxHeight: maxHeight ?? this.maxHeight,
-      yOffset: yOffset ?? this.yOffset,
+      offsetY: offsetY ?? this.offsetY,
       marginY: marginY ?? this.marginY,
       marginX: marginX ?? this.marginX,
       alignment: alignment ?? this.alignment,
@@ -166,8 +166,8 @@ class StickyOverlay {
     bool closeOnTapOutside = true,
     bool closeOnTapTarget = true,
     OverlayDecoration decoration = const .dynamicWidth(
-      yOffset: 6,
-      xOffset: 8,
+      offsetY: 6,
+      offsetX: 8,
       marginY: 14,
       marginX: 14,
       alignment: .center,
@@ -250,9 +250,9 @@ class _OverlayLayerState extends State<_OverlayLayer> {
 
   ScrollNotificationObserverState? _scrollObserver;
 
-  Size _screenSize = const Size(0, 0);
+  double _screenWidth = 0;
   Size _targetSize = const Size(0, 0);
-  Offset _targetPosition = const Offset(0, 0);
+  double _targetPositionX = 0;
   double _maxHeight = 0;
   double _maxWidth = 0;
   bool _isTopOverlay = false;
@@ -328,18 +328,18 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     final renderBox = widget.targetContext.findRenderObject() as RenderBox;
     _targetSize = renderBox.size;
     final targetPosition = renderBox.localToGlobal(.zero);
-    _targetPosition = targetPosition;
+    _targetPositionX = targetPosition.dx;
     final mediaQuery = MediaQuery.of(context);
     final size = mediaQuery.size;
-    _screenSize = size;
+    _screenWidth = size.width;
     final paddingBottom = mediaQuery.padding.bottom;
     final bottomMaxHeight =
-        (size.height - (targetPosition.dy + _targetSize.height + _decoration.yOffset)) -
+        (size.height - (targetPosition.dy + _targetSize.height + _decoration.offsetY)) -
         (_decoration.marginY + paddingBottom);
     _isTopOverlay = bottomMaxHeight < (_minTopOverlay - 10);
     final paddingTop = mediaQuery.padding.top;
     final topMaxHeight =
-        (targetPosition.dy - _decoration.yOffset) - (_decoration.marginY + paddingTop);
+        (targetPosition.dy - _decoration.offsetY) - (_decoration.marginY + paddingTop);
 
     _maxHeight = _isTopOverlay ? topMaxHeight : bottomMaxHeight;
     _maxWidth = _getMaxWidth(_decoration.alignment, size, _targetSize, targetPosition);
@@ -383,79 +383,49 @@ class _OverlayLayerState extends State<_OverlayLayer> {
       );
     }
 
-    final double screenWidth = _screenSize.width;
-    final double targetPositionX = _targetPosition.dx;
-    final double targetWidth = _targetSize.width;
-    final double marginX = _decoration.marginX;
-    final double xOffset = _decoration.xOffset;
-    // final double Ex = _elevationSurfaceX;
+    final targetWidth = _targetSize.width;
+    final alignment = _decoration.alignment;
+    final marginX = _decoration.marginX;
+    final offsetX = _decoration.offsetX;
 
-    double finalSurfaceWidth = 0; // Lebar Visual murni (tanpa shadow)
-    double Lx = 0; // Posisi absolut Kiri di layar untuk kotak visual murni
+    double surfaceWidth = _staticOverlaySurfaceWidth ?? targetWidth;
+    if (surfaceWidth < targetWidth) surfaceWidth = targetWidth;
+    double leftOverhang = 0;
+    double rightOverhang = 0;
 
-    if (_decoration._id == 1) {
-      // .dynamicWidth
-      double Cw = _staticOverlaySurfaceWidth ?? targetWidth;
-      // if (Cw < targetWidth) Cw = targetWidth;
+    final isSymmetric = alignment == .center || surfaceWidth <= targetWidth + (offsetX * 2);
 
-      double ideal_L_oh; // Ideal Left Overhang (Jarak melebar ke kiri dari target)
-      double ideal_R_oh; // Ideal Right Overhang (Jarak melebar ke kanan dari target)
-
-      // 1. Tentukan Ruang Ideal
-      // Jika ukuran terlalu kecil untuk menampung xOffset, otomatis bertindak seperti .center
-      if (_decoration.alignment == OverlayAlign.center || Cw <= targetWidth + (xOffset * 2)) {
-        ideal_L_oh = (Cw - targetWidth) / 2;
-        ideal_R_oh = (Cw - targetWidth) / 2;
-      } else if (_decoration.alignment == OverlayAlign.left) {
-        ideal_L_oh = xOffset;
-        ideal_R_oh = Cw - targetWidth - xOffset;
-      } else {
-        // .right
-        ideal_R_oh = xOffset;
-        ideal_L_oh = Cw - targetWidth - xOffset;
-      }
-
-      // 2. Batas Ruang Layar (Jangan sampai negatif jika target off-screen)
-      double max_L_oh = max(0.0, targetPositionX - marginX);
-      double max_R_oh = max(0.0, (screenWidth - marginX) - (targetPositionX + targetWidth));
-
-      double actual_L_oh = ideal_L_oh;
-      double actual_R_oh = ideal_R_oh;
-
-      // 3. Eksekusi Symmetric Squeeze Logic
-      bool isSymmetric =
-          (_decoration.alignment == OverlayAlign.center || Cw <= targetWidth + (xOffset * 2));
-
-      if (isSymmetric) {
-        // Jika sedang mode simetris (pseudo-center), potong kedua sisi sama rata
-        double max_sym_oh = min(max_L_oh, max_R_oh);
-        actual_L_oh = min(actual_L_oh, max_sym_oh);
-        actual_R_oh = min(actual_R_oh, max_sym_oh);
-      } else {
-        // Jika asimetris (.left / .right), potong sisi yang menabrak margin terlebih dahulu
-        actual_L_oh = min(actual_L_oh, max_L_oh);
-        actual_R_oh = min(actual_R_oh, max_R_oh);
-
-        // SQUEEZE TRIGGER:
-        // Jika sisi panjang terkompresi margin sampai lebih pendek dari ukuran xOffset (sisi pendek),
-        // paksa keduanya menjadi simetris agar mengecil dengan ukuran yang sama.
-        if (actual_L_oh < actual_R_oh && _decoration.alignment == OverlayAlign.right) {
-          actual_R_oh = actual_L_oh;
-        } else if (actual_R_oh < actual_L_oh && _decoration.alignment == OverlayAlign.left) {
-          actual_L_oh = actual_R_oh;
-        }
-      }
-
-      finalSurfaceWidth = targetWidth + actual_L_oh + actual_R_oh;
-      Lx = targetPositionX - actual_L_oh;
+    if (isSymmetric) {
+      leftOverhang = rightOverhang = (surfaceWidth - targetWidth) / 2;
+    } else if (alignment == .left) {
+      leftOverhang = offsetX;
+      rightOverhang = surfaceWidth - targetWidth - offsetX;
+    } else {
+      leftOverhang = surfaceWidth - targetWidth - offsetX;
+      rightOverhang = offsetX;
     }
 
-    // Hitung total lebar widget Follower (termasuk 2x padding shadow)
-    // final width = finalSurfaceWidth + (2 * Ex);
+    // Batasi Overhang Jika Menabrak Margin Layar
+    final maxLeft = max(.0, _targetPositionX - marginX);
+    final maxRight = max(.0, (_screenWidth - marginX) - (_targetPositionX + targetWidth));
 
-    final dynamicWidth = finalSurfaceWidth + (_elevationSurfaceX * 2);
+    leftOverhang = min(leftOverhang, maxLeft);
+    rightOverhang = min(rightOverhang, maxRight);
+
+    if (isSymmetric) {
+      // Ambil overhang yang paling kecil (paling tercekik margin) lalu samakan keduanya.
+      final minOverhang = min(leftOverhang, rightOverhang);
+      leftOverhang = minOverhang;
+      rightOverhang = minOverhang;
+    } else if (alignment == .right && leftOverhang < rightOverhang) {
+      rightOverhang = leftOverhang;
+    } else if (alignment == .left && rightOverhang < leftOverhang) {
+      leftOverhang = rightOverhang;
+    }
+
+    final dynamicWidth = targetWidth + leftOverhang + rightOverhang + (_elevationSurfaceX * 2);
     final staticWidth = _decoration.width + (_elevationSurfaceX * 2);
-    final fitToTargetWidth = _targetSize.width + (_elevationSurfaceX * 2);
+    final fitToTargetWidth = targetWidth + (_elevationSurfaceX * 2);
     final width = switch (_decoration._id) {
       1 => dynamicWidth,
       2 => staticWidth,
@@ -463,25 +433,17 @@ class _OverlayLayerState extends State<_OverlayLayer> {
       int() => dynamicWidth,
     };
 
-    // KALKULASI OFFSET FIX:
-    // Mengurangi/Menambahkan parameter Ex untuk mengkompensasi padding shadow di Follower.
-
-    final alignmentYOffset = _isTopOverlay
+    final alignmentoffsetY = _isTopOverlay
         ? -(_targetSize.height - _elevationSurfaceY)
         : _targetSize.height - _elevationSurfaceY;
 
-    final alignmentXOffset = switch (_decoration.alignment) {
-      .left => Lx - _elevationSurfaceX - targetPositionX,
+    final alignmentoffsetX = switch (alignment) {
+      .left => -(_elevationSurfaceX + leftOverhang),
       .center => .0,
-      .right => (Lx + finalSurfaceWidth + _elevationSurfaceX) - (targetPositionX + targetWidth),
+      .right => _elevationSurfaceX + rightOverhang,
     };
-    // final alignmentXOffset = switch (_decoration.alignment) {
-    //   .left => -(_elevationSurfaceX + offsetAdjustment),
-    //   .center => .0,
-    //   .right => _elevationSurfaceX + offsetAdjustment,
-    // };
 
-    final Alignment anchorAlignment = switch (_decoration.alignment) {
+    final Alignment anchorAlignment = switch (alignment) {
       .left => _isTopOverlay ? .bottomLeft : .topLeft,
       .center => _isTopOverlay ? .bottomCenter : .topCenter,
       .right => _isTopOverlay ? .bottomRight : .topRight,
@@ -509,7 +471,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
           child: CompositedTransformFollower(
             link: widget.link,
             showWhenUnlinked: false,
-            offset: Offset(alignmentXOffset, alignmentYOffset),
+            offset: Offset(alignmentoffsetX, alignmentoffsetY),
             targetAnchor: anchorAlignment,
             followerAnchor: anchorAlignment,
             child: Material(
@@ -524,7 +486,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
                   isTopOverlay: _isTopOverlay,
                   maxWidth: _maxWidth < _targetSize.width ? _targetSize.width : _maxWidth,
                   maxHeight: _decoration.maxHeight ?? _maxHeight,
-                  yOffset: _decoration.yOffset,
+                  offsetY: _decoration.offsetY,
                   closeOnTapOutside: widget.closeOnTapOutside,
                   decoration: _decoration,
                   onRemove: widget.onRemove,
@@ -539,15 +501,20 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     );
   }
 
-  double _getMaxWidth(OverlayAlign alignment, Size size, Size targetSize, Offset targetPosition) {
+  double _getMaxWidth(
+    OverlayAlignment alignment,
+    Size size,
+    Size targetSize,
+    Offset targetPosition,
+  ) {
     final leftRemainder = targetPosition.dx;
     final rightRemainder = size.width - (targetPosition.dx + targetSize.width);
     final minSide = min(leftRemainder, rightRemainder);
 
     return switch (alignment) {
-      .left => ((rightRemainder + targetSize.width) - _decoration.marginX) + _decoration.xOffset,
+      .left => ((rightRemainder + targetSize.width) - _decoration.marginX) + _decoration.offsetX,
       .center => (minSide * 2 + targetSize.width) - (_decoration.marginX * 2),
-      .right => ((leftRemainder + targetSize.width) - _decoration.marginX) + _decoration.xOffset,
+      .right => ((leftRemainder + targetSize.width) - _decoration.marginX) + _decoration.offsetX,
     };
   }
 }
@@ -625,7 +592,7 @@ class _OverlayContent extends StatelessWidget {
     required this.isTopOverlay,
     required this.maxWidth,
     required this.maxHeight,
-    this.yOffset,
+    this.offsetY,
     required this.closeOnTapOutside,
     required this.decoration,
     required this.onRemove,
@@ -636,7 +603,7 @@ class _OverlayContent extends StatelessWidget {
   final bool isTopOverlay;
   final double maxWidth;
   final double maxHeight;
-  final double? yOffset;
+  final double? offsetY;
   final bool closeOnTapOutside;
   final OverlayDecoration decoration;
   final void Function() onRemove;
@@ -649,7 +616,7 @@ class _OverlayContent extends StatelessWidget {
       onEnter: (_) => onHoverInside?.call(true),
       onExit: (_) => onHoverInside?.call(false),
       child: Padding(
-        padding: isTopOverlay ? .only(bottom: (yOffset ?? 0)) : .only(top: (yOffset ?? 0)),
+        padding: isTopOverlay ? .only(bottom: (offsetY ?? 0)) : .only(top: (offsetY ?? 0)),
         child: TapRegion(
           onTapOutside: closeOnTapOutside ? (_) => onRemove() : null,
           child: ConstrainedBox(

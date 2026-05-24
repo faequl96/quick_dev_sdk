@@ -7,7 +7,7 @@ class QuickSuggestionField<T> extends StatefulWidget {
     required this.onSelected,
     super.key,
     this.decoration = const .fitToTargetWidth(
-      yOffset: 6,
+      offsetY: 6,
       marginY: 14,
       marginX: 14,
       color: Color(0xFFFAFAFA),

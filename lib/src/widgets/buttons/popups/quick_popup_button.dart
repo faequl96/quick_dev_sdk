@@ -13,7 +13,8 @@ class QuickPopupButton extends StatelessWidget {
       clipBehavior: .none,
     ),
     this.overlaydecoration = const .dynamicWidth(
-      yOffset: 6,
+      offsetY: 6,
+      offsetX: 8,
       marginY: 14,
       marginX: 14,
       padding: .symmetric(vertical: 8),
