@@ -250,7 +250,9 @@ class _OverlayLayerState extends State<_OverlayLayer> {
 
   ScrollNotificationObserverState? _scrollObserver;
 
+  Size _screenSize = const Size(0, 0);
   Size _targetSize = const Size(0, 0);
+  Offset _targetPosition = const Offset(0, 0);
   double _maxHeight = 0;
   double _maxWidth = 0;
   bool _isTopOverlay = false;
@@ -326,8 +328,10 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     final renderBox = widget.targetContext.findRenderObject() as RenderBox;
     _targetSize = renderBox.size;
     final targetPosition = renderBox.localToGlobal(.zero);
+    _targetPosition = targetPosition;
     final mediaQuery = MediaQuery.of(context);
     final size = mediaQuery.size;
+    _screenSize = size;
     final paddingBottom = mediaQuery.padding.bottom;
     final bottomMaxHeight =
         (size.height - (targetPosition.dy + _targetSize.height + _decoration.yOffset)) -
@@ -379,24 +383,77 @@ class _OverlayLayerState extends State<_OverlayLayer> {
       );
     }
 
-    final useTargetSizeWidth = _decoration.alignment == .center
-        ? _maxWidth < _targetSize.width
-        : _maxWidth - (_decoration.xOffset * 2) < _targetSize.width;
+    final double screenWidth = _screenSize.width;
+    final double targetPositionX = _targetPosition.dx;
+    final double targetWidth = _targetSize.width;
+    final double marginX = _decoration.marginX;
+    final double xOffset = _decoration.xOffset;
+    // final double Ex = _elevationSurfaceX;
 
-    print('_maxWidth: $_maxWidth');
-    print('_targetSize.width: ${_targetSize.width}');
+    double finalSurfaceWidth = 0; // Lebar Visual murni (tanpa shadow)
+    double Lx = 0; // Posisi absolut Kiri di layar untuk kotak visual murni
 
-    final widthAdjustment =
-        (_decoration.xOffset * 2) -
-        ((_targetSize.width - (_maxWidth - (_decoration.xOffset * 2))) * 2);
-    print(
-      '${_decoration.xOffset * 2} - ${(_targetSize.width - (_maxWidth - (_decoration.xOffset * 2))) * 2} = $widthAdjustment',
-    );
-    final finalWidthAdjustment = widthAdjustment > (_decoration.marginX) ? widthAdjustment : 0;
-    print(finalWidthAdjustment);
-    final dynamicWidth = useTargetSizeWidth
-        ? (_targetSize.width + (_elevationSurfaceX * 2)) + finalWidthAdjustment
-        : (_staticOverlaySurfaceWidth ?? 0);
+    if (_decoration._id == 1) {
+      // .dynamicWidth
+      double Cw = _staticOverlaySurfaceWidth ?? targetWidth;
+      // if (Cw < targetWidth) Cw = targetWidth;
+
+      double ideal_L_oh; // Ideal Left Overhang (Jarak melebar ke kiri dari target)
+      double ideal_R_oh; // Ideal Right Overhang (Jarak melebar ke kanan dari target)
+
+      // 1. Tentukan Ruang Ideal
+      // Jika ukuran terlalu kecil untuk menampung xOffset, otomatis bertindak seperti .center
+      if (_decoration.alignment == OverlayAlign.center || Cw <= targetWidth + (xOffset * 2)) {
+        ideal_L_oh = (Cw - targetWidth) / 2;
+        ideal_R_oh = (Cw - targetWidth) / 2;
+      } else if (_decoration.alignment == OverlayAlign.left) {
+        ideal_L_oh = xOffset;
+        ideal_R_oh = Cw - targetWidth - xOffset;
+      } else {
+        // .right
+        ideal_R_oh = xOffset;
+        ideal_L_oh = Cw - targetWidth - xOffset;
+      }
+
+      // 2. Batas Ruang Layar (Jangan sampai negatif jika target off-screen)
+      double max_L_oh = max(0.0, targetPositionX - marginX);
+      double max_R_oh = max(0.0, (screenWidth - marginX) - (targetPositionX + targetWidth));
+
+      double actual_L_oh = ideal_L_oh;
+      double actual_R_oh = ideal_R_oh;
+
+      // 3. Eksekusi Symmetric Squeeze Logic
+      bool isSymmetric =
+          (_decoration.alignment == OverlayAlign.center || Cw <= targetWidth + (xOffset * 2));
+
+      if (isSymmetric) {
+        // Jika sedang mode simetris (pseudo-center), potong kedua sisi sama rata
+        double max_sym_oh = min(max_L_oh, max_R_oh);
+        actual_L_oh = min(actual_L_oh, max_sym_oh);
+        actual_R_oh = min(actual_R_oh, max_sym_oh);
+      } else {
+        // Jika asimetris (.left / .right), potong sisi yang menabrak margin terlebih dahulu
+        actual_L_oh = min(actual_L_oh, max_L_oh);
+        actual_R_oh = min(actual_R_oh, max_R_oh);
+
+        // SQUEEZE TRIGGER:
+        // Jika sisi panjang terkompresi margin sampai lebih pendek dari ukuran xOffset (sisi pendek),
+        // paksa keduanya menjadi simetris agar mengecil dengan ukuran yang sama.
+        if (actual_L_oh < actual_R_oh && _decoration.alignment == OverlayAlign.right) {
+          actual_R_oh = actual_L_oh;
+        } else if (actual_R_oh < actual_L_oh && _decoration.alignment == OverlayAlign.left) {
+          actual_L_oh = actual_R_oh;
+        }
+      }
+
+      finalSurfaceWidth = targetWidth + actual_L_oh + actual_R_oh;
+      Lx = targetPositionX - actual_L_oh;
+    }
+
+    // Hitung total lebar widget Follower (termasuk 2x padding shadow)
+    // final width = finalSurfaceWidth + (2 * Ex);
+
+    final dynamicWidth = finalSurfaceWidth + (_elevationSurfaceX * 2);
     final staticWidth = _decoration.width + (_elevationSurfaceX * 2);
     final fitToTargetWidth = _targetSize.width + (_elevationSurfaceX * 2);
     final width = switch (_decoration._id) {
@@ -406,29 +463,24 @@ class _OverlayLayerState extends State<_OverlayLayer> {
       int() => dynamicWidth,
     };
 
-    // print('_maxWidth: $_maxWidth');
-    // print('_targetSize.width: ${_targetSize.width}');
-    // print(
-    //   'elevationSurfaceLeft: ${_elevationSurfaceX + _decoration.border.left.width + _decoration.padding.left}',
-    // );
-    // print(
-    //   'elevationSurfaceRight ${_elevationSurfaceX + _decoration.border.right.width + _decoration.padding.right}',
-    // );
-    // print('_staticOverlaySurfaceWidth: $_staticOverlaySurfaceWidth');
-    // print('dynamicWidth: $dynamicWidth');
-    // print('staticWidth: $staticWidth');
-    // print('fitToTargetWidth: $fitToTargetWidth');
-    // print('width: $width');
+    // KALKULASI OFFSET FIX:
+    // Mengurangi/Menambahkan parameter Ex untuk mengkompensasi padding shadow di Follower.
 
     final alignmentYOffset = _isTopOverlay
         ? -(_targetSize.height - _elevationSurfaceY)
         : _targetSize.height - _elevationSurfaceY;
-    final offsetAdjustment = (useTargetSizeWidth ? finalWidthAdjustment / 2 : _decoration.xOffset);
+
     final alignmentXOffset = switch (_decoration.alignment) {
-      .left => -(_elevationSurfaceX + offsetAdjustment),
+      .left => Lx - _elevationSurfaceX - targetPositionX,
       .center => .0,
-      .right => _elevationSurfaceX + offsetAdjustment,
+      .right => (Lx + finalSurfaceWidth + _elevationSurfaceX) - (targetPositionX + targetWidth),
     };
+    // final alignmentXOffset = switch (_decoration.alignment) {
+    //   .left => -(_elevationSurfaceX + offsetAdjustment),
+    //   .center => .0,
+    //   .right => _elevationSurfaceX + offsetAdjustment,
+    // };
+
     final Alignment anchorAlignment = switch (_decoration.alignment) {
       .left => _isTopOverlay ? .bottomLeft : .topLeft,
       .center => _isTopOverlay ? .bottomCenter : .topCenter,
@@ -487,15 +539,15 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     );
   }
 
-  double _getMaxWidth(OverlayAlign alignment, Size size, Size buttonSize, Offset position) {
-    final leftRemainder = position.dx;
-    final rightRemainder = size.width - (position.dx + buttonSize.width);
+  double _getMaxWidth(OverlayAlign alignment, Size size, Size targetSize, Offset targetPosition) {
+    final leftRemainder = targetPosition.dx;
+    final rightRemainder = size.width - (targetPosition.dx + targetSize.width);
     final minSide = min(leftRemainder, rightRemainder);
 
     return switch (alignment) {
-      .left => ((rightRemainder + buttonSize.width) - _decoration.marginX) + _decoration.xOffset,
-      .center => (minSide * 2 + buttonSize.width) - (_decoration.marginX * 2),
-      .right => ((leftRemainder + buttonSize.width) - _decoration.marginX) + _decoration.xOffset,
+      .left => ((rightRemainder + targetSize.width) - _decoration.marginX) + _decoration.xOffset,
+      .center => (minSide * 2 + targetSize.width) - (_decoration.marginX * 2),
+      .right => ((leftRemainder + targetSize.width) - _decoration.marginX) + _decoration.xOffset,
     };
   }
 }
