@@ -24,12 +24,12 @@ class OverlayDecoration {
     this.elevationType = .shadow,
     this.slideTransition = true,
   }) : _id = 1,
-       width = 280;
+       _width = 0;
 
   const OverlayDecoration.staticWidth({
     this.height,
     this.maxHeight,
-    this.width = 280,
+    double width = 280,
     this.offsetY = 6,
     this.offsetX = 8,
     this.marginY = 14,
@@ -42,7 +42,8 @@ class OverlayDecoration {
     this.elevation = 1,
     this.elevationType = .shadow,
     this.slideTransition = true,
-  }) : _id = 2;
+  }) : _id = 2,
+       _width = width > 40 ? width : 40;
 
   const OverlayDecoration.fitToTargetWidth({
     this.height,
@@ -58,14 +59,14 @@ class OverlayDecoration {
     this.elevationType = .shadow,
     this.slideTransition = true,
   }) : _id = 3,
-       width = 280,
+       _width = 0,
        offsetX = 0,
        alignment = .center;
 
   final int _id;
   final double? height;
   final double? maxHeight;
-  final double width;
+  final double _width;
   final double offsetY;
   final double offsetX;
   final OverlayAlignment alignment;
@@ -117,7 +118,7 @@ class OverlayDecoration {
       return .staticWidth(
         height: height ?? this.height,
         maxHeight: maxHeight ?? this.maxHeight,
-        width: width ?? this.width,
+        width: width ?? _width,
         offsetY: offsetY ?? this.offsetY,
         offsetX: offsetX ?? this.offsetX,
         marginY: marginY ?? this.marginY,
@@ -425,7 +426,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     }
 
     final dynamicWidth = targetWidth + leftOverhang + rightOverhang + (_elevationSurfaceX * 2);
-    final staticWidth = _decoration.width + (_elevationSurfaceX * 2);
+    final staticWidth = _decoration._width + (_elevationSurfaceX * 2);
     final fitToTargetWidth = targetWidth + (_elevationSurfaceX * 2);
     final width = switch (_decoration._id) {
       1 => dynamicWidth,
@@ -625,7 +626,7 @@ class _OverlayContent extends StatelessWidget {
             child: _DecoratedOverlay(
               decoration: _OverlayDecoration(
                 height: decoration.height,
-                width: decoration._id == 2 ? decoration.width : null,
+                width: decoration._id == 2 ? decoration._width : null,
                 padding: decoration.padding,
                 color: decoration.color,
                 borderRadius: decoration.borderRadius,
