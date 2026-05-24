@@ -29,7 +29,7 @@ class OverlayDecoration {
   const OverlayDecoration.staticWidth({
     this.height,
     this.maxHeight,
-    double width = 280,
+    required double width,
     this.offsetY = 6,
     this.offsetX = 8,
     this.marginY = 14,
@@ -115,6 +115,79 @@ class OverlayDecoration {
     }
 
     if (_id == 2) {
+      return .staticWidth(
+        height: height ?? this.height,
+        maxHeight: maxHeight ?? this.maxHeight,
+        width: width ?? _width,
+        offsetY: offsetY ?? this.offsetY,
+        offsetX: offsetX ?? this.offsetX,
+        marginY: marginY ?? this.marginY,
+        marginX: marginX ?? this.marginX,
+        alignment: alignment ?? this.alignment,
+        padding: padding ?? this.padding,
+        color: color ?? this.color,
+        borderRadius: borderRadius ?? this.borderRadius,
+        border: border ?? this.border,
+        elevation: elevation ?? this.elevation,
+        elevationType: elevationType ?? this.elevationType,
+        slideTransition: slideTransition ?? this.slideTransition,
+      );
+    }
+
+    return .dynamicWidth(
+      height: height ?? this.height,
+      maxHeight: maxHeight ?? this.maxHeight,
+      offsetY: offsetY ?? this.offsetY,
+      offsetX: offsetX ?? this.offsetX,
+      marginY: marginY ?? this.marginY,
+      marginX: marginX ?? this.marginX,
+      alignment: alignment ?? this.alignment,
+      padding: padding ?? this.padding,
+      color: color ?? this.color,
+      borderRadius: borderRadius ?? this.borderRadius,
+      border: border ?? this.border,
+      elevation: elevation ?? this.elevation,
+      elevationType: elevationType ?? this.elevationType,
+      slideTransition: slideTransition ?? this.slideTransition,
+    );
+  }
+
+  OverlayDecoration _convertTo({
+    required int id,
+    double? height,
+    double? maxHeight,
+    double? width,
+    double? offsetY,
+    double? offsetX,
+    double? marginY,
+    double? marginX,
+    OverlayAlignment? alignment,
+    EdgeInsets? padding,
+    Color? color,
+    double? borderRadius,
+    Border? border,
+    double? elevation,
+    ElevationType? elevationType,
+    bool? slideTransition,
+  }) {
+    if (id == 3) {
+      return .fitToTargetWidth(
+        height: height ?? this.height,
+        maxHeight: maxHeight ?? this.maxHeight,
+        offsetY: offsetY ?? this.offsetY,
+        marginY: marginY ?? this.marginY,
+        marginX: marginX ?? this.marginX,
+        padding: padding ?? this.padding,
+        color: color ?? this.color,
+        borderRadius: borderRadius ?? this.borderRadius,
+        border: border ?? this.border,
+        elevation: elevation ?? this.elevation,
+        elevationType: elevationType ?? this.elevationType,
+        slideTransition: slideTransition ?? this.slideTransition,
+      );
+    }
+
+    if (id == 2) {
       return .staticWidth(
         height: height ?? this.height,
         maxHeight: maxHeight ?? this.maxHeight,
@@ -266,7 +339,8 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     if (_isInitial) {
       _decoration = widget.decoration;
       _set();
-      if (_decoration._id == 1) _contentKey = GlobalKey();
+      if (_decoration._id == 1 || _decoration._id == 2) _contentKey = GlobalKey();
+      print('tesssssssss');
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         if (_decoration._id != 1) {
           await Future<void>.delayed(const Duration(milliseconds: 100));
@@ -296,6 +370,8 @@ class _OverlayLayerState extends State<_OverlayLayer> {
         }
       }, duration: const Duration(milliseconds: 150));
     }
+
+    print(_contentKey);
   }
 
   @override
@@ -345,6 +421,12 @@ class _OverlayLayerState extends State<_OverlayLayer> {
 
     _maxHeight = _isTopOverlay ? topMaxHeight : bottomMaxHeight;
     _maxWidth = _getMaxWidth(_decoration.alignment, size, _targetSize, targetPosition);
+
+    if (_maxWidth < widget.decoration._width) {
+      _decoration = _decoration._convertTo(id: 1);
+    } else {
+      _decoration = widget.decoration;
+    }
 
     if (!isInitial && mounted) setState(() {});
   }
@@ -440,9 +522,9 @@ class _OverlayLayerState extends State<_OverlayLayer> {
         : _targetSize.height - _elevationSurfaceY;
 
     final alignmentoffsetX = switch (alignment) {
-      .left => -(_elevationSurfaceX + leftOverhang),
+      .left => -(_elevationSurfaceX + (_decoration._id == 1 ? leftOverhang : offsetX)),
       .center => .0,
-      .right => _elevationSurfaceX + rightOverhang,
+      .right => _elevationSurfaceX + (_decoration._id == 1 ? rightOverhang : offsetX),
     };
 
     final Alignment anchorAlignment = switch (alignment) {
