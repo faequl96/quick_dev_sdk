@@ -1,35 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:quick_dev_sdk/quick_dev_sdk.dart';
 
-class QuickDropdownField extends StatefulWidget {
+class QuickDropdownField<T> extends StatefulWidget {
   const QuickDropdownField({
     super.key,
     required this.onSelected,
     this.height,
     this.width,
-    this.style = const TextStyle(fontSize: 16),
-    this.decoration = const FieldDecoration(
-      contentVerticalPadding: 0,
-      contentHorizontalPadding: 12,
-      hideSuffixIconOnEmpty: false,
-      enabledBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: Colors.black26, width: 1),
-        borderRadius: .all(.circular(8)),
-      ),
-      disabledBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: Colors.black26, width: 1),
-        borderRadius: .all(.circular(8)),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: Colors.black26, width: 1),
-        borderRadius: .all(.circular(8)),
-      ),
-      floatingLabelBehavior: .auto,
-      filled: false,
-      obscuringCharacter: '•',
-      obscureText: false,
-    ),
-    this.splashColor,
+    this.fieldTextStyle = const TextStyle(fontSize: 16),
+    this.fieldSplashColor,
+    required this.fieldDecorationBuilder,
+    required this.fieldValueBuilder,
     this.overlaydecoration = const .fitToTargetWidth(
       offsetY: 6,
       marginY: 14,
@@ -51,44 +32,43 @@ class QuickDropdownField extends StatefulWidget {
     ),
     this.disabled = false,
     required this.value,
-    this.valueDisplay,
     required this.items,
     required this.itemBuilder,
   });
 
-  final void Function(String value) onSelected;
+  final void Function(T value) onSelected;
   final double? height;
   final double? width;
-  final TextStyle style;
-  final FieldDecoration decoration;
-  final Color? splashColor;
+  final TextStyle fieldTextStyle;
+  final Color? fieldSplashColor;
+  final FieldDecoration Function(TextEditingController controller, T value) fieldDecorationBuilder;
+  final String Function(T value) fieldValueBuilder;
   final OverlayDecoration overlaydecoration;
   final DropdownItemDecoration itemDecoration;
   final bool disabled;
-  final String? value;
-  final String? valueDisplay;
-  final List<String> items;
-  final Widget Function(BuildContext context, String value) itemBuilder;
+  final T value;
+  final List<T> items;
+  final Widget Function(BuildContext context, T value) itemBuilder;
 
   @override
-  State<QuickDropdownField> createState() => _QuickDropdownFieldState();
+  State<QuickDropdownField<T>> createState() => _QuickDropdownFieldState<T>();
 }
 
-class _QuickDropdownFieldState extends State<QuickDropdownField> {
+class _QuickDropdownFieldState<T> extends State<QuickDropdownField<T>> {
   final _textEditingController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
 
-    _textEditingController.text = widget.valueDisplay ?? widget.value ?? '';
+    _textEditingController.text = _getDisplayValue();
   }
 
   @override
-  void didUpdateWidget(covariant QuickDropdownField oldWidget) {
+  void didUpdateWidget(covariant QuickDropdownField<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    _textEditingController.text = widget.valueDisplay ?? widget.value ?? '';
+    _textEditingController.text = _getDisplayValue();
   }
 
   @override
@@ -98,8 +78,16 @@ class _QuickDropdownFieldState extends State<QuickDropdownField> {
     super.dispose();
   }
 
+  String _getDisplayValue() {
+    final currentValue = widget.value;
+    if (currentValue == null) return '';
+    return widget.fieldValueBuilder(currentValue);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final decoration = widget.fieldDecorationBuilder(_textEditingController, widget.value);
+
     return QuickStickyOverlayButton(
       onTap: (handleShowOverlay, closeOverlay) {
         if (widget.disabled) return;
@@ -121,8 +109,8 @@ class _QuickDropdownFieldState extends State<QuickDropdownField> {
       buttonStyle: QuickButtonStyle(
         height: widget.height,
         width: widget.width,
-        splashColor: widget.splashColor,
-        borderRadius: widget.decoration.enabledBorder.borderRadius,
+        splashColor: widget.fieldSplashColor,
+        borderRadius: decoration.enabledBorder.borderRadius,
         elevation: 0,
       ),
       child: Stack(
@@ -131,9 +119,9 @@ class _QuickDropdownFieldState extends State<QuickDropdownField> {
             controller: _textEditingController,
             height: widget.height,
             width: widget.width,
-            enabled: false,
-            style: widget.style,
-            decoration: widget.decoration,
+            enabled: true,
+            style: widget.fieldTextStyle,
+            decoration: decoration,
           ),
           MouseRegion(
             cursor: SystemMouseCursors.click,

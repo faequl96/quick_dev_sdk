@@ -169,7 +169,7 @@ class _QuickButtonState extends State<QuickButton> {
         hoverColor:
             style.hoveredColor ??
             (color != null ? ColorUtil.lighten(color, 25) : Colors.transparent),
-        splashColor: style.splashColor ?? color,
+        splashColor: style.splashColor ?? color ?? Colors.transparent,
         splashFactory: style.splashFactory,
         focusColor: Colors.transparent,
         highlightColor: Colors.transparent,
