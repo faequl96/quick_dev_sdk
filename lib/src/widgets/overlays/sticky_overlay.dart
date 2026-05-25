@@ -559,7 +559,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
             targetAnchor: anchorAlignment,
             followerAnchor: anchorAlignment,
             child: Material(
-              // type: .transparency,
+              type: .transparency,
               // color: Colors.amber.withValues(alpha: .5),
               child: _AnimationLayer(
                 isTopOverlay: _isTopOverlay,
@@ -569,7 +569,9 @@ class _OverlayLayerState extends State<_OverlayLayer> {
                 child: _OverlayContent(
                   isTopOverlay: _isTopOverlay,
                   maxWidth: _maxWidth < _targetSize.width ? _targetSize.width : _maxWidth,
-                  maxHeight: _decoration.maxHeight ?? _maxHeight,
+                  maxHeight: (_decoration.maxHeight ?? 0) < _maxHeight
+                      ? _decoration.maxHeight ?? _maxHeight
+                      : _maxHeight,
                   offsetY: _decoration.offsetY,
                   closeOnTapOutside: widget.closeOnTapOutside,
                   decoration: _decoration,
@@ -658,14 +660,11 @@ class _AnimationLayerState extends State<_AnimationLayer> with SingleTickerProvi
       bottom: widget.elevationSurfaceY,
     );
 
-    if (!widget.slideTransition) {
-      return Padding(padding: padding, child: widget.child);
-    }
+    if (!widget.slideTransition) return Padding(padding: padding, child: widget.child);
 
     return SizeTransition(
       sizeFactor: _animation!,
-      axisAlignment: widget.isTopOverlay ? 1 : -1,
-      // alignment: widget.isTopOverlay ? .topCenter : .bottomCenter,
+      alignment: widget.isTopOverlay ? .bottomCenter : .topCenter,
       child: Padding(padding: padding, child: widget.child),
     );
   }
