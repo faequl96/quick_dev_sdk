@@ -255,7 +255,7 @@ class StickyOverlay {
       slideTransition: true,
     ),
     void Function(bool value)? onHoverInside,
-    required Widget? Function(BuildContext context, {bool? isMeasuringWidth}) contentBuilder,
+    required Widget Function(BuildContext context, {bool? isMeasuringWidth}) contentBuilder,
   }) {
     remove();
 
@@ -306,7 +306,7 @@ class _OverlayLayer extends StatefulWidget {
   final OverlayDecoration decoration;
   final void Function(bool value)? onHoverInside;
   final void Function() onRemove;
-  final Widget? Function(BuildContext context, {bool? isMeasuringWidth}) contentBuilder;
+  final Widget Function(BuildContext context, {bool? isMeasuringWidth}) contentBuilder;
 
   @override
   State<_OverlayLayer> createState() => _OverlayLayerState();
@@ -339,20 +339,19 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     if (_isInitial) {
       _decoration = widget.decoration;
       _set();
-      if (_decoration._id == 1 || _decoration._id == 2) _contentKey = GlobalKey();
-      print('tesssssssss');
+      if (_decoration._id == 1 || widget.decoration._id == 2) _contentKey = GlobalKey();
       WidgetsBinding.instance.addPostFrameCallback((_) async {
-        if (_decoration._id != 1) {
-          await Future<void>.delayed(const Duration(milliseconds: 100));
-          _scrollObserver?.removeListener(_scrollNotification);
-          _initScrollObserver();
-        } else {
+        if (_decoration._id == 1 || widget.decoration._id == 2) {
           // await Future.delayed(const Duration(seconds: 1));
           _setStaticOverlaySurfaceWidth();
           await Future<void>.delayed(const Duration(milliseconds: 100));
           _scrollObserver?.removeListener(_scrollNotification);
           _initScrollObserver();
           _isInitial = false;
+        } else {
+          await Future<void>.delayed(const Duration(milliseconds: 100));
+          _scrollObserver?.removeListener(_scrollNotification);
+          _initScrollObserver();
         }
       });
     } else {
@@ -361,7 +360,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
         _set(isInitial: false);
         _scrollObserver?.removeListener(_scrollNotification);
         _scrollObserver = null;
-        if (_decoration._id == 1) {
+        if (_decoration._id == 1 || widget.decoration._id == 2) {
           WidgetsBinding.instance.addPostFrameCallback((_) async {
             _setStaticOverlaySurfaceWidth();
             await Future<void>.delayed(const Duration(milliseconds: 100));
@@ -370,8 +369,6 @@ class _OverlayLayerState extends State<_OverlayLayer> {
         }
       }, duration: const Duration(milliseconds: 150));
     }
-
-    print(_contentKey);
   }
 
   @override
@@ -440,6 +437,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
         children: [
           Opacity(
             opacity: 0,
+            // opacity: 1,
             child: Material(
               type: .transparency,
               // color: Colors.amber,
@@ -472,7 +470,9 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     final marginX = _decoration.marginX;
     final offsetX = _decoration.offsetX;
 
-    double surfaceWidth = _staticOverlaySurfaceWidth ?? targetWidth;
+    double surfaceWidth = _staticOverlaySurfaceWidth != null
+        ? _staticOverlaySurfaceWidth! - (_elevationSurfaceX * 2)
+        : targetWidth;
     if (surfaceWidth < targetWidth) surfaceWidth = targetWidth;
     double leftOverhang = 0;
     double rightOverhang = 0;
@@ -517,11 +517,11 @@ class _OverlayLayerState extends State<_OverlayLayer> {
       int() => dynamicWidth,
     };
 
-    final alignmentoffsetY = _isTopOverlay
+    final alignmentOffsetY = _isTopOverlay
         ? -(_targetSize.height - _elevationSurfaceY)
         : _targetSize.height - _elevationSurfaceY;
 
-    final alignmentoffsetX = switch (alignment) {
+    final alignmentOffsetX = switch (alignment) {
       .left => -(_elevationSurfaceX + (_decoration._id == 1 ? leftOverhang : offsetX)),
       .center => .0,
       .right => _elevationSurfaceX + (_decoration._id == 1 ? rightOverhang : offsetX),
@@ -555,12 +555,12 @@ class _OverlayLayerState extends State<_OverlayLayer> {
           child: CompositedTransformFollower(
             link: widget.link,
             showWhenUnlinked: false,
-            offset: Offset(alignmentoffsetX, alignmentoffsetY),
+            offset: Offset(alignmentOffsetX, alignmentOffsetY),
             targetAnchor: anchorAlignment,
             followerAnchor: anchorAlignment,
             child: Material(
-              type: .transparency,
-              // color: Colors.amber,
+              // type: .transparency,
+              // color: Colors.amber.withValues(alpha: .5),
               child: _AnimationLayer(
                 isTopOverlay: _isTopOverlay,
                 elevationSurfaceY: _elevationSurfaceY,
