@@ -31,7 +31,7 @@ export 'package:quick_dev_sdk/src/widgets/field/popups/quick_suggestion_field.da
 
 export 'package:quick_dev_sdk/src/widgets/overlays/floating_overlay/floating_overlay.dart';
 
-export 'package:quick_dev_sdk/src/widgets/overlays/sticky_overlay.dart';
+export 'package:quick_dev_sdk/src/widgets/overlays/sticky_overlay/sticky_overlay.dart';
 
 export 'package:quick_dev_sdk/src/widgets/overlays/show_snackbar.dart';
 

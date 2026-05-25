@@ -5,226 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:quick_dev_sdk/quick_dev_sdk.dart';
 
+part 'models/overlay_decoration.dart';
+part 'wrapper/sticky_overlay_wrapper.dart';
+
 enum OverlayAlignment { left, center, right }
-
-class OverlayDecoration {
-  const OverlayDecoration.dynamicWidth({
-    this.height,
-    this.maxHeight,
-    this.offsetY = 6,
-    this.offsetX = 8,
-    this.marginY = 14,
-    this.marginX = 14,
-    this.alignment = .center,
-    this.padding = const .symmetric(vertical: 8),
-    this.color = Colors.white,
-    this.borderRadius = 8,
-    this.border = const .fromBorderSide(BorderSide(width: 1, color: Colors.black12)),
-    this.elevation = 1,
-    this.elevationType = .shadow,
-    this.slideTransition = true,
-  }) : _id = 1,
-       _width = 0;
-
-  const OverlayDecoration.staticWidth({
-    this.height,
-    this.maxHeight,
-    required double width,
-    this.offsetY = 6,
-    this.offsetX = 8,
-    this.marginY = 14,
-    this.marginX = 14,
-    this.alignment = .center,
-    this.padding = const .symmetric(vertical: 8),
-    this.color = Colors.white,
-    this.borderRadius = 8,
-    this.border = const .fromBorderSide(BorderSide(width: 1, color: Colors.black12)),
-    this.elevation = 1,
-    this.elevationType = .shadow,
-    this.slideTransition = true,
-  }) : _id = 2,
-       _width = width > 40 ? width : 40;
-
-  const OverlayDecoration.fitToTargetWidth({
-    this.height,
-    this.maxHeight,
-    this.offsetY = 6,
-    this.marginY = 14,
-    this.marginX = 14,
-    this.padding = const .symmetric(vertical: 8),
-    this.color = Colors.white,
-    this.borderRadius = 8,
-    this.border = const .fromBorderSide(BorderSide(width: 1, color: Colors.black12)),
-    this.elevation = 1,
-    this.elevationType = .shadow,
-    this.slideTransition = true,
-  }) : _id = 3,
-       _width = 0,
-       offsetX = 0,
-       alignment = .center;
-
-  final int _id;
-  final double? height;
-  final double? maxHeight;
-  final double _width;
-  final double offsetY;
-  final double offsetX;
-  final OverlayAlignment alignment;
-  final double marginY;
-  final double marginX;
-  final EdgeInsets padding;
-  final Color color;
-  final double borderRadius;
-  final Border border;
-  final double elevation;
-  final ElevationType elevationType;
-  final bool slideTransition;
-
-  OverlayDecoration copyWith({
-    double? height,
-    double? maxHeight,
-    double? width,
-    double? offsetY,
-    double? offsetX,
-    double? marginY,
-    double? marginX,
-    OverlayAlignment? alignment,
-    EdgeInsets? padding,
-    Color? color,
-    double? borderRadius,
-    Border? border,
-    double? elevation,
-    ElevationType? elevationType,
-    bool? slideTransition,
-  }) {
-    if (_id == 3) {
-      return .fitToTargetWidth(
-        height: height ?? this.height,
-        maxHeight: maxHeight ?? this.maxHeight,
-        offsetY: offsetY ?? this.offsetY,
-        marginY: marginY ?? this.marginY,
-        marginX: marginX ?? this.marginX,
-        padding: padding ?? this.padding,
-        color: color ?? this.color,
-        borderRadius: borderRadius ?? this.borderRadius,
-        border: border ?? this.border,
-        elevation: elevation ?? this.elevation,
-        elevationType: elevationType ?? this.elevationType,
-        slideTransition: slideTransition ?? this.slideTransition,
-      );
-    }
-
-    if (_id == 2) {
-      return .staticWidth(
-        height: height ?? this.height,
-        maxHeight: maxHeight ?? this.maxHeight,
-        width: width ?? _width,
-        offsetY: offsetY ?? this.offsetY,
-        offsetX: offsetX ?? this.offsetX,
-        marginY: marginY ?? this.marginY,
-        marginX: marginX ?? this.marginX,
-        alignment: alignment ?? this.alignment,
-        padding: padding ?? this.padding,
-        color: color ?? this.color,
-        borderRadius: borderRadius ?? this.borderRadius,
-        border: border ?? this.border,
-        elevation: elevation ?? this.elevation,
-        elevationType: elevationType ?? this.elevationType,
-        slideTransition: slideTransition ?? this.slideTransition,
-      );
-    }
-
-    return .dynamicWidth(
-      height: height ?? this.height,
-      maxHeight: maxHeight ?? this.maxHeight,
-      offsetY: offsetY ?? this.offsetY,
-      offsetX: offsetX ?? this.offsetX,
-      marginY: marginY ?? this.marginY,
-      marginX: marginX ?? this.marginX,
-      alignment: alignment ?? this.alignment,
-      padding: padding ?? this.padding,
-      color: color ?? this.color,
-      borderRadius: borderRadius ?? this.borderRadius,
-      border: border ?? this.border,
-      elevation: elevation ?? this.elevation,
-      elevationType: elevationType ?? this.elevationType,
-      slideTransition: slideTransition ?? this.slideTransition,
-    );
-  }
-
-  OverlayDecoration _convertTo({
-    required int id,
-    double? height,
-    double? maxHeight,
-    double? width,
-    double? offsetY,
-    double? offsetX,
-    double? marginY,
-    double? marginX,
-    OverlayAlignment? alignment,
-    EdgeInsets? padding,
-    Color? color,
-    double? borderRadius,
-    Border? border,
-    double? elevation,
-    ElevationType? elevationType,
-    bool? slideTransition,
-  }) {
-    if (id == 3) {
-      return .fitToTargetWidth(
-        height: height ?? this.height,
-        maxHeight: maxHeight ?? this.maxHeight,
-        offsetY: offsetY ?? this.offsetY,
-        marginY: marginY ?? this.marginY,
-        marginX: marginX ?? this.marginX,
-        padding: padding ?? this.padding,
-        color: color ?? this.color,
-        borderRadius: borderRadius ?? this.borderRadius,
-        border: border ?? this.border,
-        elevation: elevation ?? this.elevation,
-        elevationType: elevationType ?? this.elevationType,
-        slideTransition: slideTransition ?? this.slideTransition,
-      );
-    }
-
-    if (id == 2) {
-      return .staticWidth(
-        height: height ?? this.height,
-        maxHeight: maxHeight ?? this.maxHeight,
-        width: width ?? _width,
-        offsetY: offsetY ?? this.offsetY,
-        offsetX: offsetX ?? this.offsetX,
-        marginY: marginY ?? this.marginY,
-        marginX: marginX ?? this.marginX,
-        alignment: alignment ?? this.alignment,
-        padding: padding ?? this.padding,
-        color: color ?? this.color,
-        borderRadius: borderRadius ?? this.borderRadius,
-        border: border ?? this.border,
-        elevation: elevation ?? this.elevation,
-        elevationType: elevationType ?? this.elevationType,
-        slideTransition: slideTransition ?? this.slideTransition,
-      );
-    }
-
-    return .dynamicWidth(
-      height: height ?? this.height,
-      maxHeight: maxHeight ?? this.maxHeight,
-      offsetY: offsetY ?? this.offsetY,
-      offsetX: offsetX ?? this.offsetX,
-      marginY: marginY ?? this.marginY,
-      marginX: marginX ?? this.marginX,
-      alignment: alignment ?? this.alignment,
-      padding: padding ?? this.padding,
-      color: color ?? this.color,
-      borderRadius: borderRadius ?? this.borderRadius,
-      border: border ?? this.border,
-      elevation: elevation ?? this.elevation,
-      elevationType: elevationType ?? this.elevationType,
-      slideTransition: slideTransition ?? this.slideTransition,
-    );
-  }
-}
 
 class StickyOverlay {
   StickyOverlay._();
@@ -417,7 +201,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
         (targetPosition.dy - _decoration.offsetY) - (_decoration.marginY + paddingTop);
 
     _maxHeight = _isTopOverlay ? topMaxHeight : bottomMaxHeight;
-    _maxWidth = _getMaxWidth(_decoration.alignment, size, _targetSize, targetPosition);
+    _maxWidth = _getMaxWidth(_decoration._alignment, size, _targetSize, targetPosition);
 
     if (_maxWidth < widget.decoration._width) {
       _decoration = _decoration._convertTo(id: 1);
@@ -466,9 +250,9 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     }
 
     final targetWidth = _targetSize.width;
-    final alignment = _decoration.alignment;
+    final alignment = _decoration._alignment;
     final marginX = _decoration.marginX;
-    final offsetX = _decoration.offsetX;
+    final offsetX = _decoration._offsetX;
 
     double surfaceWidth = _staticOverlaySurfaceWidth != null
         ? _staticOverlaySurfaceWidth! - (_elevationSurfaceX * 2)
@@ -598,9 +382,9 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     final minSide = min(leftRemainder, rightRemainder);
 
     return switch (alignment) {
-      .left => ((rightRemainder + targetSize.width) - _decoration.marginX) + _decoration.offsetX,
+      .left => ((rightRemainder + targetSize.width) - _decoration.marginX) + _decoration._offsetX,
       .center => (minSide * 2 + targetSize.width) - (_decoration.marginX * 2),
-      .right => ((leftRemainder + targetSize.width) - _decoration.marginX) + _decoration.offsetX,
+      .right => ((leftRemainder + targetSize.width) - _decoration.marginX) + _decoration._offsetX,
     };
   }
 }
@@ -722,28 +506,6 @@ class _OverlayContent extends StatelessWidget {
       ),
     );
   }
-}
-
-class _OverlayDecoration {
-  const _OverlayDecoration({
-    this.height,
-    this.width,
-    required this.padding,
-    required this.color,
-    required this.borderRadius,
-    required this.border,
-    required this.elevation,
-    required this.elevationType,
-  });
-
-  final double? height;
-  final double? width;
-  final EdgeInsets padding;
-  final Color color;
-  final double borderRadius;
-  final BoxBorder border;
-  final double elevation;
-  final ElevationType elevationType;
 }
 
 class _DecoratedOverlay extends SingleChildRenderObjectWidget {
@@ -884,40 +646,4 @@ class _RenderDecoratedOverlay extends RenderProxyBox {
       context.paintChild(child!, offset);
     }
   }
-}
-
-class OverlayWrapper extends StatefulWidget {
-  const OverlayWrapper({super.key, required this.child});
-
-  final Widget child;
-
-  @override
-  State<OverlayWrapper> createState() => _OverlayWrapperState();
-}
-
-class _OverlayWrapperState extends State<OverlayWrapper> {
-  late final _entry = OverlayEntry(
-    canSizeOverlay: true,
-    opaque: true,
-    builder: (BuildContext context) => widget.child,
-  );
-
-  @override
-  void didUpdateWidget(OverlayWrapper oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    _entry.markNeedsBuild();
-  }
-
-  @override
-  void dispose() {
-    _entry
-      ..remove()
-      ..dispose();
-
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) => Overlay(initialEntries: [_entry]);
 }
