@@ -234,7 +234,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
                       maxHeight: 100,
                     ),
                     child: Padding(
-                      padding: EdgeInsets.only(
+                      padding: .only(
                         top: _elevationSurfaceY + border.top.width + padding.top,
                         left: _elevationSurfaceX + border.left.width + padding.left,
                         right: _elevationSurfaceX + border.right.width + padding.right,
@@ -279,8 +279,8 @@ class _OverlayLayerState extends State<_OverlayLayer> {
             targetAnchor: layoutValues.anchorAlignment,
             followerAnchor: layoutValues.anchorAlignment,
             child: Material(
-              // type: .transparency,
-              color: Colors.amber.withValues(alpha: .5),
+              type: .transparency,
+              // color: Colors.amber.withValues(alpha: .5),
               child: _AnimationLayer(
                 isTopOverlay: _isTopOverlay,
                 elevationSurfaceY: _elevationSurfaceY,
