@@ -217,29 +217,31 @@ class _OverlayLayerState extends State<_OverlayLayer> {
       final padding = _decoration.padding;
       return Stack(
         children: [
-          Opacity(
-            opacity: 0,
-            // opacity: 1,
-            child: Material(
-              type: .transparency,
-              // color: Colors.amber,
-              child: SizedBox(
-                key: _contentKey,
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxWidth: _decoration._id == 4
-                        ? _maxWidth + (_elevationSurfaceX * 2)
-                        : _maxWidth + (_elevationSurfaceX * 2),
-                    maxHeight: 100,
-                  ),
-                  child: Padding(
-                    padding: .only(
-                      top: _elevationSurfaceY + border.top.width + padding.top,
-                      left: _elevationSurfaceX + border.left.width + padding.left,
-                      right: _elevationSurfaceX + border.right.width + padding.right,
-                      bottom: _elevationSurfaceY + border.bottom.width + padding.bottom,
+          Positioned(
+            child: Opacity(
+              opacity: 0,
+              // opacity: 1,
+              child: Material(
+                type: .transparency,
+                // color: Colors.amber,
+                child: SizedBox(
+                  key: _contentKey,
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxWidth: _decoration._id == 4
+                          ? _maxWidth
+                          : _maxWidth + (_elevationSurfaceX * 2),
+                      maxHeight: 100,
                     ),
-                    child: widget.contentBuilder(widget.targetContext, isMeasuringWidth: true),
+                    child: Padding(
+                      padding: .only(
+                        top: _elevationSurfaceY + border.top.width + padding.top,
+                        left: _elevationSurfaceX + border.left.width + padding.left,
+                        right: _elevationSurfaceX + border.right.width + padding.right,
+                        bottom: _elevationSurfaceY + border.bottom.width + padding.bottom,
+                      ),
+                      child: widget.contentBuilder(widget.targetContext, isMeasuringWidth: true),
+                    ),
                   ),
                 ),
               ),
@@ -308,7 +310,9 @@ class _OverlayLayerState extends State<_OverlayLayer> {
   }
 
   double get _getMaxWidth {
-    if (_decoration._id == 4) return _screenWidth - (_decoration.marginX * 2);
+    if (_decoration._id == 4) {
+      return _screenWidth - (_decoration.marginX * 2) + (_elevationSurfaceX * 2);
+    }
 
     final leftRemainder = _targetPositionX;
     final rightRemainder = _screenWidth - (_targetPositionX + _targetSize.width);
@@ -404,39 +408,40 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     final targetWidth = _targetSize.width;
     final marginX = _decoration.marginX;
 
-    // 1. Dapatkan lebar konten MURNI
+    // Batas maksimal mutlak untuk KOTAK COKLAT
+    final maxContentWidth = _screenWidth - (marginX * 2);
+
     double surfaceWidth = targetWidth;
     if (_staticOverlaySurfaceWidth != null) {
-      // Kurangi elevasi bawaan dari hasil ukur Dummy
+      // Dapatkan lebar teks asli
       surfaceWidth = _staticOverlaySurfaceWidth! - (_elevationSurfaceX * 2);
     } else {
-      surfaceWidth = _screenWidth - (marginX * 2);
+      surfaceWidth = maxContentWidth;
     }
 
+    // Patuh pada ukuran layar (Layar kecil = Coklat berhenti di batas layar)
+    if (surfaceWidth > maxContentWidth) surfaceWidth = maxContentWidth;
     if (surfaceWidth < targetWidth) surfaceWidth = targetWidth;
 
-    // 2. Kalkulasi Overhang Murni
     double idealLeftOverhang = (surfaceWidth - targetWidth) / 2;
     double idealRightOverhang = idealLeftOverhang;
 
-    final double idealLx = _targetPositionX - idealLeftOverhang;
-    final double idealRx = idealLx + surfaceWidth;
+    // Kalkulasi Acuan Posisi menggunakan KOTAK COKLAT
+    final double idealBrownLx = _targetPositionX - idealLeftOverhang;
+    final double idealBrownRx = idealBrownLx + surfaceWidth;
 
-    // 3. Sliding / Clamping yang akurat ke batas margin
     double adaptiveShiftX = 0;
-    if (idealLx < marginX) {
-      adaptiveShiftX = marginX - idealLx;
-    } else if (idealRx > _screenWidth - marginX) {
-      adaptiveShiftX = (_screenWidth - marginX) - idealRx;
+    if (idealBrownLx < marginX) {
+      adaptiveShiftX = marginX - idealBrownLx;
+    } else if (idealBrownRx > _screenWidth - marginX) {
+      adaptiveShiftX = (_screenWidth - marginX) - idealBrownRx;
     }
 
     adaptiveShiftX = adaptiveShiftX.clamp(-idealRightOverhang, idealLeftOverhang);
 
-    // =======================================================
-    // 4. KUNCI PERBAIKAN: Jangan tambah (_elevationSurfaceX * 2)
-    // agar tidak ada ruang kosong di kanan yang menabrak layar!
-    // =======================================================
-    final width = surfaceWidth;
+    // KUNCI: Lebar keseluruhan tetap ditambah kuning (elevasi)
+    // Saat coklat tergeser mentok margin, area kuning akan meluber keluar layar (tersembunyi)
+    final width = surfaceWidth + (_elevationSurfaceX * 2);
 
     final alignmentOffsetY = _isTopOverlay
         ? -(_targetSize.height - _elevationSurfaceY)
