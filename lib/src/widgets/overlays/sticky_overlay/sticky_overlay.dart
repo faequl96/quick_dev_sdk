@@ -405,40 +405,27 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     final marginX = _decoration.marginX;
 
     double surfaceWidth = targetWidth;
+
     if (_staticOverlaySurfaceWidth != null) {
-      // 1. Definisikan batas maksimal ruang yang tersedia di layar
-      final double maxAllowedSpace = _screenWidth - (marginX * 2);
+      // Kondisi Eksplisit: Batas deteksi "Layar Kecil" vs "Layar Besar"
+      final isSmallScreenOrLongContent =
+          _staticOverlaySurfaceWidth! >= _screenWidth - (marginX * 2);
 
-      // 2. Hitung lebar natural konten (asumsi jika berada di layar besar)
-      final double naturalContentWidth = _staticOverlaySurfaceWidth! - (_elevationSurfaceX * 2);
-
-      // 3. LOGIKA KONDISIONAL (Sesuai Eksperimen Anda)
-      if (naturalContentWidth >= maxAllowedSpace) {
-        // LAYAR KECIL (Atau konten super panjang yang menabrak layar):
-        // HILANGKAN pengurangan - (_elevationSurfaceX * 2) sesuai temuan Anda!
+      if (isSmallScreenOrLongContent) {
+        // Layar Kecil: Hilangkan pengurangan agar teks tidak tercekik (wrap)
         surfaceWidth = _staticOverlaySurfaceWidth!;
-
-        // Safety net: Pastikan lebar akhir tidak meluber menembus margin layar
-        if (surfaceWidth > maxAllowedSpace) {
-          surfaceWidth = maxAllowedSpace;
-        }
       } else {
-        // LAYAR BESAR (Konten lebih kecil dari layar, ruang masih luas):
-        // TETAP KURANGI - (_elevationSurfaceX * 2) agar layer kuning tidak kelebaran.
-        surfaceWidth = naturalContentWidth;
+        // Layar Besar: Terapkan pengurangan agar background tidak kelebaran
+        surfaceWidth = _staticOverlaySurfaceWidth! - (_elevationSurfaceX * 2);
       }
     } else {
-      // Frame pertama (Opacity 0)
       surfaceWidth = _screenWidth - (marginX * 2);
     }
 
-    // Pastikan tidak lebih kecil dari tombol target itu sendiri
     if (surfaceWidth < targetWidth) surfaceWidth = targetWidth;
 
-    double idealLeftOverhang = 0;
-    double idealRightOverhang = 0;
-
-    idealLeftOverhang = idealRightOverhang = (surfaceWidth - targetWidth) / 2;
+    double idealLeftOverhang = (surfaceWidth - targetWidth) / 2;
+    double idealRightOverhang = idealLeftOverhang;
 
     final double idealLx = _targetPositionX - idealLeftOverhang;
     final double idealRx = idealLx + surfaceWidth;
