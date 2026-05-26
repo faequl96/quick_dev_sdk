@@ -217,7 +217,6 @@ class _OverlayLayerState extends State<_OverlayLayer> {
       final padding = _decoration.padding;
       return Stack(
         children: [
-          // KUNCI ABSOLUT: left dan top wajib diisi agar batas layar (Stack) tertembus!
           Positioned(
             left: 0,
             top: 0,
@@ -229,7 +228,6 @@ class _OverlayLayerState extends State<_OverlayLayer> {
                   key: _contentKey,
                   child: ConstrainedBox(
                     constraints: BoxConstraints(
-                      // Membatasi ukuran maksimal dengan aman (menghindari error infinity)
                       maxWidth: _decoration._id == 4
                           ? _maxWidth
                           : _maxWidth + (_elevationSurfaceX * 2),
@@ -313,7 +311,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
 
   double get _getMaxWidth {
     if (_decoration._id == 4) {
-      return _screenWidth - (_decoration.marginX * 2) + (_elevationSurfaceX * 2);
+      return _screenWidth - _decoration.marginX + (_elevationSurfaceX * 2);
     }
 
     final leftRemainder = _targetPositionX;
@@ -410,8 +408,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     final targetWidth = _targetSize.width;
     final marginX = _decoration.marginX;
 
-    // Batas maksimal mutlak untuk KOTAK COKLAT
-    final maxContentWidth = _screenWidth - (marginX * 2);
+    final maxContentWidth = _screenWidth - marginX;
 
     double surfaceWidth = targetWidth;
     if (_staticOverlaySurfaceWidth != null) {
@@ -423,44 +420,17 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     if (surfaceWidth > maxContentWidth) surfaceWidth = maxContentWidth;
     if (surfaceWidth < targetWidth) surfaceWidth = targetWidth;
 
-    double idealLeftOverhang = (surfaceWidth - targetWidth) / 2;
+    final leftOverhang = (surfaceWidth - targetWidth) / 2;
+    final surfaceLeftCoordinate = _targetPositionX - leftOverhang;
+    final surfaceRightCoordinate = surfaceLeftCoordinate + surfaceWidth;
 
-    // Kalkulasi Acuan Posisi menggunakan KOTAK COKLAT
-    final double idealBrownLx = _targetPositionX - idealLeftOverhang;
-    final double idealBrownRx = idealBrownLx + surfaceWidth;
-
-    // Kalkulasi Shifting Awal
     double adaptiveShiftX = 0;
-    if (idealBrownLx < marginX) {
-      adaptiveShiftX = marginX - idealBrownLx;
-    } else if (idealBrownRx > _screenWidth - marginX) {
-      adaptiveShiftX = (_screenWidth - marginX) - idealBrownRx;
+    if (surfaceRightCoordinate > _screenWidth - marginX) {
+      adaptiveShiftX = _screenWidth - surfaceRightCoordinate;
+    } else if (surfaceLeftCoordinate < marginX) {
+      adaptiveShiftX = marginX - surfaceLeftCoordinate;
     }
-
-    // =========================================================
-    // KUNCI FINAL: REM ASIMETRIS (Sesuai Permintaan Anda)
-    // =========================================================
-
-    // ATURAN 1: Sisi kiri maksimal sejajar kiri target
-    // (Mengerem pergeseran ke kanan)
-    if (adaptiveShiftX > idealLeftOverhang) {
-      adaptiveShiftX = idealLeftOverhang;
-    }
-
-    // ATURAN 2: Sisi kanan PENTOKIN KE MERAH!
-    // (Mengerem pergeseran ke kiri HANYA jika menabrak margin kiri seberangnya)
-    double maxLeftShift = marginX - idealBrownLx;
-
-    // Safety check: Pastikan Aturan 1 tidak dilanggar jika target berada di tepi layar
-    if (maxLeftShift > idealLeftOverhang) {
-      maxLeftShift = idealLeftOverhang;
-    }
-
-    // Izinkan bergeser ke kiri bebas sampai menyentuh batas layar
-    if (adaptiveShiftX < maxLeftShift) {
-      adaptiveShiftX = maxLeftShift;
-    }
-    // =========================================================
+    if (adaptiveShiftX > leftOverhang) adaptiveShiftX = leftOverhang;
 
     final width = surfaceWidth + (_elevationSurfaceX * 2);
 
