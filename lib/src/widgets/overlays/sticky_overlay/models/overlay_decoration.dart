@@ -56,6 +56,24 @@ class OverlayDecoration {
        _offsetX = 0,
        _alignment = .center;
 
+  const OverlayDecoration.adaptive({
+    this.offsetY = 6,
+    this.marginY = 14,
+    this.marginX = 14,
+    this.padding = const .symmetric(vertical: 8),
+    this.color = Colors.white,
+    this.borderRadius = 8,
+    this.border = const .fromBorderSide(BorderSide(width: 1, color: Colors.black12)),
+    this.elevation = 1,
+    this.elevationType = .shadow,
+    this.slideTransition = true,
+  }) : _id = 4,
+       height = null,
+       maxHeight = null,
+       _width = 0,
+       _offsetX = 0,
+       _alignment = .center;
+
   final int _id;
   final double? height;
   final double? maxHeight;

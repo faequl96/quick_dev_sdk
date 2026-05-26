@@ -123,11 +123,11 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     if (_isInitial) {
       _decoration = widget.decoration;
       _set();
-      if (_decoration._id == 1 || widget.decoration._id == 2) _contentKey = GlobalKey();
+      if (widget.decoration._id != 3) _contentKey = GlobalKey();
       WidgetsBinding.instance.addPostFrameCallback((_) async {
-        if (_decoration._id == 1 || widget.decoration._id == 2) {
+        if (widget.decoration._id != 3) {
           // await Future.delayed(const Duration(seconds: 1));
-          _setStaticOverlaySurfaceWidth();
+          if (mounted) _setStaticOverlaySurfaceWidth();
           await Future<void>.delayed(const Duration(milliseconds: 100));
           _scrollObserver?.removeListener(_scrollNotification);
           _initScrollObserver();
@@ -144,9 +144,9 @@ class _OverlayLayerState extends State<_OverlayLayer> {
         _set(isInitial: false);
         _scrollObserver?.removeListener(_scrollNotification);
         _scrollObserver = null;
-        if (_decoration._id == 1 || widget.decoration._id == 2) {
+        if (widget.decoration._id != 3) {
           WidgetsBinding.instance.addPostFrameCallback((_) async {
-            _setStaticOverlaySurfaceWidth();
+            if (mounted) _setStaticOverlaySurfaceWidth();
             await Future<void>.delayed(const Duration(milliseconds: 100));
             _initScrollObserver();
           });
@@ -178,9 +178,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
   }
 
   void _setStaticOverlaySurfaceWidth() {
-    if (mounted) {
-      setState(() => _staticOverlaySurfaceWidth = _contentKey?.currentContext?.size?.width);
-    }
+    setState(() => _staticOverlaySurfaceWidth = _contentKey?.currentContext?.size?.width);
   }
 
   void _set({bool isInitial = true}) {
@@ -201,7 +199,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
         (targetPosition.dy - _decoration.offsetY) - (_decoration.marginY + paddingTop);
 
     _maxHeight = _isTopOverlay ? topMaxHeight : bottomMaxHeight;
-    _maxWidth = _getMaxWidth();
+    _maxWidth = _getMaxWidth;
 
     if (_maxWidth < widget.decoration._width) {
       _decoration = _decoration._convertTo(id: 1);
@@ -214,7 +212,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
 
   @override
   Widget build(BuildContext context) {
-    if (_decoration._id == 1 && _staticOverlaySurfaceWidth == null) {
+    if ((_decoration._id == 1 || _decoration._id == 4) && _staticOverlaySurfaceWidth == null) {
       final border = _decoration.border;
       final padding = _decoration.padding;
       return Stack(
@@ -229,7 +227,9 @@ class _OverlayLayerState extends State<_OverlayLayer> {
                 key: _contentKey,
                 child: ConstrainedBox(
                   constraints: BoxConstraints(
-                    maxWidth: _maxWidth + (_elevationSurfaceX * 2),
+                    maxWidth: _decoration._id == 4
+                        ? _maxWidth + (_elevationSurfaceX * 2)
+                        : _maxWidth + (_elevationSurfaceX * 2),
                     maxHeight: 100,
                   ),
                   child: Padding(
@@ -249,11 +249,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
       );
     }
 
-    final layoutValues = _getLayoutValues();
-    final double width = layoutValues['width'];
-    final double alignmentOffsetY = layoutValues['alignment_offset_y'];
-    final double alignmentOffsetX = layoutValues['alignment_offset_x'];
-    final Alignment anchorAlignment = layoutValues['anchor_alignment'];
+    final layoutValues = _decoration._id != 4 ? _getLayoutValues : _getAdaptiveLayoutValues;
 
     return Stack(
       children: [
@@ -273,16 +269,16 @@ class _OverlayLayerState extends State<_OverlayLayer> {
             ),
           ),
         Positioned(
-          width: width,
+          width: layoutValues.width,
           child: CompositedTransformFollower(
             link: widget.link,
             showWhenUnlinked: false,
-            offset: Offset(alignmentOffsetX, alignmentOffsetY),
-            targetAnchor: anchorAlignment,
-            followerAnchor: anchorAlignment,
+            offset: Offset(layoutValues.alignmentOffsetX, layoutValues.alignmentOffsetY),
+            targetAnchor: layoutValues.anchorAlignment,
+            followerAnchor: layoutValues.anchorAlignment,
             child: Material(
-              type: .transparency,
-              // color: Colors.amber.withValues(alpha: .5),
+              // type: .transparency,
+              color: Colors.amber.withValues(alpha: .5),
               child: _AnimationLayer(
                 isTopOverlay: _isTopOverlay,
                 elevationSurfaceY: _elevationSurfaceY,
@@ -290,7 +286,9 @@ class _OverlayLayerState extends State<_OverlayLayer> {
                 slideTransition: _isInitial ? _decoration.slideTransition : false,
                 child: _OverlayContent(
                   isTopOverlay: _isTopOverlay,
-                  maxWidth: _maxWidth < _targetSize.width ? _targetSize.width : _maxWidth,
+                  maxWidth: _decoration._id == 4
+                      ? _maxWidth
+                      : (_maxWidth < _targetSize.width ? _targetSize.width : _maxWidth),
                   maxHeight: (_decoration.maxHeight ?? 0) < _maxHeight
                       ? _decoration.maxHeight ?? _maxHeight
                       : _maxHeight,
@@ -309,7 +307,9 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     );
   }
 
-  double _getMaxWidth() {
+  double get _getMaxWidth {
+    if (_decoration._id == 4) return _screenWidth - (_decoration.marginX * 2);
+
     final leftRemainder = _targetPositionX;
     final rightRemainder = _screenWidth - (_targetPositionX + _targetSize.width);
     final minSide = min(leftRemainder, rightRemainder);
@@ -321,7 +321,8 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     };
   }
 
-  Map<String, dynamic> _getLayoutValues() {
+  ({double width, double alignmentOffsetY, double alignmentOffsetX, Alignment anchorAlignment})
+  get _getLayoutValues {
     final targetWidth = _targetSize.width;
     final alignment = _decoration._alignment;
     final marginX = _decoration.marginX;
@@ -390,12 +391,83 @@ class _OverlayLayerState extends State<_OverlayLayer> {
       .right => _isTopOverlay ? .bottomRight : .topRight,
     };
 
-    return {
-      'width': width,
-      'alignment_offset_y': alignmentOffsetY,
-      'alignment_offset_x': alignmentOffsetX,
-      'anchor_alignment': anchorAlignment,
-    };
+    return (
+      width: width,
+      alignmentOffsetY: alignmentOffsetY,
+      alignmentOffsetX: alignmentOffsetX,
+      anchorAlignment: anchorAlignment,
+    );
+  }
+
+  ({double width, double alignmentOffsetY, double alignmentOffsetX, Alignment anchorAlignment})
+  get _getAdaptiveLayoutValues {
+    final targetWidth = _targetSize.width;
+    final marginX = _decoration.marginX;
+
+    double surfaceWidth = targetWidth;
+    if (_staticOverlaySurfaceWidth != null) {
+      // 1. Definisikan batas maksimal ruang yang tersedia di layar
+      final double maxAllowedSpace = _screenWidth - (marginX * 2);
+
+      // 2. Hitung lebar natural konten (asumsi jika berada di layar besar)
+      final double naturalContentWidth = _staticOverlaySurfaceWidth! - (_elevationSurfaceX * 2);
+
+      // 3. LOGIKA KONDISIONAL (Sesuai Eksperimen Anda)
+      if (naturalContentWidth >= maxAllowedSpace) {
+        // LAYAR KECIL (Atau konten super panjang yang menabrak layar):
+        // HILANGKAN pengurangan - (_elevationSurfaceX * 2) sesuai temuan Anda!
+        surfaceWidth = _staticOverlaySurfaceWidth!;
+
+        // Safety net: Pastikan lebar akhir tidak meluber menembus margin layar
+        if (surfaceWidth > maxAllowedSpace) {
+          surfaceWidth = maxAllowedSpace;
+        }
+      } else {
+        // LAYAR BESAR (Konten lebih kecil dari layar, ruang masih luas):
+        // TETAP KURANGI - (_elevationSurfaceX * 2) agar layer kuning tidak kelebaran.
+        surfaceWidth = naturalContentWidth;
+      }
+    } else {
+      // Frame pertama (Opacity 0)
+      surfaceWidth = _screenWidth - (marginX * 2);
+    }
+
+    // Pastikan tidak lebih kecil dari tombol target itu sendiri
+    if (surfaceWidth < targetWidth) surfaceWidth = targetWidth;
+
+    double idealLeftOverhang = 0;
+    double idealRightOverhang = 0;
+
+    idealLeftOverhang = idealRightOverhang = (surfaceWidth - targetWidth) / 2;
+
+    final double idealLx = _targetPositionX - idealLeftOverhang;
+    final double idealRx = idealLx + surfaceWidth;
+
+    double adaptiveShiftX = 0;
+    if (idealLx < marginX) {
+      adaptiveShiftX = marginX - idealLx;
+    } else if (idealRx > _screenWidth - marginX) {
+      adaptiveShiftX = (_screenWidth - marginX) - idealRx;
+    }
+
+    adaptiveShiftX = adaptiveShiftX.clamp(-idealRightOverhang, idealLeftOverhang);
+
+    final width = surfaceWidth + (_elevationSurfaceX * 2);
+
+    final alignmentOffsetY = _isTopOverlay
+        ? -(_targetSize.height - _elevationSurfaceY)
+        : _targetSize.height - _elevationSurfaceY;
+
+    final alignmentOffsetX = adaptiveShiftX;
+
+    final Alignment anchorAlignment = _isTopOverlay ? .bottomCenter : .topCenter;
+
+    return (
+      width: width,
+      alignmentOffsetY: alignmentOffsetY,
+      alignmentOffsetX: alignmentOffsetX,
+      anchorAlignment: anchorAlignment,
+    );
   }
 }
 
