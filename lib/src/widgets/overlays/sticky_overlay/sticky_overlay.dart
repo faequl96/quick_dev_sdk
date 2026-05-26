@@ -404,32 +404,25 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     final targetWidth = _targetSize.width;
     final marginX = _decoration.marginX;
 
+    // 1. Dapatkan lebar konten MURNI
     double surfaceWidth = targetWidth;
-
     if (_staticOverlaySurfaceWidth != null) {
-      // Kondisi Eksplisit: Batas deteksi "Layar Kecil" vs "Layar Besar"
-      final isSmallScreenOrLongContent =
-          _staticOverlaySurfaceWidth! >= _screenWidth - (marginX * 2);
-
-      if (isSmallScreenOrLongContent) {
-        // Layar Kecil: Hilangkan pengurangan agar teks tidak tercekik (wrap)
-        surfaceWidth = _staticOverlaySurfaceWidth!;
-      } else {
-        // Layar Besar: Terapkan pengurangan agar background tidak kelebaran
-        surfaceWidth = _staticOverlaySurfaceWidth! - (_elevationSurfaceX * 2);
-      }
+      // Kurangi elevasi bawaan dari hasil ukur Dummy
+      surfaceWidth = _staticOverlaySurfaceWidth! - (_elevationSurfaceX * 2);
     } else {
       surfaceWidth = _screenWidth - (marginX * 2);
     }
 
     if (surfaceWidth < targetWidth) surfaceWidth = targetWidth;
 
+    // 2. Kalkulasi Overhang Murni
     double idealLeftOverhang = (surfaceWidth - targetWidth) / 2;
     double idealRightOverhang = idealLeftOverhang;
 
     final double idealLx = _targetPositionX - idealLeftOverhang;
     final double idealRx = idealLx + surfaceWidth;
 
+    // 3. Sliding / Clamping yang akurat ke batas margin
     double adaptiveShiftX = 0;
     if (idealLx < marginX) {
       adaptiveShiftX = marginX - idealLx;
@@ -439,7 +432,11 @@ class _OverlayLayerState extends State<_OverlayLayer> {
 
     adaptiveShiftX = adaptiveShiftX.clamp(-idealRightOverhang, idealLeftOverhang);
 
-    final width = surfaceWidth + (_elevationSurfaceX * 2);
+    // =======================================================
+    // 4. KUNCI PERBAIKAN: Jangan tambah (_elevationSurfaceX * 2)
+    // agar tidak ada ruang kosong di kanan yang menabrak layar!
+    // =======================================================
+    final width = surfaceWidth;
 
     final alignmentOffsetY = _isTopOverlay
         ? -(_targetSize.height - _elevationSurfaceY)
