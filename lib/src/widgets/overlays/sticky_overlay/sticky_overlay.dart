@@ -410,7 +410,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     final targetWidth = _targetSize.width;
     final marginX = _decoration.marginX;
 
-    // 1. Batas maksimal mutlak untuk KOTAK COKLAT
+    // Batas maksimal mutlak untuk KOTAK COKLAT
     final maxContentWidth = _screenWidth - (marginX * 2);
 
     double surfaceWidth = targetWidth;
@@ -424,13 +424,12 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     if (surfaceWidth < targetWidth) surfaceWidth = targetWidth;
 
     double idealLeftOverhang = (surfaceWidth - targetWidth) / 2;
-    double idealRightOverhang = idealLeftOverhang;
 
-    // 2. Kalkulasi Acuan Posisi menggunakan KOTAK COKLAT
+    // Kalkulasi Acuan Posisi menggunakan KOTAK COKLAT
     final double idealBrownLx = _targetPositionX - idealLeftOverhang;
     final double idealBrownRx = idealBrownLx + surfaceWidth;
 
-    // 3. Kalkulasi Shifting
+    // Kalkulasi Shifting Awal
     double adaptiveShiftX = 0;
     if (idealBrownLx < marginX) {
       adaptiveShiftX = marginX - idealBrownLx;
@@ -439,11 +438,29 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     }
 
     // =========================================================
-    // KUNCI FINAL: Kembalikan fungsi Clamp!
-    // Memastikan pergeseran maksimal berhenti tepat saat sisi
-    // overlay sejajar dengan sisi target (tidak lepas landas).
+    // KUNCI FINAL: REM ASIMETRIS (Sesuai Permintaan Anda)
     // =========================================================
-    adaptiveShiftX = adaptiveShiftX.clamp(-idealRightOverhang, idealLeftOverhang);
+
+    // ATURAN 1: Sisi kiri maksimal sejajar kiri target
+    // (Mengerem pergeseran ke kanan)
+    if (adaptiveShiftX > idealLeftOverhang) {
+      adaptiveShiftX = idealLeftOverhang;
+    }
+
+    // ATURAN 2: Sisi kanan PENTOKIN KE MERAH!
+    // (Mengerem pergeseran ke kiri HANYA jika menabrak margin kiri seberangnya)
+    double maxLeftShift = marginX - idealBrownLx;
+
+    // Safety check: Pastikan Aturan 1 tidak dilanggar jika target berada di tepi layar
+    if (maxLeftShift > idealLeftOverhang) {
+      maxLeftShift = idealLeftOverhang;
+    }
+
+    // Izinkan bergeser ke kiri bebas sampai menyentuh batas layar
+    if (adaptiveShiftX < maxLeftShift) {
+      adaptiveShiftX = maxLeftShift;
+    }
+    // =========================================================
 
     final width = surfaceWidth + (_elevationSurfaceX * 2);
 
