@@ -217,24 +217,26 @@ class _OverlayLayerState extends State<_OverlayLayer> {
       final padding = _decoration.padding;
       return Stack(
         children: [
+          // KUNCI ABSOLUT: left dan top wajib diisi agar batas layar (Stack) tertembus!
           Positioned(
+            left: 0,
+            top: 0,
             child: Opacity(
               opacity: 0,
-              // opacity: 1,
               child: Material(
-                type: .transparency,
-                // color: Colors.amber,
+                type: MaterialType.transparency,
                 child: SizedBox(
                   key: _contentKey,
                   child: ConstrainedBox(
                     constraints: BoxConstraints(
+                      // Membatasi ukuran maksimal dengan aman (menghindari error infinity)
                       maxWidth: _decoration._id == 4
                           ? _maxWidth
                           : _maxWidth + (_elevationSurfaceX * 2),
                       maxHeight: 100,
                     ),
                     child: Padding(
-                      padding: .only(
+                      padding: EdgeInsets.only(
                         top: _elevationSurfaceY + border.top.width + padding.top,
                         left: _elevationSurfaceX + border.left.width + padding.left,
                         right: _elevationSurfaceX + border.right.width + padding.right,
@@ -408,28 +410,27 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     final targetWidth = _targetSize.width;
     final marginX = _decoration.marginX;
 
-    // Batas maksimal mutlak untuk KOTAK COKLAT
+    // 1. Batas maksimal mutlak untuk KOTAK COKLAT
     final maxContentWidth = _screenWidth - (marginX * 2);
 
     double surfaceWidth = targetWidth;
     if (_staticOverlaySurfaceWidth != null) {
-      // Dapatkan lebar teks asli
       surfaceWidth = _staticOverlaySurfaceWidth! - (_elevationSurfaceX * 2);
     } else {
       surfaceWidth = maxContentWidth;
     }
 
-    // Patuh pada ukuran layar (Layar kecil = Coklat berhenti di batas layar)
     if (surfaceWidth > maxContentWidth) surfaceWidth = maxContentWidth;
     if (surfaceWidth < targetWidth) surfaceWidth = targetWidth;
 
     double idealLeftOverhang = (surfaceWidth - targetWidth) / 2;
     double idealRightOverhang = idealLeftOverhang;
 
-    // Kalkulasi Acuan Posisi menggunakan KOTAK COKLAT
+    // 2. Kalkulasi Acuan Posisi menggunakan KOTAK COKLAT
     final double idealBrownLx = _targetPositionX - idealLeftOverhang;
     final double idealBrownRx = idealBrownLx + surfaceWidth;
 
+    // 3. Kalkulasi Shifting
     double adaptiveShiftX = 0;
     if (idealBrownLx < marginX) {
       adaptiveShiftX = marginX - idealBrownLx;
@@ -437,10 +438,13 @@ class _OverlayLayerState extends State<_OverlayLayer> {
       adaptiveShiftX = (_screenWidth - marginX) - idealBrownRx;
     }
 
+    // =========================================================
+    // KUNCI FINAL: Kembalikan fungsi Clamp!
+    // Memastikan pergeseran maksimal berhenti tepat saat sisi
+    // overlay sejajar dengan sisi target (tidak lepas landas).
+    // =========================================================
     adaptiveShiftX = adaptiveShiftX.clamp(-idealRightOverhang, idealLeftOverhang);
 
-    // KUNCI: Lebar keseluruhan tetap ditambah kuning (elevasi)
-    // Saat coklat tergeser mentok margin, area kuning akan meluber keluar layar (tersembunyi)
     final width = surfaceWidth + (_elevationSurfaceX * 2);
 
     final alignmentOffsetY = _isTopOverlay
