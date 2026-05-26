@@ -421,16 +421,20 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     if (surfaceWidth < targetWidth) surfaceWidth = targetWidth;
 
     final leftOverhang = (surfaceWidth - targetWidth) / 2;
+    final rightOverhang = surfaceWidth - targetWidth - leftOverhang;
+
     final surfaceLeftCoordinate = _targetPositionX - leftOverhang;
     final surfaceRightCoordinate = surfaceLeftCoordinate + surfaceWidth;
 
     double adaptiveShiftX = 0;
     if (surfaceRightCoordinate > _screenWidth - marginX) {
-      adaptiveShiftX = _screenWidth - surfaceRightCoordinate;
+      adaptiveShiftX = (_screenWidth - marginX) - surfaceRightCoordinate;
     } else if (surfaceLeftCoordinate < marginX) {
       adaptiveShiftX = marginX - surfaceLeftCoordinate;
     }
+
     if (adaptiveShiftX > leftOverhang) adaptiveShiftX = leftOverhang;
+    if (adaptiveShiftX < -rightOverhang) adaptiveShiftX = -rightOverhang;
 
     final width = surfaceWidth + (_elevationSurfaceX * 2);
 
