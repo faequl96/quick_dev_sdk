@@ -201,7 +201,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
         (targetPosition.dy - _decoration.offsetY) - (_decoration.marginY + paddingTop);
 
     _maxHeight = _isTopOverlay ? topMaxHeight : bottomMaxHeight;
-    _maxWidth = _getMaxWidth(_decoration._alignment, size, _targetSize, targetPosition);
+    _maxWidth = _getMaxWidth();
 
     if (_maxWidth < widget.decoration._width) {
       _decoration = _decoration._convertTo(id: 1);
@@ -249,6 +249,79 @@ class _OverlayLayerState extends State<_OverlayLayer> {
       );
     }
 
+    final layoutValues = _getLayoutValues();
+    final double width = layoutValues['width'];
+    final double alignmentOffsetY = layoutValues['alignment_offset_y'];
+    final double alignmentOffsetX = layoutValues['alignment_offset_x'];
+    final Alignment anchorAlignment = layoutValues['anchor_alignment'];
+
+    return Stack(
+      children: [
+        if (widget.closeOnTapTarget)
+          Positioned(
+            width: _targetSize.width,
+            child: CompositedTransformFollower(
+              link: widget.link,
+              showWhenUnlinked: false,
+              targetAnchor: .topCenter,
+              followerAnchor: .topCenter,
+              child: SizedBox(
+                width: _targetSize.width,
+                height: _targetSize.height,
+                child: const ColoredBox(color: Colors.transparent),
+              ),
+            ),
+          ),
+        Positioned(
+          width: width,
+          child: CompositedTransformFollower(
+            link: widget.link,
+            showWhenUnlinked: false,
+            offset: Offset(alignmentOffsetX, alignmentOffsetY),
+            targetAnchor: anchorAlignment,
+            followerAnchor: anchorAlignment,
+            child: Material(
+              type: .transparency,
+              // color: Colors.amber.withValues(alpha: .5),
+              child: _AnimationLayer(
+                isTopOverlay: _isTopOverlay,
+                elevationSurfaceY: _elevationSurfaceY,
+                elevationSurfaceX: _elevationSurfaceX,
+                slideTransition: _isInitial ? _decoration.slideTransition : false,
+                child: _OverlayContent(
+                  isTopOverlay: _isTopOverlay,
+                  maxWidth: _maxWidth < _targetSize.width ? _targetSize.width : _maxWidth,
+                  maxHeight: (_decoration.maxHeight ?? 0) < _maxHeight
+                      ? _decoration.maxHeight ?? _maxHeight
+                      : _maxHeight,
+                  offsetY: _decoration.offsetY,
+                  closeOnTapOutside: widget.closeOnTapOutside,
+                  decoration: _decoration,
+                  onRemove: widget.onRemove,
+                  onHoverInside: widget.onHoverInside,
+                  child: widget.contentBuilder(context),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  double _getMaxWidth() {
+    final leftRemainder = _targetPositionX;
+    final rightRemainder = _screenWidth - (_targetPositionX + _targetSize.width);
+    final minSide = min(leftRemainder, rightRemainder);
+
+    return switch (_decoration._alignment) {
+      .left => ((rightRemainder + _targetSize.width) - _decoration.marginX) + _decoration._offsetX,
+      .center => (minSide * 2 + _targetSize.width) - (_decoration.marginX * 2),
+      .right => ((leftRemainder + _targetSize.width) - _decoration.marginX) + _decoration._offsetX,
+    };
+  }
+
+  Map<String, dynamic> _getLayoutValues() {
     final targetWidth = _targetSize.width;
     final alignment = _decoration._alignment;
     final marginX = _decoration.marginX;
@@ -305,86 +378,23 @@ class _OverlayLayerState extends State<_OverlayLayer> {
         ? -(_targetSize.height - _elevationSurfaceY)
         : _targetSize.height - _elevationSurfaceY;
 
-    final alignmentOffsetX = switch (alignment) {
-      .left => -(_elevationSurfaceX + (_decoration._id == 1 ? leftOverhang : offsetX)),
+    final alignmentOffsetX = switch (_decoration._alignment) {
+      .left => -(_elevationSurfaceX + (_decoration._id == 1 ? leftOverhang : _decoration._offsetX)),
       .center => .0,
-      .right => _elevationSurfaceX + (_decoration._id == 1 ? rightOverhang : offsetX),
+      .right => _elevationSurfaceX + (_decoration._id == 1 ? rightOverhang : _decoration._offsetX),
     };
 
-    final Alignment anchorAlignment = switch (alignment) {
+    final Alignment anchorAlignment = switch (_decoration._alignment) {
       .left => _isTopOverlay ? .bottomLeft : .topLeft,
       .center => _isTopOverlay ? .bottomCenter : .topCenter,
       .right => _isTopOverlay ? .bottomRight : .topRight,
     };
 
-    return Stack(
-      children: [
-        if (widget.closeOnTapTarget)
-          Positioned(
-            width: _targetSize.width,
-            child: CompositedTransformFollower(
-              link: widget.link,
-              showWhenUnlinked: false,
-              targetAnchor: .topCenter,
-              followerAnchor: .topCenter,
-              child: SizedBox(
-                width: _targetSize.width,
-                height: _targetSize.height,
-                child: const ColoredBox(color: Colors.transparent),
-              ),
-            ),
-          ),
-        Positioned(
-          width: width,
-          child: CompositedTransformFollower(
-            link: widget.link,
-            showWhenUnlinked: false,
-            offset: Offset(alignmentOffsetX, alignmentOffsetY),
-            targetAnchor: anchorAlignment,
-            followerAnchor: anchorAlignment,
-            child: Material(
-              type: .transparency,
-              // color: Colors.amber.withValues(alpha: .5),
-              child: _AnimationLayer(
-                isTopOverlay: _isTopOverlay,
-                elevationSurfaceY: _elevationSurfaceY,
-                elevationSurfaceX: _elevationSurfaceX,
-                slideTransition: _isInitial ? _decoration.slideTransition : false,
-                child: _OverlayContent(
-                  isTopOverlay: _isTopOverlay,
-                  maxWidth: _maxWidth < _targetSize.width ? _targetSize.width : _maxWidth,
-                  maxHeight: (_decoration.maxHeight ?? 0) < _maxHeight
-                      ? _decoration.maxHeight ?? _maxHeight
-                      : _maxHeight,
-                  offsetY: _decoration.offsetY,
-                  closeOnTapOutside: widget.closeOnTapOutside,
-                  decoration: _decoration,
-                  onRemove: widget.onRemove,
-                  onHoverInside: widget.onHoverInside,
-                  child: widget.contentBuilder(context),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  double _getMaxWidth(
-    OverlayAlignment alignment,
-    Size size,
-    Size targetSize,
-    Offset targetPosition,
-  ) {
-    final leftRemainder = targetPosition.dx;
-    final rightRemainder = size.width - (targetPosition.dx + targetSize.width);
-    final minSide = min(leftRemainder, rightRemainder);
-
-    return switch (alignment) {
-      .left => ((rightRemainder + targetSize.width) - _decoration.marginX) + _decoration._offsetX,
-      .center => (minSide * 2 + targetSize.width) - (_decoration.marginX * 2),
-      .right => ((leftRemainder + targetSize.width) - _decoration.marginX) + _decoration._offsetX,
+    return {
+      'width': width,
+      'alignment_offset_y': alignmentOffsetY,
+      'alignment_offset_x': alignmentOffsetX,
+      'anchor_alignment': anchorAlignment,
     };
   }
 }
