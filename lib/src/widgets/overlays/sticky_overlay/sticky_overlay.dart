@@ -223,7 +223,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
             child: Opacity(
               opacity: 0,
               child: Material(
-                type: MaterialType.transparency,
+                type: .transparency,
                 child: SizedBox(
                   key: _contentKey,
                   child: ConstrainedBox(
