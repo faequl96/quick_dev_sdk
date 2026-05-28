@@ -323,11 +323,13 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     final rightRemainder = _screenSize.width - (_targetPositionX + _targetSize.width);
     final minSide = min(leftRemainder, rightRemainder);
 
-    return switch (_decoration._alignment) {
+    final maxWidth = switch (_decoration._alignment) {
       .left => ((rightRemainder + _targetSize.width) - _decoration.marginX) + _decoration._offsetX,
       .center => (minSide * 2 + _targetSize.width) - (_decoration.marginX * 2),
       .right => ((leftRemainder + _targetSize.width) - _decoration.marginX) + _decoration._offsetX,
     };
+
+    return maxWidth < _targetSize.width ? _targetSize.width : maxWidth;
   }
 
   ({
@@ -630,12 +632,11 @@ class _RenderDecoratedOverlay extends RenderProxyBox {
   BoxPainter? _cachedPainter;
 
   set decoration(_OverlayDecoration value) {
-    if (_decoration != value) {
-      _decoration = value;
-      _cachedPainter?.dispose();
-      _cachedPainter = null;
-      markNeedsLayout();
-    }
+    if (_decoration == value) return;
+    _decoration = value;
+    _cachedPainter?.dispose();
+    _cachedPainter = null;
+    markNeedsLayout();
   }
 
   @override
@@ -647,102 +648,81 @@ class _RenderDecoratedOverlay extends RenderProxyBox {
 
   @override
   void performLayout() {
-    if (child != null) {
-      final borderPadding = _decoration.border.dimensions.resolve(.ltr);
-
-      final totalInternalPadding = borderPadding + _decoration.padding;
-
-      final deflatedConstraints = BoxConstraints(
-        minWidth: (constraints.minWidth - totalInternalPadding.horizontal).clamp(.0, .infinity),
-        maxWidth: (constraints.maxWidth - totalInternalPadding.horizontal).clamp(.0, .infinity),
-        minHeight: (constraints.minHeight - totalInternalPadding.vertical).clamp(.0, .infinity),
-        maxHeight: (constraints.maxHeight - totalInternalPadding.vertical).clamp(.0, .infinity),
-      );
-
-      final childConstraints = deflatedConstraints.copyWith(
-        minWidth: _decoration.width != null
-            ? (_decoration.width! - totalInternalPadding.horizontal).clamp(
-                deflatedConstraints.minWidth,
-                deflatedConstraints.maxWidth,
-              )
-            : null,
-        maxWidth: _decoration.width != null
-            ? (_decoration.width! - totalInternalPadding.horizontal).clamp(
-                deflatedConstraints.minWidth,
-                deflatedConstraints.maxWidth,
-              )
-            : null,
-        minHeight: _decoration.height != null
-            ? (_decoration.height! - totalInternalPadding.vertical).clamp(
-                deflatedConstraints.minHeight,
-                deflatedConstraints.maxHeight,
-              )
-            : null,
-        maxHeight: _decoration.height != null
-            ? (_decoration.height! - totalInternalPadding.vertical).clamp(
-                deflatedConstraints.minHeight,
-                deflatedConstraints.maxHeight,
-              )
-            : null,
-      );
-
-      child!.layout(childConstraints, parentUsesSize: true);
-
-      if (child!.size.height == 0) {
-        size = child!.size;
-      } else {
-        final totalSize = Size(
-          _decoration.width ?? (child!.size.width + totalInternalPadding.horizontal),
-          _decoration.height ?? (child!.size.height + totalInternalPadding.vertical),
-        );
-        size = constraints.constrain(totalSize);
-      }
-    } else {
+    final child = this.child;
+    if (child == null) {
       size = constraints.smallest;
+      return;
+    }
+
+    final borderPadding = _decoration.border.dimensions.resolve(.ltr);
+    final totalPadding = borderPadding + _decoration.padding;
+
+    final deflated = constraints.deflate(totalPadding);
+
+    double? constrainDimension(double? target, double min, double max) {
+      if (target == null) return null;
+      return (target - totalPadding.horizontal).clamp(min, max);
+    }
+
+    final exactWidth = constrainDimension(_decoration.width, deflated.minWidth, deflated.maxWidth);
+    final exactHeight = constrainDimension(
+      _decoration.height,
+      deflated.minHeight,
+      deflated.maxHeight,
+    );
+
+    final childConstraints = deflated.copyWith(
+      minWidth: exactWidth,
+      maxWidth: exactWidth,
+      minHeight: exactHeight,
+      maxHeight: exactHeight,
+    );
+
+    child.layout(childConstraints, parentUsesSize: true);
+
+    if (child.size.height == 0) {
+      size = child.size;
+    } else {
+      final totalSize = Size(
+        _decoration.width ?? (child.size.width + totalPadding.horizontal),
+        _decoration.height ?? (child.size.height + totalPadding.vertical),
+      );
+      size = constraints.constrain(totalSize);
     }
   }
 
   @override
   void paint(PaintingContext context, Offset offset) {
-    if (child != null && child!.size.height > 0) {
-      final BoxDecoration texturizedDecoration = BoxDecoration(
-        color: _decoration.color,
-        borderRadius: .circular(_decoration.borderRadius),
-        border: _decoration.border,
-        boxShadow: DecorationUtils.elevation(
-          _decoration.elevation,
-          elevationType: _decoration.elevationType,
-        ),
-      );
-
-      _cachedPainter ??= texturizedDecoration.createBoxPainter(markNeedsPaint);
-      _cachedPainter!.paint(context.canvas, offset, ImageConfiguration(size: size));
-
-      final borderPadding = _decoration.border.dimensions.resolve(.ltr);
-
-      final clipX = offset.dx + borderPadding.left;
-      final clipY = offset.dy + borderPadding.top;
-      final clipWidth = size.width - borderPadding.horizontal;
-      final clipHeight = size.height - borderPadding.vertical;
-      final clipRect = Rect.fromLTWH(clipX, clipY, clipWidth, clipHeight);
-
-      final outerRadius = _decoration.borderRadius;
-      final double innerRadiusX = (outerRadius - borderPadding.left).clamp(.0, .infinity);
-      final double innerRadiusY = (outerRadius - borderPadding.top).clamp(.0, .infinity);
-      final innerRRect = RRect.fromRectAndRadius(clipRect, .elliptical(innerRadiusX, innerRadiusY));
-
-      final totalInternalPadding = borderPadding + _decoration.padding;
-      final childX = offset.dx + totalInternalPadding.left;
-      final childY = offset.dy + totalInternalPadding.top;
-
-      context.pushClipRRect(needsCompositing, .zero, clipRect, innerRRect, (
-        PaintingContext innerContext,
-        Offset innerOffset,
-      ) {
-        innerContext.paintChild(child!, Offset(childX, childY));
-      });
-    } else if (child != null) {
-      context.paintChild(child!, offset);
+    final child = this.child;
+    if (child == null) return;
+    if (child.size.height == 0) {
+      context.paintChild(child, offset);
+      return;
     }
+
+    _cachedPainter ??= BoxDecoration(
+      color: _decoration.color,
+      borderRadius: .circular(_decoration.borderRadius),
+      border: _decoration.border,
+      boxShadow: DecorationUtils.elevation(
+        _decoration.elevation,
+        elevationType: _decoration.elevationType,
+      ),
+    ).createBoxPainter(markNeedsPaint);
+
+    _cachedPainter!.paint(context.canvas, offset, ImageConfiguration(size: size));
+
+    final borderPadding = _decoration.border.dimensions.resolve(.ltr);
+    final clipRect = borderPadding.deflateRect(offset & size);
+
+    final innerRadius = (_decoration.borderRadius - borderPadding.left).clamp(.0, double.infinity);
+    final innerRRect = RRect.fromRectAndRadius(clipRect, .circular(innerRadius));
+
+    final totalPadding = borderPadding + _decoration.padding;
+    final childOffset = offset + Offset(totalPadding.left, totalPadding.top);
+
+    context.pushClipRRect(needsCompositing, .zero, clipRect, innerRRect, (innerContext, _) {
+      innerContext.paintChild(child, childOffset);
+    });
   }
 }
