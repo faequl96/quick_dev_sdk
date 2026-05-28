@@ -100,6 +100,7 @@ class OverlayDecoration {
     double? height,
     double? maxHeight,
     double? width,
+    double? maxWidth,
     double? offsetY,
     double? offsetX,
     double? marginY,
@@ -113,6 +114,22 @@ class OverlayDecoration {
     ElevationType? elevationType,
     bool? slideTransition,
   }) {
+    if (_id == 4) {
+      return .adaptive(
+        maxWidth: maxWidth ?? _maxWidth,
+        offsetY: offsetY ?? this.offsetY,
+        marginY: marginY ?? this.marginY,
+        marginX: marginX ?? this.marginX,
+        padding: padding ?? this.padding,
+        color: color ?? this.color,
+        borderRadius: borderRadius ?? this.borderRadius,
+        border: border ?? this.border,
+        elevation: elevation ?? this.elevation,
+        elevationType: elevationType ?? this.elevationType,
+        slideTransition: slideTransition ?? this.slideTransition,
+      );
+    }
+
     if (_id == 3) {
       return .fitToTargetWidth(
         height: height ?? this.height,
@@ -153,6 +170,7 @@ class OverlayDecoration {
     return .dynamicWidth(
       height: height ?? this.height,
       maxHeight: maxHeight ?? this.maxHeight,
+      maxWidth: maxWidth ?? _maxWidth,
       offsetY: offsetY ?? this.offsetY,
       offsetX: offsetX ?? _offsetX,
       marginY: marginY ?? this.marginY,
@@ -172,6 +190,7 @@ class OverlayDecoration {
     required int id,
     double? height,
     double? maxHeight,
+    double? maxWidth,
     double? width,
     double? offsetY,
     double? offsetX,
@@ -186,6 +205,22 @@ class OverlayDecoration {
     ElevationType? elevationType,
     bool? slideTransition,
   }) {
+    if (_id == 4) {
+      return .adaptive(
+        maxWidth: maxWidth ?? _maxWidth,
+        offsetY: offsetY ?? this.offsetY,
+        marginY: marginY ?? this.marginY,
+        marginX: marginX ?? this.marginX,
+        padding: padding ?? this.padding,
+        color: color ?? this.color,
+        borderRadius: borderRadius ?? this.borderRadius,
+        border: border ?? this.border,
+        elevation: elevation ?? this.elevation,
+        elevationType: elevationType ?? this.elevationType,
+        slideTransition: slideTransition ?? this.slideTransition,
+      );
+    }
+
     if (id == 3) {
       return .fitToTargetWidth(
         height: height ?? this.height,
@@ -226,6 +261,7 @@ class OverlayDecoration {
     return .dynamicWidth(
       height: height ?? this.height,
       maxHeight: maxHeight ?? this.maxHeight,
+      maxWidth: maxWidth ?? _maxWidth,
       offsetY: offsetY ?? this.offsetY,
       offsetX: offsetX ?? _offsetX,
       marginY: marginY ?? this.marginY,
