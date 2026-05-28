@@ -109,7 +109,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
 
   ScrollNotificationObserverState? _scrollObserver;
 
-  double _screenWidth = 0;
+  Size _screenSize = const Size(0, 0);
   Size _targetSize = const Size(0, 0);
   double _targetPositionX = 0;
   double _maxHeight = 0;
@@ -188,7 +188,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     _targetPositionX = targetPosition.dx;
     final mediaQuery = MediaQuery.of(context);
     final size = mediaQuery.size;
-    _screenWidth = size.width;
+    _screenSize = size;
     final paddingBottom = mediaQuery.padding.bottom;
     final bottomMaxHeight =
         (size.height - (targetPosition.dy + _targetSize.height + _decoration.offsetY)) -
@@ -199,7 +199,17 @@ class _OverlayLayerState extends State<_OverlayLayer> {
         (targetPosition.dy - _decoration.offsetY) - (_decoration.marginY + paddingTop);
 
     _maxHeight = _isTopOverlay ? topMaxHeight : bottomMaxHeight;
-    _maxWidth = _getMaxWidth;
+
+    final decorationMaxWidth = widget.decoration._maxWidth;
+    final maxWidth = _getMaxWidth;
+    if (decorationMaxWidth != null) {
+      _maxWidth = min(
+        maxWidth,
+        decorationMaxWidth + (_decoration._id == 4 ? _elevationSurfaceX * 2 : 0),
+      );
+    } else {
+      _maxWidth = maxWidth;
+    }
 
     if (_maxWidth < widget.decoration._width) {
       _decoration = _decoration._convertTo(id: 1);
@@ -271,7 +281,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
             ),
           ),
         Positioned(
-          width: layoutValues.width,
+          width: layoutValues.maxWidth + (_elevationSurfaceX * 2),
           child: CompositedTransformFollower(
             link: widget.link,
             showWhenUnlinked: false,
@@ -288,12 +298,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
                 slideTransition: _isInitial ? _decoration.slideTransition : false,
                 child: _OverlayContent(
                   isTopOverlay: _isTopOverlay,
-                  maxWidth: _decoration._id == 4
-                      ? _maxWidth
-                      : (_maxWidth < _targetSize.width ? _targetSize.width : _maxWidth),
-                  maxHeight: (_decoration.maxHeight ?? 0) < _maxHeight
-                      ? _decoration.maxHeight ?? _maxHeight
-                      : _maxHeight,
+                  maxHeight: layoutValues.maxHeight,
                   offsetY: _decoration.offsetY,
                   closeOnTapOutside: widget.closeOnTapOutside,
                   decoration: _decoration,
@@ -311,11 +316,11 @@ class _OverlayLayerState extends State<_OverlayLayer> {
 
   double get _getMaxWidth {
     if (_decoration._id == 4) {
-      return _screenWidth - _decoration.marginX + (_elevationSurfaceX * 2);
+      return _screenSize.width - _decoration.marginX + (_elevationSurfaceX * 2);
     }
 
     final leftRemainder = _targetPositionX;
-    final rightRemainder = _screenWidth - (_targetPositionX + _targetSize.width);
+    final rightRemainder = _screenSize.width - (_targetPositionX + _targetSize.width);
     final minSide = min(leftRemainder, rightRemainder);
 
     return switch (_decoration._alignment) {
@@ -325,8 +330,15 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     };
   }
 
-  ({double width, double alignmentOffsetY, double alignmentOffsetX, Alignment anchorAlignment})
+  ({
+    double maxWidth,
+    double maxHeight,
+    double alignmentOffsetY,
+    double alignmentOffsetX,
+    Alignment anchorAlignment,
+  })
   get _getLayoutValues {
+    final screenWidth = _screenSize.width;
     final targetWidth = _targetSize.width;
     final alignment = _decoration._alignment;
     final marginX = _decoration.marginX;
@@ -353,7 +365,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
 
     // Batasi Overhang Jika Menabrak Margin Layar
     final maxLeft = max(.0, _targetPositionX - marginX);
-    final maxRight = max(.0, (_screenWidth - marginX) - (_targetPositionX + targetWidth));
+    final maxRight = max(.0, (screenWidth - marginX) - (_targetPositionX + targetWidth));
 
     leftOverhang = min(leftOverhang, maxLeft);
     rightOverhang = min(rightOverhang, maxRight);
@@ -395,20 +407,39 @@ class _OverlayLayerState extends State<_OverlayLayer> {
       .right => _isTopOverlay ? .bottomRight : .topRight,
     };
 
+    final decorationMaxHeight = _decoration.maxHeight?.clamp(
+      _minTopOverlay,
+      _screenSize.height - (_minTopOverlay + _decoration.marginY),
+    );
+
+    final maxHeight = decorationMaxHeight != null
+        ? decorationMaxHeight < _maxHeight
+              ? decorationMaxHeight
+              : _maxHeight
+        : _maxHeight;
+
     return (
-      width: width,
+      maxWidth: width - (_elevationSurfaceX * 2),
+      maxHeight: maxHeight,
       alignmentOffsetY: alignmentOffsetY,
       alignmentOffsetX: alignmentOffsetX,
       anchorAlignment: anchorAlignment,
     );
   }
 
-  ({double width, double alignmentOffsetY, double alignmentOffsetX, Alignment anchorAlignment})
+  ({
+    double maxWidth,
+    double maxHeight,
+    double alignmentOffsetY,
+    double alignmentOffsetX,
+    Alignment anchorAlignment,
+  })
   get _getAdaptiveLayoutValues {
+    final screenWidth = _screenSize.width;
     final targetWidth = _targetSize.width;
     final marginX = _decoration.marginX;
 
-    final maxContentWidth = _screenWidth - marginX;
+    final maxContentWidth = screenWidth - marginX;
 
     double surfaceWidth = targetWidth;
     if (_staticOverlaySurfaceWidth != null) {
@@ -427,8 +458,8 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     final surfaceRightCoordinate = surfaceLeftCoordinate + surfaceWidth;
 
     double adaptiveShiftX = 0;
-    if (surfaceRightCoordinate > _screenWidth - marginX) {
-      adaptiveShiftX = (_screenWidth - marginX) - surfaceRightCoordinate;
+    if (surfaceRightCoordinate > screenWidth - marginX) {
+      adaptiveShiftX = (screenWidth - marginX) - surfaceRightCoordinate;
     } else if (surfaceLeftCoordinate < marginX) {
       adaptiveShiftX = marginX - surfaceLeftCoordinate;
     }
@@ -446,8 +477,20 @@ class _OverlayLayerState extends State<_OverlayLayer> {
 
     final Alignment anchorAlignment = _isTopOverlay ? .bottomCenter : .topCenter;
 
+    final decorationMaxHeight = _decoration.maxHeight?.clamp(
+      _minTopOverlay,
+      _screenSize.height - (_minTopOverlay + _decoration.marginY),
+    );
+
+    final maxHeight = decorationMaxHeight != null
+        ? decorationMaxHeight < _maxHeight
+              ? decorationMaxHeight
+              : _maxHeight
+        : _maxHeight;
+
     return (
-      width: width,
+      maxWidth: width - (_elevationSurfaceX * 2),
+      maxHeight: maxHeight,
       alignmentOffsetY: alignmentOffsetY,
       alignmentOffsetX: alignmentOffsetX,
       anchorAlignment: anchorAlignment,
@@ -523,7 +566,6 @@ class _AnimationLayerState extends State<_AnimationLayer> with SingleTickerProvi
 class _OverlayContent extends StatelessWidget {
   const _OverlayContent({
     required this.isTopOverlay,
-    required this.maxWidth,
     required this.maxHeight,
     this.offsetY,
     required this.closeOnTapOutside,
@@ -534,7 +576,6 @@ class _OverlayContent extends StatelessWidget {
   });
 
   final bool isTopOverlay;
-  final double maxWidth;
   final double maxHeight;
   final double? offsetY;
   final bool closeOnTapOutside;
@@ -553,7 +594,7 @@ class _OverlayContent extends StatelessWidget {
         child: TapRegion(
           onTapOutside: closeOnTapOutside ? (_) => onRemove() : null,
           child: ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: maxWidth, maxHeight: maxHeight),
+            constraints: BoxConstraints(maxHeight: maxHeight),
             child: _DecoratedOverlay(
               decoration: _OverlayDecoration(
                 height: decoration.height,
