@@ -16,6 +16,9 @@ class StickyOverlay {
   static final StickyOverlay _instance = StickyOverlay._();
   static StickyOverlay get instance => _instance;
 
+  void Function()? _onDispose;
+  GlobalKey? _activeTargetKey;
+
   OverlayEntry? _overlayEntry;
 
   void create(
@@ -40,8 +43,12 @@ class StickyOverlay {
     ),
     void Function(bool value)? onHoverInside,
     required Widget Function(BuildContext context, {bool? isMeasuringWidth}) contentBuilder,
+    void Function()? onDispose,
   }) {
-    remove();
+    _remove();
+
+    _onDispose = onDispose;
+    _activeTargetKey = targetKey;
 
     final targetContext = targetKey.currentContext;
     if (targetContext == null || !targetContext.mounted) {
@@ -57,7 +64,7 @@ class StickyOverlay {
         closeOnTapTarget: closeOnTapTarget,
         decoration: decoration,
         onHoverInside: onHoverInside,
-        onRemove: remove,
+        onRemove: _remove,
         contentBuilder: contentBuilder,
       ),
     );
@@ -65,9 +72,30 @@ class StickyOverlay {
     Overlay.of(context).insert(_overlayEntry!);
   }
 
-  void remove() {
+  void _remove() {
     _overlayEntry?.remove();
     _overlayEntry = null;
+
+    _activeTargetKey = null;
+    if (_onDispose != null) {
+      final callback = _onDispose;
+      _onDispose = null;
+      callback!();
+    }
+  }
+
+  void remove({required GlobalKey targetKey}) {
+    if (targetKey != _activeTargetKey) return;
+
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+
+    _activeTargetKey = null;
+    if (_onDispose != null) {
+      final callback = _onDispose;
+      _onDispose = null;
+      callback!();
+    }
   }
 }
 

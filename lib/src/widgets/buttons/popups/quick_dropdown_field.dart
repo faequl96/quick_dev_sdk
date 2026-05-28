@@ -119,7 +119,7 @@ class _QuickDropdownFieldState<T> extends State<QuickDropdownField<T>> {
             controller: _textEditingController,
             height: widget.height,
             width: widget.width,
-            enabled: true,
+            readOnly: true,
             style: widget.fieldTextStyle,
             decoration: decoration,
           ),

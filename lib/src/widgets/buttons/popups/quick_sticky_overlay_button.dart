@@ -54,7 +54,7 @@ class QuickStickyOverlayButton extends StatefulWidget {
 
 class _QuickStickyOverlayButtonState extends State<QuickStickyOverlayButton> {
   final _overlay = StickyOverlay.instance;
-  final _key = GlobalKey();
+  final _targetKey = GlobalKey();
   final _layerLink = LayerLink();
 
   bool _isOverlayContentHovered = false;
@@ -62,7 +62,7 @@ class _QuickStickyOverlayButtonState extends State<QuickStickyOverlayButton> {
   void _onHoverContentInside(bool value) async {
     _isOverlayContentHovered = value;
     await Future<void>.delayed(.zero);
-    if (value == false) _overlay.remove();
+    if (value == false) _overlay.remove(targetKey: _targetKey);
   }
 
   void _showOverlay(
@@ -73,7 +73,7 @@ class _QuickStickyOverlayButtonState extends State<QuickStickyOverlayButton> {
   }) {
     _overlay.create(
       context,
-      targetKey: _key,
+      targetKey: _targetKey,
       link: _layerLink,
       closeOnTapOutside: widget.closeOnTapOutside,
       closeOnTapTarget: closeOnTapTarget,
@@ -87,7 +87,7 @@ class _QuickStickyOverlayButtonState extends State<QuickStickyOverlayButton> {
 
   @override
   void dispose() {
-    _overlay.remove();
+    _overlay.remove(targetKey: _targetKey);
 
     super.dispose();
   }
@@ -97,7 +97,7 @@ class _QuickStickyOverlayButtonState extends State<QuickStickyOverlayButton> {
     return CompositedTransformTarget(
       link: _layerLink,
       child: QuickButton(
-        key: _key,
+        key: _targetKey,
         onTap: () => widget.onTap?.call((
           BuildContext context, {
           required OverlayDecoration decoration,
@@ -109,7 +109,7 @@ class _QuickStickyOverlayButtonState extends State<QuickStickyOverlayButton> {
             decoration: decoration,
             contentBuilder: contentBuilder,
           );
-        }, () => _overlay.remove()),
+        }, () => _overlay.remove(targetKey: _targetKey)),
         onHover: (value) async {
           if (value) {
             widget.onHover?.call((
@@ -123,11 +123,11 @@ class _QuickStickyOverlayButtonState extends State<QuickStickyOverlayButton> {
                 decoration: decoration,
                 contentBuilder: contentBuilder,
               );
-            }, () => _overlay.remove());
+            }, () => _overlay.remove(targetKey: _targetKey));
           } else {
             if (widget.closeOnUnHover) {
               await Future<void>.delayed(.zero);
-              if (!_isOverlayContentHovered) _overlay.remove();
+              if (!_isOverlayContentHovered) _overlay.remove(targetKey: _targetKey);
             }
           }
         },

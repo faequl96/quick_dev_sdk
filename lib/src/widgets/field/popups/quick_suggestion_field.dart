@@ -44,7 +44,7 @@ class QuickSuggestionField<T> extends StatefulWidget {
   final Duration debouncer;
   final Widget Function(BuildContext context, TextEditingController controller, FocusNode focusNode)
   fieldBuilder;
-  final Future<List<T>> Function(String value) suggestions;
+  final Future<List<T>> Function({required String keywords}) suggestions;
   final Widget Function(BuildContext context, T value) itemBuilder;
   final Widget Function(BuildContext context)? emptyBuilder;
   final Widget Function(BuildContext context)? loadingBuilder;
@@ -54,16 +54,65 @@ class QuickSuggestionField<T> extends StatefulWidget {
 }
 
 class _QuickSuggestionFieldState<T> extends State<QuickSuggestionField<T>> {
-  late final FocusNode _focusNode;
+  late FocusNode _focusNode;
   bool _isFocusNodeExternal = false;
   bool _isPointerInsideOverlay = false;
   bool _isOverlayUseInteraction = false;
 
   final _overlay = StickyOverlay.instance;
-  final _key = GlobalKey();
+  final _targetKey = GlobalKey();
   final _layerLink = LayerLink();
 
   final _textStreamController = StreamController<String>.broadcast();
+
+  @override
+  void initState() {
+    super.initState();
+
+    _initFocusNode();
+    widget.controller.addListener(_onChangeListener);
+    _focusNode.addListener(_onFocusListener);
+  }
+
+  @override
+  void didUpdateWidget(covariant QuickSuggestionField<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.controller != widget.controller) {
+      oldWidget.controller.removeListener(_onChangeListener);
+      widget.controller.addListener(_onChangeListener);
+    }
+
+    if (oldWidget.focusNode != widget.focusNode) {
+      oldWidget.focusNode?.removeListener(_onFocusListener);
+      if (!_isFocusNodeExternal) _focusNode.dispose();
+      _initFocusNode();
+      _focusNode.addListener(_onFocusListener);
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_onChangeListener);
+    _focusNode.removeListener(_onFocusListener);
+    _textStreamController.close();
+
+    if (!_isFocusNodeExternal) _focusNode.dispose();
+
+    _overlay.remove(targetKey: _targetKey);
+
+    super.dispose();
+  }
+
+  void _initFocusNode() {
+    if (widget.focusNode != null) {
+      _focusNode = widget.focusNode!;
+      _isFocusNodeExternal = true;
+    } else {
+      _focusNode = FocusNode();
+      _isFocusNodeExternal = false;
+    }
+  }
 
   void _onChangeListener() => _textStreamController.add(widget.controller.text);
 
@@ -72,7 +121,7 @@ class _QuickSuggestionFieldState<T> extends State<QuickSuggestionField<T>> {
       if (!_isOverlayUseInteraction) {
         _overlay.create(
           context,
-          targetKey: _key,
+          targetKey: _targetKey,
           link: _layerLink,
           closeOnTapOutside: false,
           closeOnTapTarget: false,
@@ -90,7 +139,7 @@ class _QuickSuggestionFieldState<T> extends State<QuickSuggestionField<T>> {
             },
             child: _MainContent<T>(
               onSelected: (value) {
-                _overlay.remove();
+                _overlay.remove(targetKey: _targetKey);
                 _isPointerInsideOverlay = false;
                 _isOverlayUseInteraction = false;
                 widget.onSelected(value);
@@ -107,57 +156,29 @@ class _QuickSuggestionFieldState<T> extends State<QuickSuggestionField<T>> {
               loadingBuilder: widget.loadingBuilder,
             ),
           ),
+          onDispose: () {
+            if (!mounted) return;
+            if (_focusNode.hasFocus && !_isPointerInsideOverlay) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (mounted) _focusNode.unfocus();
+              });
+            }
+            _isOverlayUseInteraction = false;
+          },
         );
       }
     } else {
       if (!_isPointerInsideOverlay) {
-        _overlay.remove();
+        _overlay.remove(targetKey: _targetKey);
         _isOverlayUseInteraction = false;
       }
     }
   }
 
   @override
-  void initState() {
-    super.initState();
-
-    if (widget.focusNode != null) {
-      _focusNode = widget.focusNode!;
-      _isFocusNodeExternal = true;
-    } else {
-      _focusNode = FocusNode();
-    }
-    widget.controller.addListener(_onChangeListener);
-    _focusNode.addListener(_onFocusListener);
-  }
-
-  @override
-  void didUpdateWidget(covariant QuickSuggestionField<T> oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    if (oldWidget.controller != widget.controller) {
-      oldWidget.controller.removeListener(_onChangeListener);
-      widget.controller.addListener(_onChangeListener);
-    }
-  }
-
-  @override
-  void dispose() {
-    widget.controller.removeListener(_onChangeListener);
-    _focusNode.removeListener(_onFocusListener);
-    _textStreamController.close();
-
-    if (!_isFocusNodeExternal) _focusNode.dispose();
-
-    _overlay.remove();
-
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return CompositedTransformTarget(
-      key: _key,
+      key: _targetKey,
       link: _layerLink,
       child: widget.fieldBuilder(context, widget.controller, _focusNode),
     );
@@ -187,7 +208,7 @@ class _MainContent<T> extends StatefulWidget {
   final FocusNode focusNode;
   final Duration debouncer;
   final Stream<String> textStream;
-  final Future<List<T>> Function(String value) suggestions;
+  final Future<List<T>> Function({required String keywords}) suggestions;
   final Widget Function(BuildContext context, T value) itemBuilder;
   final Widget Function(BuildContext context)? emptyBuilder;
   final Widget Function(BuildContext context)? loadingBuilder;
@@ -208,7 +229,7 @@ class _MainContentState<T> extends State<_MainContent<T>> {
       if (keywords.isNotEmpty) _isLoading = true;
       if (mounted) setState(() {});
       Debouncer.run(() {
-        widget.suggestions(keywords).then((values) {
+        widget.suggestions(keywords: keywords).then((values) {
           _suggestions = values;
           _isLoading = false;
           if (mounted) setState(() {});
@@ -223,9 +244,7 @@ class _MainContentState<T> extends State<_MainContent<T>> {
 
     _setSuggestions(widget.controller.text);
 
-    _textSubscription = widget.textStream.listen((keywords) {
-      _setSuggestions(keywords);
-    });
+    _textSubscription = widget.textStream.listen((keywords) => _setSuggestions(keywords));
   }
 
   @override

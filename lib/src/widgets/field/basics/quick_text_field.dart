@@ -11,6 +11,7 @@ class QuickTextField extends StatefulWidget {
     this.focusNode,
     this.autofocus = false,
     this.enabled,
+    this.readOnly = false,
     this.style = const TextStyle(fontSize: 16),
     this.decoration,
     this.maxLines,
@@ -28,6 +29,7 @@ class QuickTextField extends StatefulWidget {
   final FocusNode? focusNode;
   final bool autofocus;
   final bool? enabled;
+  final bool readOnly;
   final TextStyle style;
   final FieldDecoration? decoration;
   final int? maxLines;
@@ -121,6 +123,7 @@ class _QuickTextFieldState extends State<QuickTextField> {
               focusNode: _focusNode,
               autofocus: widget.autofocus,
               enabled: widget.enabled,
+              readOnly: widget.readOnly,
               style: widget.style.copyWith(fontSize: (widget.style.fontSize ?? 16)),
               keyboardType: widget.keyboardType,
               inputFormatters: widget.inputFormatters,
