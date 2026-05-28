@@ -10,7 +10,6 @@ class QuickDropdownField<T> extends StatefulWidget {
     this.fieldTextStyle = const TextStyle(fontSize: 16),
     this.fieldSplashColor,
     required this.fieldDecorationBuilder,
-    required this.fieldValueBuilder,
     this.overlaydecoration = const .fitToTargetWidth(
       offsetY: 6,
       marginY: 14,
@@ -32,6 +31,7 @@ class QuickDropdownField<T> extends StatefulWidget {
     ),
     this.disabled = false,
     required this.value,
+    required this.fieldValueBuilder,
     required this.items,
     required this.itemBuilder,
   });
@@ -42,11 +42,11 @@ class QuickDropdownField<T> extends StatefulWidget {
   final TextStyle fieldTextStyle;
   final Color? fieldSplashColor;
   final FieldDecoration Function(TextEditingController controller, T value) fieldDecorationBuilder;
-  final String Function(T value) fieldValueBuilder;
   final OverlayDecoration overlaydecoration;
   final DropdownItemDecoration itemDecoration;
   final bool disabled;
   final T value;
+  final String Function(T value) fieldValueBuilder;
   final List<T> items;
   final Widget Function(BuildContext context, T value) itemBuilder;
 
