@@ -281,7 +281,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
             ),
           ),
         Positioned(
-          width: layoutValues.maxWidth + (_elevationSurfaceX * 2),
+          width: layoutValues.surfaceMaxWidth + (_elevationSurfaceX * 2),
           child: CompositedTransformFollower(
             link: widget.link,
             showWhenUnlinked: false,
@@ -298,7 +298,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
                 slideTransition: _isInitial ? _decoration.slideTransition : false,
                 child: _OverlayContent(
                   isTopOverlay: _isTopOverlay,
-                  maxHeight: layoutValues.maxHeight,
+                  maxHeight: layoutValues.surfaceMaxHeight,
                   offsetY: _decoration.offsetY,
                   closeOnTapOutside: widget.closeOnTapOutside,
                   decoration: _decoration,
@@ -315,9 +315,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
   }
 
   double get _getMaxWidth {
-    if (_decoration._id == 4) {
-      return _screenSize.width - _decoration.marginX + (_elevationSurfaceX * 2);
-    }
+    if (_decoration._id == 4) _screenSize.width - _decoration.marginX + (_elevationSurfaceX * 2);
 
     final leftRemainder = _targetPositionX;
     final rightRemainder = _screenSize.width - (_targetPositionX + _targetSize.width);
@@ -331,8 +329,8 @@ class _OverlayLayerState extends State<_OverlayLayer> {
   }
 
   ({
-    double maxWidth,
-    double maxHeight,
+    double surfaceMaxWidth,
+    double surfaceMaxHeight,
     double alignmentOffsetY,
     double alignmentOffsetX,
     Alignment anchorAlignment,
@@ -381,10 +379,10 @@ class _OverlayLayerState extends State<_OverlayLayer> {
       leftOverhang = rightOverhang;
     }
 
-    final dynamicWidth = targetWidth + leftOverhang + rightOverhang + (_elevationSurfaceX * 2);
-    final staticWidth = _decoration._width + (_elevationSurfaceX * 2);
-    final fitToTargetWidth = targetWidth + (_elevationSurfaceX * 2);
-    final width = switch (_decoration._id) {
+    final dynamicWidth = targetWidth + leftOverhang + rightOverhang;
+    final staticWidth = _decoration._width;
+    final fitToTargetWidth = targetWidth;
+    final surfaceMaxWidth = switch (_decoration._id) {
       1 => dynamicWidth,
       2 => staticWidth,
       3 => fitToTargetWidth,
@@ -412,11 +410,11 @@ class _OverlayLayerState extends State<_OverlayLayer> {
       _screenSize.height - (_minTopOverlay + _decoration.marginY),
     );
     final finalDecorationMaxHeight = decorationMaxHeight ?? _maxHeight;
-    final maxHeight = min(_maxHeight, finalDecorationMaxHeight);
+    final surfaceMaxHeight = min(_maxHeight, finalDecorationMaxHeight);
 
     return (
-      maxWidth: width - (_elevationSurfaceX * 2),
-      maxHeight: maxHeight,
+      surfaceMaxWidth: surfaceMaxWidth,
+      surfaceMaxHeight: surfaceMaxHeight,
       alignmentOffsetY: alignmentOffsetY,
       alignmentOffsetX: alignmentOffsetX,
       anchorAlignment: anchorAlignment,
@@ -424,8 +422,8 @@ class _OverlayLayerState extends State<_OverlayLayer> {
   }
 
   ({
-    double maxWidth,
-    double maxHeight,
+    double surfaceMaxWidth,
+    double surfaceMaxHeight,
     double alignmentOffsetY,
     double alignmentOffsetX,
     Alignment anchorAlignment,
@@ -463,7 +461,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     if (adaptiveShiftX > leftOverhang) adaptiveShiftX = leftOverhang;
     if (adaptiveShiftX < -rightOverhang) adaptiveShiftX = -rightOverhang;
 
-    final width = surfaceWidth + (_elevationSurfaceX * 2);
+    final surfaceMaxWidth = surfaceWidth;
 
     final alignmentOffsetY = _isTopOverlay
         ? -(_targetSize.height - _elevationSurfaceY)
@@ -478,11 +476,11 @@ class _OverlayLayerState extends State<_OverlayLayer> {
       _screenSize.height - (_minTopOverlay + _decoration.marginY),
     );
     final finalDecorationMaxHeight = decorationMaxHeight ?? _maxHeight;
-    final maxHeight = min(_maxHeight, finalDecorationMaxHeight);
+    final surfaceMaxHeight = min(_maxHeight, finalDecorationMaxHeight);
 
     return (
-      maxWidth: width - (_elevationSurfaceX * 2),
-      maxHeight: maxHeight,
+      surfaceMaxWidth: surfaceMaxWidth,
+      surfaceMaxHeight: surfaceMaxHeight,
       alignmentOffsetY: alignmentOffsetY,
       alignmentOffsetX: alignmentOffsetX,
       anchorAlignment: anchorAlignment,
