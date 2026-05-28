@@ -411,12 +411,8 @@ class _OverlayLayerState extends State<_OverlayLayer> {
       _minTopOverlay,
       _screenSize.height - (_minTopOverlay + _decoration.marginY),
     );
-
-    final maxHeight = decorationMaxHeight != null
-        ? decorationMaxHeight < _maxHeight
-              ? decorationMaxHeight
-              : _maxHeight
-        : _maxHeight;
+    final finalDecorationMaxHeight = decorationMaxHeight ?? _maxHeight;
+    final maxHeight = min(_maxHeight, finalDecorationMaxHeight);
 
     return (
       maxWidth: width - (_elevationSurfaceX * 2),
@@ -481,12 +477,8 @@ class _OverlayLayerState extends State<_OverlayLayer> {
       _minTopOverlay,
       _screenSize.height - (_minTopOverlay + _decoration.marginY),
     );
-
-    final maxHeight = decorationMaxHeight != null
-        ? decorationMaxHeight < _maxHeight
-              ? decorationMaxHeight
-              : _maxHeight
-        : _maxHeight;
+    final finalDecorationMaxHeight = decorationMaxHeight ?? _maxHeight;
+    final maxHeight = min(_maxHeight, finalDecorationMaxHeight);
 
     return (
       maxWidth: width - (_elevationSurfaceX * 2),
