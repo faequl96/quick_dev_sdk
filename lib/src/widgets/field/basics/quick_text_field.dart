@@ -32,6 +32,7 @@ class QuickTextField extends StatefulWidget {
   final bool readOnly;
   final TextStyle style;
   final FieldDecoration? decoration;
+
   final int? maxLines;
   final int? maxLength;
   final TextInputType? keyboardType;
@@ -59,8 +60,8 @@ class _QuickTextFieldState extends State<QuickTextField> {
       _lastText = widget.controller.text;
 
       widget.onChanged?.call(widget.controller.text);
-      _prefixIcon = widget.decoration?.prefixIcons?.call() ?? [];
-      _suffixIcon = widget.decoration?.suffixIcons?.call() ?? [];
+      _prefixIcon = widget.decoration?.prefixIcons?.call(widget.controller) ?? [];
+      _suffixIcon = widget.decoration?.suffixIcons?.call(widget.controller) ?? [];
 
       if (widget.validator != null) {
         final validate = widget.validator!.call(_lastText);
@@ -84,8 +85,8 @@ class _QuickTextFieldState extends State<QuickTextField> {
       _focusNode = widget.focusNode!;
     }
 
-    _prefixIcon = widget.decoration?.prefixIcons?.call() ?? [];
-    _suffixIcon = widget.decoration?.suffixIcons?.call() ?? [];
+    _prefixIcon = widget.decoration?.prefixIcons?.call(widget.controller) ?? [];
+    _suffixIcon = widget.decoration?.suffixIcons?.call(widget.controller) ?? [];
     widget.controller.addListener(_onChangeListener);
   }
 
@@ -240,8 +241,8 @@ class FieldDecoration {
 
   final double contentVerticalPadding;
   final double contentHorizontalPadding;
-  final List<PreSufFixIcon> Function()? prefixIcons;
-  final List<PreSufFixIcon> Function()? suffixIcons;
+  final List<PreSufFixIcon> Function(TextEditingController controller)? prefixIcons;
+  final List<PreSufFixIcon> Function(TextEditingController controller)? suffixIcons;
   final bool hideSuffixIconOnEmpty;
   final OutlineInputBorder enabledBorder;
   final OutlineInputBorder disabledBorder;

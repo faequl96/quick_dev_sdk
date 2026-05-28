@@ -30,6 +30,7 @@ class QuickDropdownButton<T> extends StatelessWidget {
       margin: .symmetric(vertical: 2),
       color: Colors.white,
       hoveredColor: Color(0xFFF5F5F5),
+      selectedColor: Color(0xFFE0E0E0),
       borderRadius: 0,
     ),
     this.disabled = false,
@@ -80,7 +81,7 @@ class _Dropdowns<T> extends StatelessWidget {
   const _Dropdowns({
     required this.onSelected,
     this.isMeasuringWidth,
-    this.overlayPadding,
+    required this.overlayPadding,
     required this.decoration,
     this.value,
     required this.items,
@@ -90,7 +91,7 @@ class _Dropdowns<T> extends StatelessWidget {
 
   final void Function(T value) onSelected;
   final bool? isMeasuringWidth;
-  final EdgeInsets? overlayPadding;
+  final EdgeInsets overlayPadding;
   final DropdownItemDecoration decoration;
   final T? value;
   final List<T> items;

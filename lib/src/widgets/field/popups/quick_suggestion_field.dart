@@ -2,8 +2,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:quick_dev_sdk/quick_dev_sdk.dart';
 
-typedef FieldValueBuilder<T> = String Function(T value);
-
 String _defaultFieldValueBuilder<T>(T value) => value.toString();
 
 class QuickSuggestionField<T> extends StatefulWidget {
@@ -40,7 +38,7 @@ class QuickSuggestionField<T> extends StatefulWidget {
     required this.itemBuilder,
     this.emptyBuilder,
     this.loadingBuilder,
-  }) : _isSearchOnly = false;
+  }) : _searchOnly = false;
 
   const QuickSuggestionField.searchOnly({
     required this.onSelected,
@@ -73,11 +71,11 @@ class QuickSuggestionField<T> extends StatefulWidget {
     required this.itemBuilder,
     this.emptyBuilder,
     this.loadingBuilder,
-  }) : _isSearchOnly = true,
+  }) : _searchOnly = true,
        value = null,
        fieldValueBuilder = _defaultFieldValueBuilder<T>;
 
-  final bool _isSearchOnly;
+  final bool _searchOnly;
   final void Function(T value) onSelected;
   final OverlayDecoration decoration;
   final SuggestionItemDecoration itemDecoration;
@@ -87,7 +85,7 @@ class QuickSuggestionField<T> extends StatefulWidget {
   final Widget Function(BuildContext context, TextEditingController controller, FocusNode focusNode)
   fieldBuilder;
   final T? value;
-  final FieldValueBuilder<T> fieldValueBuilder;
+  final String Function(T value) fieldValueBuilder;
   final Future<List<T>> Function({required String keywords}) suggestions;
   final Widget Function(BuildContext context, T value) itemBuilder;
   final Widget Function(BuildContext context)? emptyBuilder;
@@ -114,7 +112,7 @@ class _QuickSuggestionFieldState<T> extends State<QuickSuggestionField<T>> {
     super.initState();
 
     _initFocusNode();
-    if (!widget._isSearchOnly) widget.controller.text = _getDisplayValue();
+    if (!widget._searchOnly) widget.controller.text = _getDisplayValue();
     widget.controller.addListener(_onChangeListener);
     _focusNode.addListener(_onFocusListener);
   }
@@ -125,10 +123,10 @@ class _QuickSuggestionFieldState<T> extends State<QuickSuggestionField<T>> {
 
     if (oldWidget.controller != widget.controller) {
       oldWidget.controller.removeListener(_onChangeListener);
-      if (!widget._isSearchOnly) widget.controller.text = _getDisplayValue();
+      if (!widget._searchOnly) widget.controller.text = _getDisplayValue();
       widget.controller.addListener(_onChangeListener);
     } else {
-      if (!widget._isSearchOnly) widget.controller.text = _getDisplayValue();
+      if (!widget._searchOnly) widget.controller.text = _getDisplayValue();
     }
 
     if (oldWidget.focusNode != widget.focusNode) {
@@ -241,7 +239,7 @@ class _QuickSuggestionFieldState<T> extends State<QuickSuggestionField<T>> {
 
 class _MainContent<T> extends StatefulWidget {
   const _MainContent({
-    super.key,
+    // super.key,
     required this.onSelected,
     required this.overlayPadding,
     required this.itemDecoration,
@@ -317,9 +315,9 @@ class _MainContentState<T> extends State<_MainContent<T>> {
 
     if (_suggestions.isNotEmpty) {
       return _Suggestions<T>(
+        onSelected: widget.onSelected,
         overlayPadding: widget.overlayPadding,
         itemDecoration: widget.itemDecoration,
-        onSelected: widget.onSelected,
         suggestions: _suggestions,
         itemBuilder: widget.itemBuilder,
       );
@@ -336,16 +334,16 @@ class _MainContentState<T> extends State<_MainContent<T>> {
 
 class _Suggestions<T> extends StatelessWidget {
   const _Suggestions({
+    required this.onSelected,
     required this.overlayPadding,
     required this.itemDecoration,
-    required this.onSelected,
     required this.suggestions,
     required this.itemBuilder,
   });
 
+  final void Function(T value) onSelected;
   final EdgeInsets overlayPadding;
   final SuggestionItemDecoration itemDecoration;
-  final void Function(T value) onSelected;
   final List<T> suggestions;
   final Widget Function(BuildContext context, T value) itemBuilder;
 
