@@ -315,7 +315,9 @@ class _OverlayLayerState extends State<_OverlayLayer> {
   }
 
   double get _getMaxWidth {
-    if (_decoration._id == 4) _screenSize.width - _decoration.marginX + (_elevationSurfaceX * 2);
+    if (_decoration._id == 4) {
+      return _screenSize.width - _decoration.marginX + (_elevationSurfaceX * 2);
+    }
 
     final leftRemainder = _targetPositionX;
     final rightRemainder = _screenSize.width - (_targetPositionX + _targetSize.width);
