@@ -33,6 +33,9 @@ class QuickMenuButton<T> extends StatelessWidget {
       hoveredColor: Color(0xFFF5F5F5),
       borderRadius: 0,
     ),
+    this.disabled = false,
+    this.showOnHover = false,
+    this.closeOnUnHover = false,
     required this.items,
     required this.itemBuilder,
     this.onHoverChildBuilder,
@@ -43,28 +46,47 @@ class QuickMenuButton<T> extends StatelessWidget {
   final QuickButtonStyle buttonStyle;
   final OverlayDecoration overlaydecoration;
   final MenuItemDecoration itemDecoration;
+  final bool disabled;
+  final bool showOnHover;
+  final bool closeOnUnHover;
   final List<T> items;
   final Widget Function(BuildContext context, T value) itemBuilder;
   final Widget Function(BuildContext context, bool value)? onHoverChildBuilder;
   final Widget? child;
 
+  void _overlay(
+    BuildContext context,
+    void Function(
+      BuildContext, {
+      required Widget Function(BuildContext, {bool? isMeasuringWidth}) contentBuilder,
+      required OverlayDecoration decoration,
+    })
+    showOverlay,
+    void Function() closeOverlay,
+  ) => showOverlay(
+    context,
+    decoration: overlaydecoration.copyWith(padding: .zero),
+    contentBuilder: (_, {isMeasuringWidth}) => _Menus(
+      onSelected: onSelected,
+      isMeasuringWidth: isMeasuringWidth,
+      overlayPadding: overlaydecoration.padding,
+      decoration: itemDecoration,
+      items: items,
+      itemBuilder: itemBuilder,
+      closeOverlay: closeOverlay,
+    ),
+  );
+
   @override
   Widget build(BuildContext context) {
     return QuickStickyOverlayButton(
-      onTap: (handleShowOverlay, closeOverlay) => handleShowOverlay(
-        context,
-        decoration: overlaydecoration.copyWith(padding: .zero),
-        contentBuilder: (_, {isMeasuringWidth}) => _Menus(
-          onSelected: onSelected,
-          isMeasuringWidth: isMeasuringWidth,
-          overlayPadding: overlaydecoration.padding,
-          decoration: itemDecoration,
-          items: items,
-          itemBuilder: itemBuilder,
-          closeOverlay: closeOverlay,
-        ),
-      ),
+      onTap: (showOverlay, closeOverlay) => _overlay(context, showOverlay, closeOverlay),
+      onHover: showOnHover
+          ? (showOverlay, closeOverlay) => _overlay(context, showOverlay, closeOverlay)
+          : null,
       buttonStyle: buttonStyle,
+      disabled: disabled,
+      closeOnUnHover: closeOnUnHover,
       onHoverChildBuilder: onHoverChildBuilder,
       child: child,
     );

@@ -256,4 +256,44 @@ class FieldDecoration {
   final Color? fillColor;
   final String obscuringCharacter;
   final bool obscureText;
+
+  FieldDecoration copyWith({
+    double? contentVerticalPadding,
+    double? contentHorizontalPadding,
+    List<PreSufFixIcon> Function(TextEditingController controller)? prefixIcons,
+    List<PreSufFixIcon> Function(TextEditingController controller)? suffixIcons,
+    bool? hideSuffixIconOnEmpty,
+    OutlineInputBorder? enabledBorder,
+    OutlineInputBorder? disabledBorder,
+    OutlineInputBorder? focusedBorder,
+    String? labelText,
+    TextStyle? labelStyle,
+    FloatingLabelBehavior? floatingLabelBehavior,
+    String? hintText,
+    TextStyle? hintStyle,
+    bool? filled,
+    Color? fillColor,
+    String? obscuringCharacter,
+    bool? obscureText,
+  }) {
+    return FieldDecoration(
+      contentVerticalPadding: contentVerticalPadding ?? this.contentVerticalPadding,
+      contentHorizontalPadding: contentHorizontalPadding ?? this.contentHorizontalPadding,
+      prefixIcons: prefixIcons ?? this.prefixIcons,
+      suffixIcons: suffixIcons ?? this.suffixIcons,
+      hideSuffixIconOnEmpty: hideSuffixIconOnEmpty ?? this.hideSuffixIconOnEmpty,
+      enabledBorder: enabledBorder ?? this.enabledBorder,
+      disabledBorder: disabledBorder ?? this.disabledBorder,
+      focusedBorder: focusedBorder ?? this.focusedBorder,
+      labelText: labelText ?? this.labelText,
+      labelStyle: labelStyle ?? this.labelStyle,
+      floatingLabelBehavior: floatingLabelBehavior ?? this.floatingLabelBehavior,
+      hintText: hintText ?? this.hintText,
+      hintStyle: hintStyle ?? this.hintStyle,
+      filled: filled ?? this.filled,
+      fillColor: fillColor ?? this.fillColor,
+      obscuringCharacter: obscuringCharacter ?? this.obscuringCharacter,
+      obscureText: obscureText ?? this.obscureText,
+    );
+  }
 }

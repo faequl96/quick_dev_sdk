@@ -49,30 +49,33 @@ class QuickPopupButton extends StatelessWidget {
   final Widget Function(BuildContext context, bool value)? onHoverChildBuilder;
   final Widget? child;
 
+  void _overlay(
+    BuildContext context,
+    void Function(
+      BuildContext, {
+      required Widget Function(BuildContext, {bool? isMeasuringWidth}) contentBuilder,
+      required OverlayDecoration decoration,
+    })
+    showOverlay,
+    void Function() closeOverlay,
+  ) => showOverlay(
+    context,
+    decoration: overlaydecoration,
+    contentBuilder: (context, {isMeasuringWidth}) {
+      return contentBuilder(
+        context,
+        isMeasuringWidth: isMeasuringWidth,
+        closeOverlay: closeOverlay,
+      );
+    },
+  );
+
   @override
   Widget build(BuildContext context) {
     return QuickStickyOverlayButton(
-      onTap: (handleShowOverlay, closeOverlay) => handleShowOverlay(
-        context,
-        decoration: overlaydecoration,
-        contentBuilder: (context, {isMeasuringWidth}) {
-          return contentBuilder(
-            context,
-            isMeasuringWidth: isMeasuringWidth,
-            closeOverlay: closeOverlay,
-          );
-        },
-      ),
+      onTap: (showOverlay, closeOverlay) => _overlay(context, showOverlay, closeOverlay),
       onHover: showOnHover
-          ? (handleShowOverlay, closeOverlay) => handleShowOverlay(
-              context,
-              decoration: overlaydecoration,
-              contentBuilder: (context, {isMeasuringWidth}) => contentBuilder(
-                context,
-                isMeasuringWidth: isMeasuringWidth,
-                closeOverlay: closeOverlay,
-              ),
-            )
+          ? (showOverlay, closeOverlay) => _overlay(context, showOverlay, closeOverlay)
           : null,
       buttonStyle: buttonStyle,
       disabled: disabled,

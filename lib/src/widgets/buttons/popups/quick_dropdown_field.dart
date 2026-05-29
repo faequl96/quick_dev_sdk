@@ -40,7 +40,10 @@ class QuickDropdownField<T> extends StatefulWidget {
     required this._items,
     required this.itemBuilder,
   }) : _withItemsSearch = false,
-       _itemsBuilder = _defaultItemsBuilder;
+       _itemsBuilder = _defaultItemsBuilder,
+       _searchFieldHeight = 40,
+       _searchFieldTextStyle = const TextStyle(),
+       _searchFieldDecoration = const FieldDecoration();
 
   const QuickDropdownField.withItemsSearch({
     super.key,
@@ -75,6 +78,23 @@ class QuickDropdownField<T> extends StatefulWidget {
     required this.fieldValueBuilder,
     required FutureOr<List<T>> Function({required String keywords}) items,
     required this.itemBuilder,
+    this._searchFieldHeight = 40,
+    this._searchFieldTextStyle = const TextStyle(fontSize: 14),
+    this._searchFieldDecoration = const FieldDecoration(
+      contentHorizontalPadding: 4,
+      enabledBorder: OutlineInputBorder(
+        borderSide: BorderSide(color: Colors.black12, width: 1),
+        borderRadius: .all(.circular(6)),
+      ),
+      disabledBorder: OutlineInputBorder(
+        borderSide: BorderSide(color: Colors.black12, width: 1),
+        borderRadius: .all(.circular(6)),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderSide: BorderSide(color: Colors.black12, width: 1),
+        borderRadius: .all(.circular(6)),
+      ),
+    ),
   }) : _withItemsSearch = true,
        _itemsBuilder = items,
        _items = const [];
@@ -94,6 +114,9 @@ class QuickDropdownField<T> extends StatefulWidget {
   final List<T> _items;
   final FutureOr<List<T>> Function({required String keywords}) _itemsBuilder;
   final Widget Function(BuildContext context, T value) itemBuilder;
+  final double _searchFieldHeight;
+  final TextStyle _searchFieldTextStyle;
+  final FieldDecoration _searchFieldDecoration;
 
   @override
   State<QuickDropdownField<T>> createState() => _QuickDropdownFieldState<T>();
@@ -134,9 +157,9 @@ class _QuickDropdownFieldState<T> extends State<QuickDropdownField<T>> {
     final decoration = widget.fieldDecoration;
 
     return QuickStickyOverlayButton(
-      onTap: (handleShowOverlay, closeOverlay) {
+      onTap: (showOverlay, closeOverlay) {
         if (widget.disabled) return;
-        handleShowOverlay(
+        showOverlay(
           context,
           decoration: widget.overlaydecoration.copyWith(padding: .zero),
           contentBuilder: (_, {isMeasuringWidth}) {
@@ -149,6 +172,9 @@ class _QuickDropdownFieldState<T> extends State<QuickDropdownField<T>> {
                 value: widget.value,
                 items: widget._itemsBuilder,
                 itemBuilder: widget.itemBuilder,
+                searchFieldHeight: widget._searchFieldHeight,
+                searchFieldTextStyle: widget._searchFieldTextStyle,
+                searchFieldDecoration: widget._searchFieldDecoration,
                 closeOverlay: closeOverlay,
               );
             }
@@ -257,6 +283,9 @@ class _DropdownItemsSearch<T> extends StatefulWidget {
     this.value,
     required this.items,
     required this.itemBuilder,
+    required this.searchFieldHeight,
+    required this.searchFieldTextStyle,
+    required this.searchFieldDecoration,
     required this.closeOverlay,
   });
 
@@ -267,6 +296,9 @@ class _DropdownItemsSearch<T> extends StatefulWidget {
   final T? value;
   final FutureOr<List<T>> Function({required String keywords}) items;
   final Widget Function(BuildContext context, T value) itemBuilder;
+  final double searchFieldHeight;
+  final TextStyle searchFieldTextStyle;
+  final FieldDecoration searchFieldDecoration;
   final void Function() closeOverlay;
 
   @override
@@ -308,30 +340,19 @@ class _DropdownItemsSearchState<T> extends State<_DropdownItemsSearch<T>> {
             controller: _textEditingController,
             height: 40,
             width: .maxFinite,
-            style: const TextStyle(fontSize: 14),
+            style: widget.searchFieldTextStyle,
             autofocus: true,
-            decoration: FieldDecoration(
-              contentHorizontalPadding: 4,
-              enabledBorder: const OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.black12, width: 1),
-                borderRadius: .all(.circular(6)),
-              ),
-              disabledBorder: const OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.black12, width: 1),
-                borderRadius: .all(.circular(6)),
-              ),
-              focusedBorder: const OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.black12, width: 1),
-                borderRadius: .all(.circular(6)),
-              ),
-              suffixIcons: (controller) => [
-                if (controller.text.isNotEmpty)
-                  PreSufFixIcon(
-                    onTap: () => controller.clear(),
-                    hoveredColor: Colors.grey.shade300,
-                    child: const Icon(Icons.close, size: 22),
-                  ),
-              ],
+            decoration: widget.searchFieldDecoration.copyWith(
+              suffixIcons:
+                  widget.searchFieldDecoration.suffixIcons ??
+                  (controller) => [
+                    if (controller.text.isNotEmpty)
+                      PreSufFixIcon(
+                        onTap: () => controller.clear(),
+                        hoveredColor: Colors.grey.shade300,
+                        child: const Icon(Icons.close, size: 22),
+                      ),
+                  ],
             ),
             onChanged: _onChangeKeywords,
           ),
