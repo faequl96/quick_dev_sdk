@@ -127,6 +127,9 @@ class _OverlayLayer extends StatefulWidget {
 class _OverlayLayerState extends State<_OverlayLayer> {
   bool _isInitial = true;
 
+  final _changeDependeciesDebouncer = Debouncer(duration: const Duration(milliseconds: 150));
+  final _scrollingDebouncer = Debouncer(duration: const Duration(milliseconds: 150));
+
   GlobalKey? _contentKey;
   double? _staticOverlaySurfaceWidth;
   late OverlayDecoration _decoration;
@@ -167,7 +170,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
         }
       });
     } else {
-      Debouncer.run(() {
+      _changeDependeciesDebouncer.run(() {
         _staticOverlaySurfaceWidth = null;
         _set(isInitial: false);
         _scrollObserver?.removeListener(_scrollNotification);
@@ -179,22 +182,24 @@ class _OverlayLayerState extends State<_OverlayLayer> {
             _initScrollObserver();
           });
         }
-      }, duration: const Duration(milliseconds: 150));
+      });
     }
   }
 
   @override
   void dispose() {
     _scrollObserver?.removeListener(_scrollNotification);
+    _changeDependeciesDebouncer.dispose();
+    _scrollingDebouncer.dispose();
 
     super.dispose();
   }
 
   void _scrollNotification(ScrollNotification notification) {
     if (notification is ScrollUpdateNotification || notification is OverscrollNotification) {
-      Debouncer.run(() {
+      _scrollingDebouncer.run(() {
         if (mounted) _set(isInitial: false);
-      }, duration: const Duration(milliseconds: 150));
+      });
     }
   }
 
@@ -250,7 +255,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
 
   @override
   Widget build(BuildContext context) {
-    if ((_decoration._id == 1 || _decoration._id == 4) && _staticOverlaySurfaceWidth == null) {
+    if (_decoration._id != 3 && _staticOverlaySurfaceWidth == null) {
       final border = _decoration.border;
       final padding = _decoration.padding;
       return Stack(

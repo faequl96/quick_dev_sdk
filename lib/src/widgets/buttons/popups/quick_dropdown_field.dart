@@ -163,6 +163,7 @@ class _QuickDropdownFieldState<T> extends State<QuickDropdownField<T>> {
           context,
           decoration: widget.overlaydecoration.copyWith(padding: .zero),
           contentBuilder: (_, {isMeasuringWidth}) {
+            // print('tesssssssssss8');
             if (widget._withItemsSearch) {
               return _DropdownItemsSearch<T>(
                 onSelected: widget.onSelected,
@@ -219,7 +220,7 @@ class _QuickDropdownFieldState<T> extends State<QuickDropdownField<T>> {
   }
 }
 
-class _Dropdowns<T> extends StatelessWidget {
+class _Dropdowns<T> extends StatefulWidget {
   const _Dropdowns({
     required this.onSelected,
     this.isMeasuringWidth,
@@ -241,32 +242,113 @@ class _Dropdowns<T> extends StatelessWidget {
   final void Function() closeOverlay;
 
   @override
+  State<_Dropdowns<T>> createState() => _DropdownsState<T>();
+}
+
+class _DropdownsState<T> extends State<_Dropdowns<T>> {
+  ScrollController? _controller;
+  final _itemHeightKey = GlobalKey();
+  final _scrollKey = GlobalKey();
+
+  final bool _isInitial = true;
+
+  double _itemHeight = 40;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = ScrollController();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_itemHeightKey.currentContext != null) {
+        _itemHeight = _itemHeightKey.currentContext!.size?.height ?? 40;
+      }
+    });
+
+    // if (_isInitial && widget.isMeasuringWidth != true) {
+    //   print('tessssssssss1');
+    //   WidgetsBinding.instance.addPostFrameCallback((_) {
+    //     if (_scrollKey.currentContext != null) {
+    //       print('tesssssssss1.2');
+    //       final itemHeight = _scrollKey.currentContext!.size?.height ?? 40;
+    //       final selectedIndex = widget.items.indexOf(widget.value as T);
+    //       print(selectedIndex);
+    //       _controller?.jumpTo(selectedIndex * itemHeight);
+
+    //       Scrollable.ensureVisible(_scrollKey.currentContext!, alignment: .2);
+    //       _isInitial = false;
+    //     }
+    //   });
+    // }
+  }
+
+  // @override
+  // void didUpdateWidget(covariant _Dropdowns<T> oldWidget) {
+  //   super.didUpdateWidget(oldWidget);
+  //   print(widget.value);
+  //   _isInitial = false;
+
+  //   if (_isInitial && widget.items.contains(widget.value) && widget.isMeasuringWidth != true) {
+  //     print('tessssssssss2');
+
+  //     print('tessssssssss2.1');
+  //     final selectedIndex = widget.items.indexOf(widget.value as T);
+  //     print(selectedIndex);
+  //     _controller?.jumpTo(selectedIndex * _itemHeight);
+  //     WidgetsBinding.instance.addPostFrameCallback((_) {
+  //       if (_scrollKey.currentContext != null) {
+  //         print('tessssssssss2.2');
+
+  //         Scrollable.ensureVisible(_scrollKey.currentContext!, alignment: .2);
+  //       }
+  //     });
+  //   }
+  // }
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final itemCount = isMeasuringWidth == true ? 1 : items.length;
+    final itemCount = widget.isMeasuringWidth == true ? 1 : widget.items.length;
 
     return ListView.builder(
-      scrollCacheExtent: const .pixels(2),
-      padding: overlayPadding,
+      // controller: _controller,
+      scrollCacheExtent: const .pixels(200),
+      padding: widget.overlayPadding,
       shrinkWrap: true,
       itemCount: itemCount,
       itemBuilder: (context, index) {
-        final item = items[index];
-        return Padding(
-          padding: decoration.margin,
-          child: QuickButton(
-            onTap: () {
-              closeOverlay();
-              onSelected(item);
-            },
-            style: .lite(
-              padding: decoration.padding,
-              borderRadius: .circular(decoration.borderRadius),
-              color: item == value ? decoration.selectedColor : decoration.color,
-              hoveredColor: decoration.hoveredColor,
-              hoverDuration: const Duration(milliseconds: 100),
-              elevation: 0,
+        if (widget.items.isEmpty) return const SizedBox.shrink();
+
+        final item = widget.items[index];
+        return SizedBox(
+          // key: index == 0 ? _itemHeightKey : null,
+          child: Padding(
+            // key: item == widget.value ? _scrollKey : null,
+            padding: widget.decoration.margin,
+            child: QuickButton(
+              onTap: () {
+                widget.closeOverlay();
+                widget.onSelected(item);
+              },
+              style: .lite(
+                padding: widget.decoration.padding,
+                borderRadius: .circular(widget.decoration.borderRadius),
+                color: item == widget.value
+                    ? widget.decoration.selectedColor
+                    : widget.decoration.color,
+                hoveredColor: widget.decoration.hoveredColor,
+                hoverDuration: const Duration(milliseconds: 100),
+                elevation: 0,
+              ),
+              child: widget.itemBuilder(context, item),
             ),
-            child: itemBuilder(context, item),
           ),
         );
       },
@@ -308,16 +390,22 @@ class _DropdownItemsSearch<T> extends StatefulWidget {
 class _DropdownItemsSearchState<T> extends State<_DropdownItemsSearch<T>> {
   final _textEditingController = TextEditingController();
 
+  bool _isInitial = true;
+
   List<T> _filteredItems = [];
 
   void _onChangeKeywords(String keywords) async {
     _filteredItems = await widget.items(keywords: keywords);
+    // print('tessssssssssss10');
+    if (_isInitial) _isInitial = false;
     if (mounted) setState(() {});
   }
 
   @override
   void initState() {
     super.initState();
+
+    // print('tesssssssssssss9');
 
     _onChangeKeywords(_textEditingController.text);
   }
@@ -357,6 +445,7 @@ class _DropdownItemsSearchState<T> extends State<_DropdownItemsSearch<T>> {
             onChanged: _onChangeKeywords,
           ),
         ),
+        // if (!_isInitial)
         Flexible(
           child: _Dropdowns<T>(
             onSelected: widget.onSelected,

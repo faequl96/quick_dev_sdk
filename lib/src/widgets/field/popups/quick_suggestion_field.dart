@@ -270,6 +270,8 @@ class _MainContent<T> extends StatefulWidget {
 }
 
 class _MainContentState<T> extends State<_MainContent<T>> {
+  late final Debouncer _debouncer;
+
   StreamSubscription<String>? _textSubscription;
 
   List<T> _suggestions = [];
@@ -280,13 +282,13 @@ class _MainContentState<T> extends State<_MainContent<T>> {
     if (mounted) {
       if (keywords.isNotEmpty) _isLoading = true;
       if (mounted) setState(() {});
-      Debouncer.run(() {
+      _debouncer.run(() {
         widget.suggestions(keywords: keywords).then((values) {
           _suggestions = values;
           _isLoading = false;
           if (mounted) setState(() {});
         });
-      }, duration: widget.debouncer);
+      });
     }
   }
 
@@ -294,14 +296,16 @@ class _MainContentState<T> extends State<_MainContent<T>> {
   void initState() {
     super.initState();
 
-    _setSuggestions(widget.controller.text);
+    _debouncer = _debouncer = Debouncer(duration: widget.debouncer);
 
+    _setSuggestions(widget.controller.text);
     _textSubscription = widget.textStream.listen((keywords) => _setSuggestions(keywords));
   }
 
   @override
   void dispose() {
     _textSubscription?.cancel();
+    _debouncer.dispose();
 
     super.dispose();
   }
