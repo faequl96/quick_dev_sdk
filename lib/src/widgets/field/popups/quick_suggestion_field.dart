@@ -172,36 +172,36 @@ class _QuickSuggestionFieldState<T> extends State<QuickSuggestionField<T>> {
           closeOnTapOutside: false,
           closeOnTapTarget: false,
           decoration: widget.decoration.copyWith(padding: .zero),
-          contentBuilder: (_, {isMeasuringWidth}) => Listener(
-            onPointerDown: (_) {
-              _isOverlayUseInteraction = true;
-              _isPointerInsideOverlay = true;
-            },
-            onPointerUp: (_) async {
-              await Future<void>.delayed(.zero);
-              if (!_isPointerInsideOverlay) return;
-              _focusNode.requestFocus();
-              _isPointerInsideOverlay = false;
-            },
-            child: _MainContent<T>(
-              onSelected: (value) {
-                _overlay.remove(targetKey: _targetKey);
-                _isPointerInsideOverlay = false;
-                _isOverlayUseInteraction = false;
-                widget.onSelected(value);
+          contentBuilder: (_, {isMeasuringWidth}) {
+            return Listener(
+              onPointerDown: (_) {
+                _isOverlayUseInteraction = true;
+                _isPointerInsideOverlay = true;
               },
-              overlayPadding: widget.decoration.padding,
-              itemDecoration: widget.itemDecoration,
-              controller: widget.controller,
-              focusNode: _focusNode,
-              debouncer: widget.debouncer,
-              suggestions: widget.suggestions,
-              textStream: _textStreamController.stream,
-              itemBuilder: widget.itemBuilder,
-              emptyBuilder: widget.emptyBuilder,
-              loadingBuilder: widget.loadingBuilder,
-            ),
-          ),
+              onPointerUp: (_) async {
+                await Future<void>.delayed(.zero);
+                if (!_isPointerInsideOverlay) return;
+                _focusNode.requestFocus();
+                _isPointerInsideOverlay = false;
+              },
+              child: _Content<T>(
+                onSelected: (value) {
+                  _overlay.remove(targetKey: _targetKey);
+                  _isPointerInsideOverlay = false;
+                  _isOverlayUseInteraction = false;
+                  widget.onSelected(value);
+                },
+                overlayPadding: widget.decoration.padding,
+                itemDecoration: widget.itemDecoration,
+                debouncer: widget.debouncer,
+                suggestions: widget.suggestions,
+                textStream: _textStreamController.stream,
+                itemBuilder: widget.itemBuilder,
+                emptyBuilder: widget.emptyBuilder,
+                loadingBuilder: widget.loadingBuilder,
+              ),
+            );
+          },
           onDispose: () {
             if (!mounted) return;
             if (_focusNode.hasFocus && !_isPointerInsideOverlay) {
@@ -237,14 +237,12 @@ class _QuickSuggestionFieldState<T> extends State<QuickSuggestionField<T>> {
   }
 }
 
-class _MainContent<T> extends StatefulWidget {
-  const _MainContent({
+class _Content<T> extends StatefulWidget {
+  const _Content({
     // super.key,
     required this.onSelected,
     required this.overlayPadding,
     required this.itemDecoration,
-    required this.controller,
-    required this.focusNode,
     required this.debouncer,
     required this.suggestions,
     required this.textStream,
@@ -256,8 +254,6 @@ class _MainContent<T> extends StatefulWidget {
   final void Function(T value) onSelected;
   final EdgeInsets overlayPadding;
   final SuggestionItemDecoration itemDecoration;
-  final TextEditingController controller;
-  final FocusNode focusNode;
   final Duration debouncer;
   final Stream<String> textStream;
   final Future<List<T>> Function({required String keywords}) suggestions;
@@ -266,10 +262,10 @@ class _MainContent<T> extends StatefulWidget {
   final Widget Function(BuildContext context)? loadingBuilder;
 
   @override
-  State<_MainContent<T>> createState() => _MainContentState<T>();
+  State<_Content<T>> createState() => _ContentState<T>();
 }
 
-class _MainContentState<T> extends State<_MainContent<T>> {
+class _ContentState<T> extends State<_Content<T>> {
   late final Debouncer _debouncer;
 
   StreamSubscription<String>? _textSubscription;
@@ -277,8 +273,10 @@ class _MainContentState<T> extends State<_MainContent<T>> {
   List<T> _suggestions = [];
   bool _isLoading = false;
 
+  String _keywords = '';
+
   void _setSuggestions(String keywords) {
-    print('tessssssssssssssssssss20');
+    _keywords = keywords;
     _suggestions.clear();
     if (mounted) {
       if (keywords.isNotEmpty) _isLoading = true;
@@ -299,7 +297,7 @@ class _MainContentState<T> extends State<_MainContent<T>> {
 
     _debouncer = Debouncer(duration: widget.debouncer);
 
-    _setSuggestions(widget.controller.text);
+    _setSuggestions('');
     _textSubscription = widget.textStream.listen((keywords) => _setSuggestions(keywords));
   }
 
@@ -328,7 +326,7 @@ class _MainContentState<T> extends State<_MainContent<T>> {
       );
     }
 
-    if (widget.controller.text.isNotEmpty) {
+    if (_keywords.isNotEmpty) {
       if (widget.emptyBuilder == null) return const SizedBox.shrink();
       return Padding(padding: widget.overlayPadding, child: widget.emptyBuilder!.call(context));
     }

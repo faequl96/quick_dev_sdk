@@ -162,10 +162,14 @@ class _OverlayLayerState extends State<_OverlayLayer> {
         if (widget.decoration._id != 3) {
           // await Future.delayed(const Duration(seconds: 1));
           if (mounted) _setStaticSurfaceWidth();
+          WidgetsBinding.instance.addPostFrameCallback((_) async {
+            _isInitial = false;
+            await Future<void>.delayed(const Duration(milliseconds: 500));
+            _initScrollObserver();
+          });
+        } else {
+          _initScrollObserver();
         }
-        _isInitial = false;
-        await Future<void>.delayed(const Duration(milliseconds: 500));
-        _initScrollObserver();
       });
     } else {
       print('tesssssssssss_2');
@@ -174,7 +178,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
       _changeDependeciesDebouncer.run(() {
         _set(isInitial: false);
         WidgetsBinding.instance.addPostFrameCallback((_) async {
-          await Future<void>.delayed(const Duration(milliseconds: 50));
+          await Future<void>.delayed(const Duration(milliseconds: 300));
           _initScrollObserver();
         });
       });
@@ -197,17 +201,9 @@ class _OverlayLayerState extends State<_OverlayLayer> {
       print(notification.context);
       if (mounted) _set(isInitial: false);
       WidgetsBinding.instance.addPostFrameCallback((_) async {
-        await Future<void>.delayed(const Duration(milliseconds: 500));
+        await Future<void>.delayed(const Duration(milliseconds: 300));
         _initScrollObserver();
       });
-      // if (notification is ScrollUpdateNotification || notification is OverscrollNotification) {
-      //   print('tessssssssssssss_15');
-      //   if (mounted) _set(isInitial: false);
-      //   // WidgetsBinding.instance.addPostFrameCallback((_) async {
-      //   //   await Future<void>.delayed(const Duration(milliseconds: 50));
-      //   //   _initScrollObserver();
-      //   // });
-      // }
     });
   }
 
@@ -258,13 +254,9 @@ class _OverlayLayerState extends State<_OverlayLayer> {
       return Stack(children: [_measuringWidthContent]);
     }
 
-    // print(_staticSurfaceWidth);
-
     print('tessssssssssssssssss11');
 
     final layoutValues = _decoration._id != 4 ? _getLayoutValues : _getAdaptiveLayoutValues;
-
-    // print(layoutValues.surfaceMaxWidth);
 
     return Stack(
       children: [
@@ -549,28 +541,31 @@ class _AnimationLayer extends StatefulWidget {
 }
 
 class _AnimationLayerState extends State<_AnimationLayer> with SingleTickerProviderStateMixin {
-  AnimationController? _animationController;
-  Animation<double>? _animation;
+  late final AnimationController _animationController;
+  late final Animation<double> _animation;
 
   @override
   void initState() {
     super.initState();
 
-    if (!widget.slideTransition) return;
-
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 400),
     );
-    _animation = CurvedAnimation(parent: _animationController!, curve: Curves.easeOutCubic);
+    _animation = CurvedAnimation(parent: _animationController, curve: Curves.easeOutCubic);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _animationController!.forward();
+      if (widget.slideTransition) {
+        print(widget.slideTransition);
+        _animationController.forward();
+      } else {
+        _animationController.value = 1;
+      }
     });
   }
 
   @override
   void dispose() {
-    _animationController?.dispose();
+    _animationController.dispose();
 
     super.dispose();
   }
@@ -584,10 +579,8 @@ class _AnimationLayerState extends State<_AnimationLayer> with SingleTickerProvi
       bottom: widget.elevationSurfaceY,
     );
 
-    if (!widget.slideTransition) return Padding(padding: padding, child: widget.child);
-
     return SizeTransition(
-      sizeFactor: _animation!,
+      sizeFactor: _animation,
       alignment: widget.isTopOverlay ? .bottomCenter : .topCenter,
       child: Padding(padding: padding, child: widget.child),
     );
@@ -718,7 +711,8 @@ class _RenderDecoratedOverlay extends RenderProxyBox {
     child.layout(childConstraints, parentUsesSize: true);
 
     if (child.size.height == 0) {
-      size = child.size;
+      final emptySize = Size(child.size.width + totalPadding.horizontal, 0.0);
+      size = constraints.constrain(emptySize);
     } else {
       final totalSize = Size(
         _decoration.width ?? (child.size.width + totalPadding.horizontal),
