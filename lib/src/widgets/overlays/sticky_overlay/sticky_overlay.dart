@@ -131,7 +131,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
   final _scrollingDebouncer = Debouncer(duration: const Duration(milliseconds: 150));
 
   GlobalKey? _contentKey;
-  double? _staticOverlaySurfaceWidth;
+  double? _staticSurfaceWidth;
   late OverlayDecoration _decoration;
 
   final double _minTopOverlay = 80;
@@ -152,36 +152,31 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     super.didChangeDependencies();
 
     if (_isInitial) {
+      print('tesssssssssss_1');
       _decoration = widget.decoration;
       _set();
+      _scrollObserver?.removeListener(_scrollNotification);
+      _scrollObserver = null;
       if (widget.decoration._id != 3) _contentKey = GlobalKey();
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         if (widget.decoration._id != 3) {
           // await Future.delayed(const Duration(seconds: 1));
-          if (mounted) _setStaticOverlaySurfaceWidth();
-          await Future<void>.delayed(const Duration(milliseconds: 100));
-          _scrollObserver?.removeListener(_scrollNotification);
-          _initScrollObserver();
-          _isInitial = false;
-        } else {
-          await Future<void>.delayed(const Duration(milliseconds: 100));
-          _scrollObserver?.removeListener(_scrollNotification);
-          _initScrollObserver();
+          if (mounted) _setStaticSurfaceWidth();
         }
+        _isInitial = false;
+        await Future<void>.delayed(const Duration(milliseconds: 500));
+        _initScrollObserver();
       });
     } else {
+      print('tesssssssssss_2');
+      _scrollObserver?.removeListener(_scrollNotification);
+      _scrollObserver = null;
       _changeDependeciesDebouncer.run(() {
-        _staticOverlaySurfaceWidth = null;
         _set(isInitial: false);
-        _scrollObserver?.removeListener(_scrollNotification);
-        _scrollObserver = null;
-        if (widget.decoration._id != 3) {
-          WidgetsBinding.instance.addPostFrameCallback((_) async {
-            if (mounted) _setStaticOverlaySurfaceWidth();
-            await Future<void>.delayed(const Duration(milliseconds: 100));
-            _initScrollObserver();
-          });
-        }
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          await Future<void>.delayed(const Duration(milliseconds: 50));
+          _initScrollObserver();
+        });
       });
     }
   }
@@ -196,11 +191,24 @@ class _OverlayLayerState extends State<_OverlayLayer> {
   }
 
   void _scrollNotification(ScrollNotification notification) {
-    if (notification is ScrollUpdateNotification || notification is OverscrollNotification) {
-      _scrollingDebouncer.run(() {
-        if (mounted) _set(isInitial: false);
+    _scrollingDebouncer.run(() {
+      _scrollObserver?.removeListener(_scrollNotification);
+      _scrollObserver = null;
+      print(notification.context);
+      if (mounted) _set(isInitial: false);
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        await Future<void>.delayed(const Duration(milliseconds: 500));
+        _initScrollObserver();
       });
-    }
+      // if (notification is ScrollUpdateNotification || notification is OverscrollNotification) {
+      //   print('tessssssssssssss_15');
+      //   if (mounted) _set(isInitial: false);
+      //   // WidgetsBinding.instance.addPostFrameCallback((_) async {
+      //   //   await Future<void>.delayed(const Duration(milliseconds: 50));
+      //   //   _initScrollObserver();
+      //   // });
+      // }
+    });
   }
 
   void _initScrollObserver() {
@@ -210,8 +218,10 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     _scrollObserver?.addListener(_scrollNotification);
   }
 
-  void _setStaticOverlaySurfaceWidth() {
-    setState(() => _staticOverlaySurfaceWidth = _contentKey?.currentContext?.size?.width);
+  void _setStaticSurfaceWidth() {
+    // print(_contentKey?.currentContext);
+    // print(_contentKey?.currentContext?.size?.width);
+    setState(() => _staticSurfaceWidth = _contentKey?.currentContext?.size?.width);
   }
 
   void _set({bool isInitial = true}) {
@@ -235,66 +245,26 @@ class _OverlayLayerState extends State<_OverlayLayer> {
 
     final decorationMaxWidth = widget.decoration._maxWidth;
     final maxWidth = _getMaxWidth;
-    if (decorationMaxWidth != null) {
-      _maxWidth = min(
-        maxWidth,
-        decorationMaxWidth + (_decoration._id == 4 ? _elevationSurfaceX * 2 : 0),
-      );
-    } else {
-      _maxWidth = maxWidth;
-    }
-
-    if (_maxWidth < widget.decoration._width) {
-      _decoration = _decoration._convertTo(id: 1);
-    } else {
-      _decoration = widget.decoration;
-    }
+    _maxWidth = min(maxWidth, decorationMaxWidth ?? maxWidth);
 
     if (!isInitial && mounted) setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_decoration._id != 3 && _staticOverlaySurfaceWidth == null) {
-      final border = _decoration.border;
-      final padding = _decoration.padding;
-      return Stack(
-        children: [
-          Positioned(
-            left: 0,
-            top: 0,
-            child: Opacity(
-              opacity: 0,
-              child: Material(
-                type: .transparency,
-                child: SizedBox(
-                  key: _contentKey,
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxWidth: _decoration._id == 4
-                          ? _maxWidth
-                          : _maxWidth + (_elevationSurfaceX * 2),
-                      maxHeight: 100,
-                    ),
-                    child: Padding(
-                      padding: .only(
-                        top: _elevationSurfaceY + border.top.width + padding.top,
-                        left: _elevationSurfaceX + border.left.width + padding.left,
-                        right: _elevationSurfaceX + border.right.width + padding.right,
-                        bottom: _elevationSurfaceY + border.bottom.width + padding.bottom,
-                      ),
-                      child: widget.contentBuilder(widget.targetContext, isMeasuringWidth: true),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      );
+    // print('tessssssssssssssssss11');
+    if (_decoration._id != 3 && _staticSurfaceWidth == null) {
+      print('tessssssssssss10');
+      return Stack(children: [_measuringWidthContent]);
     }
 
+    // print(_staticSurfaceWidth);
+
+    print('tessssssssssssssssss11');
+
     final layoutValues = _decoration._id != 4 ? _getLayoutValues : _getAdaptiveLayoutValues;
+
+    // print(layoutValues.surfaceMaxWidth);
 
     return Stack(
       children: [
@@ -347,23 +317,49 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     );
   }
 
-  double get _getMaxWidth {
-    if (_decoration._id == 4) {
-      return _screenSize.width - _decoration.marginX + (_elevationSurfaceX * 2);
-    }
-
-    final leftRemainder = _targetPositionX;
-    final rightRemainder = _screenSize.width - (_targetPositionX + _targetSize.width);
-    final minSide = min(leftRemainder, rightRemainder);
-
-    final maxWidth = switch (_decoration._alignment) {
-      .left => ((rightRemainder + _targetSize.width) - _decoration.marginX) + _decoration._offsetX,
-      .center => (minSide * 2 + _targetSize.width) - (_decoration.marginX * 2),
-      .right => ((leftRemainder + _targetSize.width) - _decoration.marginX) + _decoration._offsetX,
-    };
-
-    return maxWidth < _targetSize.width ? _targetSize.width : maxWidth;
+  Widget get _measuringWidthContent {
+    final decoration = widget.decoration;
+    final border = decoration.border;
+    final padding = decoration.padding;
+    return Positioned(
+      left: 0,
+      top: 0,
+      child: Opacity(
+        opacity: 1,
+        child: Material(
+          type: .transparency,
+          // color: Colors.red,
+          child: Padding(
+            padding: .only(
+              top: _elevationSurfaceY,
+              left: _elevationSurfaceX,
+              right: _elevationSurfaceX,
+              bottom: _elevationSurfaceY,
+            ),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: _maxWidth, maxHeight: 100),
+              child: SizedBox(
+                key: _contentKey,
+                width: decoration._width,
+                height: decoration.height,
+                child: Padding(
+                  padding: .only(
+                    top: border.top.width + padding.top,
+                    left: border.left.width + padding.left,
+                    right: border.right.width + padding.right,
+                    bottom: border.bottom.width + padding.bottom,
+                  ),
+                  child: widget.contentBuilder(context, isMeasuringWidth: true),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
+
+  double get _getMaxWidth => _screenSize.width - _decoration.marginX;
 
   ({
     double surfaceMaxWidth,
@@ -373,15 +369,13 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     Alignment anchorAlignment,
   })
   get _getLayoutValues {
+    final decoration = widget.decoration;
     final screenWidth = _screenSize.width;
     final targetWidth = _targetSize.width;
-    final alignment = _decoration._alignment;
-    final marginX = _decoration.marginX;
-    final offsetX = _decoration._offsetX;
-
-    double surfaceWidth = _staticOverlaySurfaceWidth != null
-        ? _staticOverlaySurfaceWidth! - (_elevationSurfaceX * 2)
-        : targetWidth;
+    final alignment = decoration._alignment;
+    final marginX = decoration.marginX;
+    final offsetX = decoration._offsetX;
+    double surfaceWidth = _staticSurfaceWidth != null ? _staticSurfaceWidth! : targetWidth;
     if (surfaceWidth < targetWidth) surfaceWidth = targetWidth;
     double leftOverhang = 0;
     double rightOverhang = 0;
@@ -417,8 +411,15 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     }
 
     final dynamicWidth = targetWidth + leftOverhang + rightOverhang;
-    final staticWidth = _decoration._width;
+    final staticWidth = decoration._width ?? decoration._widthCopy;
     final fitToTargetWidth = targetWidth;
+
+    if (dynamicWidth < (decoration._width ?? decoration._widthCopy)) {
+      _decoration = decoration._convertTo(id: 1);
+    } else {
+      _decoration = decoration;
+    }
+
     final surfaceMaxWidth = switch (_decoration._id) {
       1 => dynamicWidth,
       2 => staticWidth,
@@ -473,14 +474,17 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     final maxContentWidth = screenWidth - marginX;
 
     double surfaceWidth = targetWidth;
-    if (_staticOverlaySurfaceWidth != null) {
-      surfaceWidth = _staticOverlaySurfaceWidth! - (_elevationSurfaceX * 2);
+    if (_staticSurfaceWidth != null) {
+      surfaceWidth = _staticSurfaceWidth!;
     } else {
       surfaceWidth = maxContentWidth;
     }
 
     if (surfaceWidth > maxContentWidth) surfaceWidth = maxContentWidth;
     if (surfaceWidth < targetWidth) surfaceWidth = targetWidth;
+
+    // print(_staticSurfaceWidth);
+    // print(surfaceWidth);
 
     final leftOverhang = (surfaceWidth - targetWidth) / 2;
     final rightOverhang = surfaceWidth - targetWidth - leftOverhang;

@@ -278,6 +278,7 @@ class _MainContentState<T> extends State<_MainContent<T>> {
   bool _isLoading = false;
 
   void _setSuggestions(String keywords) {
+    print('tessssssssssssssssssss20');
     _suggestions.clear();
     if (mounted) {
       if (keywords.isNotEmpty) _isLoading = true;
@@ -296,7 +297,7 @@ class _MainContentState<T> extends State<_MainContent<T>> {
   void initState() {
     super.initState();
 
-    _debouncer = _debouncer = Debouncer(duration: widget.debouncer);
+    _debouncer = Debouncer(duration: widget.debouncer);
 
     _setSuggestions(widget.controller.text);
     _textSubscription = widget.textStream.listen((keywords) => _setSuggestions(keywords));

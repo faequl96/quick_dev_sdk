@@ -18,7 +18,8 @@ class OverlayDecoration {
     this.elevationType = .shadow,
     this.slideTransition = true,
   }) : _id = 1,
-       _width = 0;
+       _width = null,
+       _widthCopy = 0;
 
   const OverlayDecoration.staticWidth({
     this.height,
@@ -38,6 +39,7 @@ class OverlayDecoration {
     this.slideTransition = true,
   }) : _id = 2,
        _width = width > 40 ? width : 40,
+       _widthCopy = width > 40 ? width : 40,
        _maxWidth = null;
 
   const OverlayDecoration.fitToTargetWidth({
@@ -54,7 +56,8 @@ class OverlayDecoration {
     this.elevationType = .shadow,
     this.slideTransition = true,
   }) : _id = 3,
-       _width = 0,
+       _width = null,
+       _widthCopy = 0,
        _maxWidth = null,
        _offsetX = 0,
        _alignment = .center;
@@ -74,14 +77,16 @@ class OverlayDecoration {
   }) : _id = 4,
        height = null,
        maxHeight = null,
-       _width = 0,
+       _width = null,
+       _widthCopy = 0,
        _offsetX = 0,
        _alignment = .center;
 
   final int _id;
   final double? height;
   final double? maxHeight;
-  final double _width;
+  final double? _width;
+  final double _widthCopy;
   final double? _maxWidth;
   final double offsetY;
   final double _offsetX;
@@ -151,7 +156,7 @@ class OverlayDecoration {
       return .staticWidth(
         height: height ?? this.height,
         maxHeight: maxHeight ?? this.maxHeight,
-        width: width ?? _width,
+        width: width ?? _widthCopy,
         offsetY: offsetY ?? this.offsetY,
         offsetX: offsetX ?? _offsetX,
         marginY: marginY ?? this.marginY,
@@ -242,7 +247,7 @@ class OverlayDecoration {
       return .staticWidth(
         height: height ?? this.height,
         maxHeight: maxHeight ?? this.maxHeight,
-        width: width ?? _width,
+        width: width ?? _widthCopy,
         offsetY: offsetY ?? this.offsetY,
         offsetX: offsetX ?? _offsetX,
         marginY: marginY ?? this.marginY,
