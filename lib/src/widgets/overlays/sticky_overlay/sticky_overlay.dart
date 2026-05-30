@@ -142,7 +142,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
 
   Size _screenSize = const Size(0, 0);
   Size _targetSize = const Size(0, 0);
-  double _targetPositionX = 0;
+  Offset _targetPosition = const Offset(0, 0);
   double _maxHeight = 0;
   double _maxWidth = 0;
   bool _isTopOverlay = false;
@@ -162,17 +162,15 @@ class _OverlayLayerState extends State<_OverlayLayer> {
         if (widget.decoration._id != 3) {
           // await Future.delayed(const Duration(seconds: 1));
           if (mounted) _setStaticSurfaceWidth();
-          WidgetsBinding.instance.addPostFrameCallback((_) async {
-            _isInitial = false;
-            await Future<void>.delayed(const Duration(milliseconds: 500));
-            _initScrollObserver();
-          });
-        } else {
-          _initScrollObserver();
         }
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          _isInitial = false;
+          await Future<void>.delayed(const Duration(milliseconds: 500));
+          _initScrollObserver();
+        });
       });
     } else {
-      print('tesssssssssss_2');
+      // print('tesssssssssss_2');
       _scrollObserver?.removeListener(_scrollNotification);
       _scrollObserver = null;
       _changeDependeciesDebouncer.run(() {
@@ -196,9 +194,13 @@ class _OverlayLayerState extends State<_OverlayLayer> {
 
   void _scrollNotification(ScrollNotification notification) {
     _scrollingDebouncer.run(() {
+      final renderBox = widget.targetContext.findRenderObject() as RenderBox;
+      final targetPosition = renderBox.localToGlobal(.zero);
+      if (targetPosition == _targetPosition) return;
+
       _scrollObserver?.removeListener(_scrollNotification);
       _scrollObserver = null;
-      print(notification.context);
+      // print(notification.context);
       if (mounted) _set(isInitial: false);
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         await Future<void>.delayed(const Duration(milliseconds: 300));
@@ -215,8 +217,6 @@ class _OverlayLayerState extends State<_OverlayLayer> {
   }
 
   void _setStaticSurfaceWidth() {
-    // print(_contentKey?.currentContext);
-    // print(_contentKey?.currentContext?.size?.width);
     setState(() => _staticSurfaceWidth = _contentKey?.currentContext?.size?.width);
   }
 
@@ -224,7 +224,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     final renderBox = widget.targetContext.findRenderObject() as RenderBox;
     _targetSize = renderBox.size;
     final targetPosition = renderBox.localToGlobal(.zero);
-    _targetPositionX = targetPosition.dx;
+    _targetPosition = targetPosition;
     final mediaQuery = MediaQuery.of(context);
     final size = mediaQuery.size;
     _screenSize = size;
@@ -250,13 +250,15 @@ class _OverlayLayerState extends State<_OverlayLayer> {
   Widget build(BuildContext context) {
     // print('tessssssssssssssssss11');
     if (_decoration._id != 3 && _staticSurfaceWidth == null) {
-      print('tessssssssssss10');
+      // print('tessssssssssss10');
       return Stack(children: [_measuringWidthContent]);
     }
 
-    print('tessssssssssssssssss11');
+    // print('tessssssssssssssssss11');
 
     final layoutValues = _decoration._id != 4 ? _getLayoutValues : _getAdaptiveLayoutValues;
+
+    // print(layoutValues.surfaceMaxHeight);
 
     return Stack(
       children: [
@@ -364,6 +366,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     final decoration = widget.decoration;
     final screenWidth = _screenSize.width;
     final targetWidth = _targetSize.width;
+    final targetPositionX = _targetPosition.dx;
     final alignment = decoration._alignment;
     final marginX = decoration.marginX;
     final offsetX = decoration._offsetX;
@@ -385,8 +388,8 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     }
 
     // Batasi Overhang Jika Menabrak Margin Layar
-    final maxLeft = max(.0, _targetPositionX - marginX);
-    final maxRight = max(.0, (screenWidth - marginX) - (_targetPositionX + targetWidth));
+    final maxLeft = max(.0, targetPositionX - marginX);
+    final maxRight = max(.0, (screenWidth - marginX) - (targetPositionX + targetWidth));
 
     leftOverhang = min(leftOverhang, maxLeft);
     rightOverhang = min(rightOverhang, maxRight);
@@ -481,7 +484,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     final leftOverhang = (surfaceWidth - targetWidth) / 2;
     final rightOverhang = surfaceWidth - targetWidth - leftOverhang;
 
-    final surfaceLeftCoordinate = _targetPositionX - leftOverhang;
+    final surfaceLeftCoordinate = _targetPosition.dx - leftOverhang;
     final surfaceRightCoordinate = surfaceLeftCoordinate + surfaceWidth;
 
     double adaptiveShiftX = 0;
