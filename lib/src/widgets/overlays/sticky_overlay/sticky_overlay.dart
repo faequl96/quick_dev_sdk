@@ -299,7 +299,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
                     key: _contentKey,
                     child: _OverlayContent(
                       isTopOverlay: _isTopOverlay,
-                      maxHeight: _isMeasuringContentWidth ? 100 : layoutValues.surfaceMaxHeight,
+                      maxHeight: _isMeasuringContentWidth ? null : layoutValues.surfaceMaxHeight,
                       maxWidth: _isMeasuringContentWidth ? _maxWidth : null,
                       offsetY: _decoration.offsetY,
                       closeOnTapOutside: widget.closeOnTapOutside,
@@ -582,7 +582,7 @@ class _AnimationLayerState extends State<_AnimationLayer> with SingleTickerProvi
 class _OverlayContent extends StatelessWidget {
   const _OverlayContent({
     required this.isTopOverlay,
-    required this.maxHeight,
+    this.maxHeight,
     this.maxWidth,
     this.offsetY,
     required this.closeOnTapOutside,
@@ -593,7 +593,7 @@ class _OverlayContent extends StatelessWidget {
   });
 
   final bool isTopOverlay;
-  final double maxHeight;
+  final double? maxHeight;
   final double? maxWidth;
   final double? offsetY;
   final bool closeOnTapOutside;
@@ -612,7 +612,10 @@ class _OverlayContent extends StatelessWidget {
         child: TapRegion(
           onTapOutside: closeOnTapOutside ? (_) => onRemove() : null,
           child: ConstrainedBox(
-            constraints: BoxConstraints(maxHeight: maxHeight, maxWidth: maxWidth ?? .infinity),
+            constraints: BoxConstraints(
+              maxHeight: maxHeight ?? .infinity,
+              maxWidth: maxWidth ?? .infinity,
+            ),
             child: _DecoratedOverlay(
               decoration: _OverlayDecoration(
                 height: decoration.height,

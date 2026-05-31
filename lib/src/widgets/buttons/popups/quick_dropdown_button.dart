@@ -196,6 +196,8 @@ class _Dropdowns<T> extends StatelessWidget {
       shrinkWrap: true,
       itemCount: itemCount,
       itemBuilder: (context, index) {
+        if (items.isEmpty) return const SizedBox.shrink();
+
         final item = items[index];
         return Padding(
           padding: decoration.margin,

@@ -1,9 +1,7 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:quick_dev_sdk/quick_dev_sdk.dart';
 
-FutureOr<List<T>> _defaultItemsBuilder<T>({required String keywords}) => [];
+List<T> _defaultItemsBuilder<T>({required String keywords}) => [];
 
 class QuickDropdownField<T> extends StatefulWidget {
   const QuickDropdownField({
@@ -76,7 +74,7 @@ class QuickDropdownField<T> extends StatefulWidget {
     this.disabled = false,
     required this.value,
     required this.fieldValueBuilder,
-    required FutureOr<List<T>> Function({required String keywords}) items,
+    required List<T> Function({required String keywords}) items,
     required this.itemBuilder,
     this._searchFieldHeight = 40,
     this._searchFieldTextStyle = const TextStyle(fontSize: 14),
@@ -112,7 +110,7 @@ class QuickDropdownField<T> extends StatefulWidget {
   final T value;
   final String Function(T value) fieldValueBuilder;
   final List<T> _items;
-  final FutureOr<List<T>> Function({required String keywords}) _itemsBuilder;
+  final List<T> Function({required String keywords}) _itemsBuilder;
   final Widget Function(BuildContext context, T value) itemBuilder;
   final double _searchFieldHeight;
   final TextStyle _searchFieldTextStyle;
@@ -163,7 +161,6 @@ class _QuickDropdownFieldState<T> extends State<QuickDropdownField<T>> {
           context,
           decoration: widget.overlaydecoration.copyWith(padding: .zero),
           contentBuilder: (_, {isMeasuringWidth}) {
-            // print('tesssssssssss8');
             if (widget._withItemsSearch) {
               return _DropdownItemsSearch<T>(
                 onSelected: widget.onSelected,
@@ -246,13 +243,14 @@ class _Dropdowns<T> extends StatefulWidget {
 }
 
 class _DropdownsState<T> extends State<_Dropdowns<T>> {
-  ScrollController? _controller;
-  final _itemHeightKey = GlobalKey();
-  final _scrollKey = GlobalKey();
+  late final ScrollController _controller;
+  final _selectedScrollOffsetKey = GlobalKey();
+  final _selectedItemKey = GlobalKey();
 
   bool _isInitial = true;
 
-  double _itemHeight = 40;
+  int? _selectedIndex;
+  double _selectedScrollOffset = 0;
 
   @override
   void initState() {
@@ -260,68 +258,57 @@ class _DropdownsState<T> extends State<_Dropdowns<T>> {
 
     _controller = ScrollController();
 
-    print('tesssssssssssss5');
+    _selectedIndex = widget.items.indexOf(widget.value as T);
+    if ((_selectedIndex ?? 0) < 0) _selectedIndex = null;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_itemHeightKey.currentContext != null) {
-        _itemHeight = _itemHeightKey.currentContext!.size?.height ?? 40;
+      if (_selectedScrollOffsetKey.currentContext != null) {
+        final listViewHeight = _selectedScrollOffsetKey.currentContext!.size?.height ?? 0;
+        _selectedScrollOffset = _selectedIndex == null
+            ? 0
+            : listViewHeight - widget.overlayPadding.top;
       }
     });
-
-    if (_isInitial && widget.isMeasuringWidth != true) {
-      print('tessssssssss1');
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (_scrollKey.currentContext != null) {
-          print('tesssssssss1.2');
-          final itemHeight = _scrollKey.currentContext!.size?.height ?? 40;
-          final selectedIndex = widget.items.indexOf(widget.value as T);
-          print(selectedIndex);
-          _controller?.jumpTo(selectedIndex * itemHeight);
-
-          Scrollable.ensureVisible(_scrollKey.currentContext!, alignment: .2);
-          _isInitial = false;
-        }
-      });
-    }
   }
 
   @override
   void didUpdateWidget(covariant _Dropdowns<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // print(widget.value);
-    _isInitial = false;
 
-    if (_isInitial && widget.items.contains(widget.value) && widget.isMeasuringWidth != true) {
-      print('tessssssssss2');
-
-      print('tessssssssss2.1');
-      final selectedIndex = widget.items.indexOf(widget.value as T);
-      print(selectedIndex);
-      _controller?.jumpTo(selectedIndex * _itemHeight);
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (_scrollKey.currentContext != null) {
-          print('tessssssssss2.2');
-
-          Scrollable.ensureVisible(_scrollKey.currentContext!, alignment: .2);
-        }
-      });
-    }
+    if (_isInitial) _autoScrollToSelectedItem();
   }
 
   @override
   void dispose() {
-    _controller?.dispose();
+    _controller.dispose();
 
     super.dispose();
   }
 
+  void _autoScrollToSelectedItem() async {
+    await _controller.animateTo(
+      _selectedScrollOffset,
+      duration: const Duration(milliseconds: 10),
+      curve: Curves.ease,
+    );
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_selectedItemKey.currentContext != null) {
+        Scrollable.ensureVisible(_selectedItemKey.currentContext!, alignment: .2);
+      }
+
+      _isInitial = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final itemCount = widget.isMeasuringWidth == true ? 1 : widget.items.length;
+    final itemCount = widget.isMeasuringWidth == true ? (_selectedIndex ?? 0) : widget.items.length;
 
     return ListView.builder(
-      // controller: _controller,
-      scrollCacheExtent: const .pixels(200),
+      key: _selectedScrollOffsetKey,
+      controller: _controller,
+      scrollCacheExtent: widget.isMeasuringWidth == true ? const .pixels(5000) : const .pixels(200),
       padding: widget.overlayPadding,
       shrinkWrap: true,
       itemCount: itemCount,
@@ -329,28 +316,25 @@ class _DropdownsState<T> extends State<_Dropdowns<T>> {
         if (widget.items.isEmpty) return const SizedBox.shrink();
 
         final item = widget.items[index];
-        return SizedBox(
-          // key: index == 0 ? _itemHeightKey : null,
-          child: Padding(
-            // key: item == widget.value ? _scrollKey : null,
-            padding: widget.decoration.margin,
-            child: QuickButton(
-              onTap: () {
-                widget.closeOverlay();
-                widget.onSelected(item);
-              },
-              style: .lite(
-                padding: widget.decoration.padding,
-                borderRadius: .circular(widget.decoration.borderRadius),
-                color: item == widget.value
-                    ? widget.decoration.selectedColor
-                    : widget.decoration.color,
-                hoveredColor: widget.decoration.hoveredColor,
-                hoverDuration: const Duration(milliseconds: 100),
-                elevation: 0,
-              ),
-              child: widget.itemBuilder(context, item),
+        return Padding(
+          key: _selectedIndex == index ? _selectedItemKey : null,
+          padding: widget.decoration.margin,
+          child: QuickButton(
+            onTap: () {
+              widget.closeOverlay();
+              widget.onSelected(item);
+            },
+            style: .lite(
+              padding: widget.decoration.padding,
+              borderRadius: .circular(widget.decoration.borderRadius),
+              color: item == widget.value
+                  ? widget.decoration.selectedColor
+                  : widget.decoration.color,
+              hoveredColor: widget.decoration.hoveredColor,
+              hoverDuration: const Duration(milliseconds: 100),
+              elevation: 0,
             ),
+            child: widget.itemBuilder(context, item),
           ),
         );
       },
@@ -378,7 +362,7 @@ class _DropdownItemsSearch<T> extends StatefulWidget {
   final EdgeInsets overlayPadding;
   final DropdownItemDecoration decoration;
   final T? value;
-  final FutureOr<List<T>> Function({required String keywords}) items;
+  final List<T> Function({required String keywords}) items;
   final Widget Function(BuildContext context, T value) itemBuilder;
   final double searchFieldHeight;
   final TextStyle searchFieldTextStyle;
@@ -395,15 +379,13 @@ class _DropdownItemsSearchState<T> extends State<_DropdownItemsSearch<T>> {
   List<T> _filteredItems = [];
 
   void _onChangeKeywords(String keywords) async {
-    _filteredItems = await widget.items(keywords: keywords);
+    _filteredItems = widget.items(keywords: keywords);
     if (mounted) setState(() {});
   }
 
   @override
   void initState() {
     super.initState();
-
-    print('tesssssssssssssss20');
 
     _onChangeKeywords(_textEditingController.text);
   }
