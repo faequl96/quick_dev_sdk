@@ -155,7 +155,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     if (_isInitial) {
       _contentKey = GlobalKey();
       _decoration = widget.decoration;
-      _set();
+      _setInitialLayoutValues();
       _scrollObserver?.removeListener(_scrollNotification);
       _scrollObserver = null;
       WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -172,7 +172,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
       _scrollObserver?.removeListener(_scrollNotification);
       _scrollObserver = null;
       _changeDependeciesDebouncer.run(() {
-        _set(isInitial: false);
+        _setInitialLayoutValues();
         WidgetsBinding.instance.addPostFrameCallback((_) async {
           await Future<void>.delayed(const Duration(milliseconds: 300));
           _initScrollObserver();
@@ -198,7 +198,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
 
       _scrollObserver?.removeListener(_scrollNotification);
       _scrollObserver = null;
-      if (mounted) _set(isInitial: false);
+      if (mounted) _setInitialLayoutValues();
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         await Future<void>.delayed(const Duration(milliseconds: 300));
         _initScrollObserver();
@@ -217,7 +217,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     setState(() => _staticSurfaceWidth = _contentKey?.currentContext?.size?.width);
   }
 
-  void _set({bool isInitial = true}) {
+  void _setInitialLayoutValues() {
     final renderBox = widget.targetContext.findRenderObject() as RenderBox;
     _targetSize = renderBox.size;
     final targetPosition = renderBox.localToGlobal(.zero);
@@ -233,14 +233,16 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     final paddingTop = mediaQuery.padding.top;
     final topMaxHeight =
         (targetPosition.dy - _decoration.offsetY) - (_decoration.marginY + paddingTop);
-
     _maxHeight = _isTopOverlay ? topMaxHeight : bottomMaxHeight;
+
+    if (!_isInitial && mounted) {
+      setState(() {});
+      return;
+    }
 
     final decorationMaxWidth = widget.decoration._maxWidth;
     final maxWidth = _getMaxWidth;
     _maxWidth = min(maxWidth, decorationMaxWidth ?? maxWidth);
-
-    if (!isInitial && mounted) setState(() {});
   }
 
   @override
