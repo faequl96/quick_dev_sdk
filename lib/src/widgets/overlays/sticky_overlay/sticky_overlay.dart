@@ -152,7 +152,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     super.didChangeDependencies();
 
     if (_isInitial) {
-      print('tesssssssssss_1');
+      // print('tesssssssssss_1');
       _decoration = widget.decoration;
       _set();
       _scrollObserver?.removeListener(_scrollNotification);
@@ -319,7 +319,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
       left: 0,
       top: 0,
       child: Opacity(
-        opacity: 1,
+        opacity: 0,
         child: Material(
           type: .transparency,
           // color: Colors.red,

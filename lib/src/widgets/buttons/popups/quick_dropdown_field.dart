@@ -250,7 +250,7 @@ class _DropdownsState<T> extends State<_Dropdowns<T>> {
   final _itemHeightKey = GlobalKey();
   final _scrollKey = GlobalKey();
 
-  final bool _isInitial = true;
+  bool _isInitial = true;
 
   double _itemHeight = 40;
 
@@ -260,51 +260,53 @@ class _DropdownsState<T> extends State<_Dropdowns<T>> {
 
     _controller = ScrollController();
 
+    print('tesssssssssssss5');
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_itemHeightKey.currentContext != null) {
         _itemHeight = _itemHeightKey.currentContext!.size?.height ?? 40;
       }
     });
 
-    // if (_isInitial && widget.isMeasuringWidth != true) {
-    //   print('tessssssssss1');
-    //   WidgetsBinding.instance.addPostFrameCallback((_) {
-    //     if (_scrollKey.currentContext != null) {
-    //       print('tesssssssss1.2');
-    //       final itemHeight = _scrollKey.currentContext!.size?.height ?? 40;
-    //       final selectedIndex = widget.items.indexOf(widget.value as T);
-    //       print(selectedIndex);
-    //       _controller?.jumpTo(selectedIndex * itemHeight);
+    if (_isInitial && widget.isMeasuringWidth != true) {
+      print('tessssssssss1');
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_scrollKey.currentContext != null) {
+          print('tesssssssss1.2');
+          final itemHeight = _scrollKey.currentContext!.size?.height ?? 40;
+          final selectedIndex = widget.items.indexOf(widget.value as T);
+          print(selectedIndex);
+          _controller?.jumpTo(selectedIndex * itemHeight);
 
-    //       Scrollable.ensureVisible(_scrollKey.currentContext!, alignment: .2);
-    //       _isInitial = false;
-    //     }
-    //   });
-    // }
+          Scrollable.ensureVisible(_scrollKey.currentContext!, alignment: .2);
+          _isInitial = false;
+        }
+      });
+    }
   }
 
-  // @override
-  // void didUpdateWidget(covariant _Dropdowns<T> oldWidget) {
-  //   super.didUpdateWidget(oldWidget);
-  //   print(widget.value);
-  //   _isInitial = false;
+  @override
+  void didUpdateWidget(covariant _Dropdowns<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // print(widget.value);
+    _isInitial = false;
 
-  //   if (_isInitial && widget.items.contains(widget.value) && widget.isMeasuringWidth != true) {
-  //     print('tessssssssss2');
+    if (_isInitial && widget.items.contains(widget.value) && widget.isMeasuringWidth != true) {
+      print('tessssssssss2');
 
-  //     print('tessssssssss2.1');
-  //     final selectedIndex = widget.items.indexOf(widget.value as T);
-  //     print(selectedIndex);
-  //     _controller?.jumpTo(selectedIndex * _itemHeight);
-  //     WidgetsBinding.instance.addPostFrameCallback((_) {
-  //       if (_scrollKey.currentContext != null) {
-  //         print('tessssssssss2.2');
+      print('tessssssssss2.1');
+      final selectedIndex = widget.items.indexOf(widget.value as T);
+      print(selectedIndex);
+      _controller?.jumpTo(selectedIndex * _itemHeight);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_scrollKey.currentContext != null) {
+          print('tessssssssss2.2');
 
-  //         Scrollable.ensureVisible(_scrollKey.currentContext!, alignment: .2);
-  //       }
-  //     });
-  //   }
-  // }
+          Scrollable.ensureVisible(_scrollKey.currentContext!, alignment: .2);
+        }
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -390,14 +392,10 @@ class _DropdownItemsSearch<T> extends StatefulWidget {
 class _DropdownItemsSearchState<T> extends State<_DropdownItemsSearch<T>> {
   final _textEditingController = TextEditingController();
 
-  bool _isInitial = true;
-
   List<T> _filteredItems = [];
 
   void _onChangeKeywords(String keywords) async {
     _filteredItems = await widget.items(keywords: keywords);
-    // print('tessssssssssss10');
-    if (_isInitial) _isInitial = false;
     if (mounted) setState(() {});
   }
 
@@ -405,7 +403,7 @@ class _DropdownItemsSearchState<T> extends State<_DropdownItemsSearch<T>> {
   void initState() {
     super.initState();
 
-    // print('tesssssssssssss9');
+    print('tesssssssssssssss20');
 
     _onChangeKeywords(_textEditingController.text);
   }
@@ -445,7 +443,6 @@ class _DropdownItemsSearchState<T> extends State<_DropdownItemsSearch<T>> {
             onChanged: _onChangeKeywords,
           ),
         ),
-        // if (!_isInitial)
         Flexible(
           child: _Dropdowns<T>(
             onSelected: widget.onSelected,
