@@ -42,7 +42,7 @@ class StickyOverlay {
       slideTransition: true,
     ),
     void Function(bool value)? onHoverInside,
-    required Widget Function(BuildContext context, {bool? isMeasuringWidth}) contentBuilder,
+    required Widget Function(BuildContext context, {bool? measuringContentWidth}) contentBuilder,
     void Function()? onDispose,
   }) {
     _remove();
@@ -118,7 +118,7 @@ class _OverlayLayer extends StatefulWidget {
   final OverlayDecoration decoration;
   final void Function(bool value)? onHoverInside;
   final void Function() onRemove;
-  final Widget Function(BuildContext context, {bool? isMeasuringWidth}) contentBuilder;
+  final Widget Function(BuildContext context, {bool? measuringContentWidth}) contentBuilder;
 
   @override
   State<_OverlayLayer> createState() => _OverlayLayerState();
@@ -126,7 +126,7 @@ class _OverlayLayer extends StatefulWidget {
 
 class _OverlayLayerState extends State<_OverlayLayer> {
   bool _isInitial = true;
-  bool _isMeasuringContentWidth = true;
+  bool _measuringContentWidth = true;
 
   final _changeDependeciesDebouncer = Debouncer(duration: const Duration(milliseconds: 150));
   final _scrollingDebouncer = Debouncer(duration: const Duration(milliseconds: 150));
@@ -160,7 +160,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
       _scrollObserver = null;
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         // await Future.delayed(const Duration(seconds: 1));
-        _isMeasuringContentWidth = false;
+        _measuringContentWidth = false;
         if (mounted) _setStaticSurfaceWidth();
         WidgetsBinding.instance.addPostFrameCallback((_) async {
           _isInitial = false;
@@ -247,7 +247,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
 
   @override
   Widget build(BuildContext context) {
-    final layoutValues = _isMeasuringContentWidth
+    final layoutValues = _measuringContentWidth
         ? _getMeasuringLayoutValues
         : _decoration._id != 4
         ? _getLayoutValues
@@ -271,9 +271,9 @@ class _OverlayLayerState extends State<_OverlayLayer> {
             ),
           ),
         Positioned(
-          left: _isMeasuringContentWidth ? 0 : null,
-          top: _isMeasuringContentWidth ? 0 : null,
-          width: _isMeasuringContentWidth
+          left: _measuringContentWidth ? 0 : null,
+          top: _measuringContentWidth ? 0 : null,
+          width: _measuringContentWidth
               ? null
               : layoutValues.surfaceMaxWidth + (_elevationSurfaceX * 2),
           child: CompositedTransformFollower(
@@ -283,7 +283,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
             targetAnchor: layoutValues.anchorAlignment,
             followerAnchor: layoutValues.anchorAlignment,
             child: Opacity(
-              opacity: _isMeasuringContentWidth ? 0 : 1,
+              opacity: _measuringContentWidth ? 0 : 1,
               // opacity: 1,
               child: Material(
                 type: .transparency,
@@ -292,7 +292,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
                   isTopOverlay: _isTopOverlay,
                   elevationSurfaceY: _elevationSurfaceY,
                   elevationSurfaceX: _elevationSurfaceX,
-                  slideTransition: _isMeasuringContentWidth
+                  slideTransition: _measuringContentWidth
                       ? false
                       : _isInitial
                       ? _decoration.slideTransition
@@ -301,8 +301,8 @@ class _OverlayLayerState extends State<_OverlayLayer> {
                     key: _contentKey,
                     child: _OverlayContent(
                       isTopOverlay: _isTopOverlay,
-                      maxHeight: _isMeasuringContentWidth ? null : layoutValues.surfaceMaxHeight,
-                      maxWidth: _isMeasuringContentWidth ? _maxWidth : null,
+                      maxHeight: _measuringContentWidth ? null : layoutValues.surfaceMaxHeight,
+                      maxWidth: _measuringContentWidth ? _maxWidth : null,
                       offsetY: _decoration.offsetY,
                       closeOnTapOutside: widget.closeOnTapOutside,
                       decoration: _decoration,
@@ -310,7 +310,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
                       onHoverInside: widget.onHoverInside,
                       child: widget.contentBuilder(
                         context,
-                        isMeasuringWidth: _isMeasuringContentWidth,
+                        measuringContentWidth: _measuringContentWidth,
                       ),
                     ),
                   ),

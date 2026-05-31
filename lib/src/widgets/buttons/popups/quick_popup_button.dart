@@ -43,7 +43,7 @@ class QuickPopupButton extends StatelessWidget {
   final Widget Function(
     BuildContext context, {
     void Function()? closeOverlay,
-    bool? isMeasuringWidth,
+    bool? measuringContentWidth,
   })
   contentBuilder;
   final Widget Function(BuildContext context, bool value)? onHoverChildBuilder;
@@ -53,7 +53,7 @@ class QuickPopupButton extends StatelessWidget {
     BuildContext context,
     void Function(
       BuildContext, {
-      required Widget Function(BuildContext, {bool? isMeasuringWidth}) contentBuilder,
+      required Widget Function(BuildContext, {bool? measuringContentWidth}) contentBuilder,
       required OverlayDecoration decoration,
     })
     showOverlay,
@@ -61,10 +61,10 @@ class QuickPopupButton extends StatelessWidget {
   ) => showOverlay(
     context,
     decoration: overlaydecoration,
-    contentBuilder: (context, {isMeasuringWidth}) {
+    contentBuilder: (context, {measuringContentWidth}) {
       return contentBuilder(
         context,
-        isMeasuringWidth: isMeasuringWidth,
+        measuringContentWidth: measuringContentWidth,
         closeOverlay: closeOverlay,
       );
     },

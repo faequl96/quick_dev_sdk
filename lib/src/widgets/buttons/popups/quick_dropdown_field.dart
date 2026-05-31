@@ -160,11 +160,11 @@ class _QuickDropdownFieldState<T> extends State<QuickDropdownField<T>> {
         showOverlay(
           context,
           decoration: widget.overlaydecoration.copyWith(padding: .zero),
-          contentBuilder: (_, {isMeasuringWidth}) {
+          contentBuilder: (_, {measuringContentWidth}) {
             if (widget._withItemsSearch) {
               return _DropdownItemsSearch<T>(
                 onSelected: widget.onSelected,
-                isMeasuringWidth: isMeasuringWidth,
+                measuringContentWidth: measuringContentWidth,
                 overlayPadding: widget.overlaydecoration.padding,
                 decoration: widget.itemDecoration,
                 value: widget.value,
@@ -179,7 +179,7 @@ class _QuickDropdownFieldState<T> extends State<QuickDropdownField<T>> {
 
             return _Dropdowns<T>(
               onSelected: widget.onSelected,
-              isMeasuringWidth: isMeasuringWidth,
+              measuringContentWidth: measuringContentWidth,
               overlayPadding: widget.overlaydecoration.padding,
               decoration: widget.itemDecoration,
               value: widget.value,
@@ -220,7 +220,7 @@ class _QuickDropdownFieldState<T> extends State<QuickDropdownField<T>> {
 class _Dropdowns<T> extends StatefulWidget {
   const _Dropdowns({
     required this.onSelected,
-    this.isMeasuringWidth,
+    this.measuringContentWidth,
     required this.overlayPadding,
     required this.decoration,
     this.value,
@@ -230,7 +230,7 @@ class _Dropdowns<T> extends StatefulWidget {
   });
 
   final void Function(T value) onSelected;
-  final bool? isMeasuringWidth;
+  final bool? measuringContentWidth;
   final EdgeInsets overlayPadding;
   final DropdownItemDecoration decoration;
   final T? value;
@@ -275,7 +275,7 @@ class _DropdownsState<T> extends State<_Dropdowns<T>> {
   void didUpdateWidget(covariant _Dropdowns<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (_isInitial) _autoScrollToSelectedItem();
+    if (_isInitial && _selectedIndex != null) _autoScrollToSelectedItem();
   }
 
   @override
@@ -299,41 +299,54 @@ class _DropdownsState<T> extends State<_Dropdowns<T>> {
 
   @override
   Widget build(BuildContext context) {
-    final itemCount = widget.isMeasuringWidth == true ? (_selectedIndex ?? 0) : widget.items.length;
+    final itemCount = widget.measuringContentWidth == true && _selectedIndex != null
+        ? (_selectedIndex ?? 0)
+        : widget.measuringContentWidth == true
+        ? 1
+        : widget.items.length;
 
-    return ListView.builder(
-      key: _selectedScrollOffsetKey,
-      controller: _controller,
-      scrollCacheExtent: widget.isMeasuringWidth == true ? const .pixels(5000) : const .pixels(200),
-      padding: widget.overlayPadding,
-      shrinkWrap: true,
-      itemCount: itemCount,
-      itemBuilder: (context, index) {
-        if (widget.items.isEmpty) return const SizedBox.shrink();
+    return SizedBox(
+      height: widget.measuringContentWidth == true && _selectedIndex != null
+          ? null
+          : widget.measuringContentWidth == true
+          ? 50
+          : null,
+      child: ListView.builder(
+        key: _selectedScrollOffsetKey,
+        controller: _controller,
+        scrollCacheExtent: widget.measuringContentWidth == true && _selectedIndex != null
+            ? const .pixels(5000)
+            : const .pixels(200),
+        padding: widget.overlayPadding,
+        shrinkWrap: true,
+        itemCount: itemCount,
+        itemBuilder: (context, index) {
+          if (widget.items.isEmpty) return const SizedBox.shrink();
 
-        final item = widget.items[index];
-        return Padding(
-          key: _selectedIndex == index ? _selectedItemKey : null,
-          padding: widget.decoration.margin,
-          child: QuickButton(
-            onTap: () {
-              widget.closeOverlay();
-              widget.onSelected(item);
-            },
-            style: .lite(
-              padding: widget.decoration.padding,
-              borderRadius: .circular(widget.decoration.borderRadius),
-              color: item == widget.value
-                  ? widget.decoration.selectedColor
-                  : widget.decoration.color,
-              hoveredColor: widget.decoration.hoveredColor,
-              hoverDuration: const Duration(milliseconds: 100),
-              elevation: 0,
+          final item = widget.items[index];
+          return Padding(
+            key: _selectedIndex == index ? _selectedItemKey : null,
+            padding: widget.decoration.margin,
+            child: QuickButton(
+              onTap: () {
+                widget.closeOverlay();
+                widget.onSelected(item);
+              },
+              style: .lite(
+                padding: widget.decoration.padding,
+                borderRadius: .circular(widget.decoration.borderRadius),
+                color: item == widget.value
+                    ? widget.decoration.selectedColor
+                    : widget.decoration.color,
+                hoveredColor: widget.decoration.hoveredColor,
+                hoverDuration: const Duration(milliseconds: 100),
+                elevation: 0,
+              ),
+              child: widget.itemBuilder(context, item),
             ),
-            child: widget.itemBuilder(context, item),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }
@@ -341,7 +354,7 @@ class _DropdownsState<T> extends State<_Dropdowns<T>> {
 class _DropdownItemsSearch<T> extends StatefulWidget {
   const _DropdownItemsSearch({
     required this.onSelected,
-    this.isMeasuringWidth,
+    this.measuringContentWidth,
     required this.overlayPadding,
     required this.decoration,
     this.value,
@@ -354,7 +367,7 @@ class _DropdownItemsSearch<T> extends StatefulWidget {
   });
 
   final void Function(T value) onSelected;
-  final bool? isMeasuringWidth;
+  final bool? measuringContentWidth;
   final EdgeInsets overlayPadding;
   final DropdownItemDecoration decoration;
   final T? value;
@@ -424,7 +437,7 @@ class _DropdownItemsSearchState<T> extends State<_DropdownItemsSearch<T>> {
         Flexible(
           child: _Dropdowns<T>(
             onSelected: widget.onSelected,
-            isMeasuringWidth: widget.isMeasuringWidth,
+            measuringContentWidth: widget.measuringContentWidth,
             overlayPadding: widget.overlayPadding,
             decoration: widget.decoration,
             value: widget.value,

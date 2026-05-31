@@ -172,7 +172,7 @@ class _QuickSuggestionFieldState<T> extends State<QuickSuggestionField<T>> {
           closeOnTapOutside: false,
           closeOnTapTarget: false,
           decoration: widget.decoration.copyWith(padding: .zero),
-          contentBuilder: (_, {isMeasuringWidth}) {
+          contentBuilder: (_, {measuringContentWidth}) {
             return Listener(
               onPointerDown: (_) {
                 _isOverlayUseInteraction = true;
