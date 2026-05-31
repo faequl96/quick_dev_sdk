@@ -286,11 +286,7 @@ class _DropdownsState<T> extends State<_Dropdowns<T>> {
   }
 
   void _autoScrollToSelectedItem() async {
-    await _controller.animateTo(
-      _selectedScrollOffset,
-      duration: const Duration(milliseconds: 10),
-      curve: Curves.ease,
-    );
+    _controller.jumpTo(_selectedScrollOffset - 50);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_selectedItemKey.currentContext != null) {
