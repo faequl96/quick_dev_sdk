@@ -1,9 +1,7 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:quick_dev_sdk/quick_dev_sdk.dart';
 
-FutureOr<List<T>> _defaultItemsBuilder<T>({required String keywords}) => [];
+List<T> _defaultItemsBuilder<T>({required String keywords}) => [];
 
 class QuickDropdownButton<T> extends StatelessWidget {
   const QuickDropdownButton({
@@ -81,7 +79,7 @@ class QuickDropdownButton<T> extends StatelessWidget {
     ),
     this.disabled = false,
     required this.value,
-    required FutureOr<List<T>> Function({required String keywords}) items,
+    required List<T> Function({required String keywords}) items,
     required this.itemBuilder,
     required this.selectedValueBuilder,
     this._searchFieldHeight = 40,
@@ -113,7 +111,7 @@ class QuickDropdownButton<T> extends StatelessWidget {
   final bool disabled;
   final T? value;
   final List<T> _items;
-  final FutureOr<List<T>> Function({required String keywords}) _itemsBuilder;
+  final List<T> Function({required String keywords}) _itemsBuilder;
   final Widget Function(BuildContext context, T value) itemBuilder;
   final Widget? Function(BuildContext context, T? value) selectedValueBuilder;
   final double _searchFieldHeight;
@@ -165,7 +163,7 @@ class QuickDropdownButton<T> extends StatelessWidget {
   }
 }
 
-class _Dropdowns<T> extends StatelessWidget {
+class _Dropdowns<T> extends StatefulWidget {
   const _Dropdowns({
     required this.onSelected,
     this.isMeasuringWidth,
@@ -187,34 +185,102 @@ class _Dropdowns<T> extends StatelessWidget {
   final void Function() closeOverlay;
 
   @override
+  State<_Dropdowns<T>> createState() => _DropdownsState<T>();
+}
+
+class _DropdownsState<T> extends State<_Dropdowns<T>> {
+  late final ScrollController _controller;
+  final _selectedScrollOffsetKey = GlobalKey();
+  final _selectedItemKey = GlobalKey();
+
+  bool _isInitial = true;
+
+  int? _selectedIndex;
+  double _selectedScrollOffset = 0;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = ScrollController();
+
+    _selectedIndex = widget.items.indexOf(widget.value as T);
+    if ((_selectedIndex ?? 0) < 0) _selectedIndex = null;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_selectedScrollOffsetKey.currentContext != null) {
+        final listViewHeight = _selectedScrollOffsetKey.currentContext!.size?.height ?? 0;
+        _selectedScrollOffset = _selectedIndex == null
+            ? 0
+            : listViewHeight - widget.overlayPadding.top;
+      }
+    });
+  }
+
+  @override
+  void didUpdateWidget(covariant _Dropdowns<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (_isInitial) _autoScrollToSelectedItem();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+
+    super.dispose();
+  }
+
+  void _autoScrollToSelectedItem() async {
+    await _controller.animateTo(
+      _selectedScrollOffset,
+      duration: const Duration(milliseconds: 10),
+      curve: Curves.ease,
+    );
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_selectedItemKey.currentContext != null) {
+        Scrollable.ensureVisible(_selectedItemKey.currentContext!, alignment: .2);
+      }
+
+      _isInitial = false;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final itemCount = isMeasuringWidth == true ? 1 : items.length;
+    final itemCount = widget.isMeasuringWidth == true ? (_selectedIndex ?? 0) : widget.items.length;
 
     return ListView.builder(
-      scrollCacheExtent: const .pixels(2),
-      padding: overlayPadding,
+      key: _selectedScrollOffsetKey,
+      controller: _controller,
+      scrollCacheExtent: widget.isMeasuringWidth == true ? const .pixels(5000) : const .pixels(200),
+      padding: widget.overlayPadding,
       shrinkWrap: true,
       itemCount: itemCount,
       itemBuilder: (context, index) {
-        if (items.isEmpty) return const SizedBox.shrink();
+        if (widget.items.isEmpty) return const SizedBox.shrink();
 
-        final item = items[index];
+        final item = widget.items[index];
         return Padding(
-          padding: decoration.margin,
+          key: _selectedIndex == index ? _selectedItemKey : null,
+          padding: widget.decoration.margin,
           child: QuickButton(
             onTap: () {
-              closeOverlay();
-              onSelected(item);
+              widget.closeOverlay();
+              widget.onSelected(item);
             },
             style: .lite(
-              padding: decoration.padding,
-              borderRadius: .circular(decoration.borderRadius),
-              color: item == value ? decoration.selectedColor : decoration.color,
-              hoveredColor: decoration.hoveredColor,
+              padding: widget.decoration.padding,
+              borderRadius: .circular(widget.decoration.borderRadius),
+              color: item == widget.value
+                  ? widget.decoration.selectedColor
+                  : widget.decoration.color,
+              hoveredColor: widget.decoration.hoveredColor,
               hoverDuration: const Duration(milliseconds: 100),
               elevation: 0,
             ),
-            child: itemBuilder(context, item),
+            child: widget.itemBuilder(context, item),
           ),
         );
       },
@@ -242,7 +308,7 @@ class _DropdownItemsSearch<T> extends StatefulWidget {
   final EdgeInsets overlayPadding;
   final DropdownItemDecoration decoration;
   final T? value;
-  final FutureOr<List<T>> Function({required String keywords}) items;
+  final List<T> Function({required String keywords}) items;
   final Widget Function(BuildContext context, T value) itemBuilder;
   final double searchFieldHeight;
   final TextStyle searchFieldTextStyle;
@@ -259,7 +325,7 @@ class _DropdownItemsSearchState<T> extends State<_DropdownItemsSearch<T>> {
   List<T> _filteredItems = [];
 
   void _onChangeKeywords(String keywords) async {
-    _filteredItems = await widget.items(keywords: keywords);
+    _filteredItems = widget.items(keywords: keywords);
     if (mounted) setState(() {});
   }
 
