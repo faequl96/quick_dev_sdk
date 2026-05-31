@@ -126,6 +126,7 @@ class _OverlayLayer extends StatefulWidget {
 
 class _OverlayLayerState extends State<_OverlayLayer> {
   bool _isInitial = true;
+  bool _isMeasuringContentWidth = true;
 
   final _changeDependeciesDebouncer = Debouncer(duration: const Duration(milliseconds: 150));
   final _scrollingDebouncer = Debouncer(duration: const Duration(milliseconds: 150));
@@ -152,17 +153,15 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     super.didChangeDependencies();
 
     if (_isInitial) {
-      // print('tesssssssssss_1');
+      _contentKey = GlobalKey();
       _decoration = widget.decoration;
       _set();
       _scrollObserver?.removeListener(_scrollNotification);
       _scrollObserver = null;
-      if (widget.decoration._id != 3) _contentKey = GlobalKey();
       WidgetsBinding.instance.addPostFrameCallback((_) async {
-        if (widget.decoration._id != 3) {
-          // await Future.delayed(const Duration(seconds: 1));
-          if (mounted) _setStaticSurfaceWidth();
-        }
+        // await Future.delayed(const Duration(seconds: 1));
+        _isMeasuringContentWidth = false;
+        if (mounted) _setStaticSurfaceWidth();
         WidgetsBinding.instance.addPostFrameCallback((_) async {
           _isInitial = false;
           await Future<void>.delayed(const Duration(milliseconds: 500));
@@ -170,7 +169,6 @@ class _OverlayLayerState extends State<_OverlayLayer> {
         });
       });
     } else {
-      // print('tesssssssssss_2');
       _scrollObserver?.removeListener(_scrollNotification);
       _scrollObserver = null;
       _changeDependeciesDebouncer.run(() {
@@ -200,7 +198,6 @@ class _OverlayLayerState extends State<_OverlayLayer> {
 
       _scrollObserver?.removeListener(_scrollNotification);
       _scrollObserver = null;
-      // print(notification.context);
       if (mounted) _set(isInitial: false);
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         await Future<void>.delayed(const Duration(milliseconds: 300));
@@ -248,17 +245,11 @@ class _OverlayLayerState extends State<_OverlayLayer> {
 
   @override
   Widget build(BuildContext context) {
-    // print('tessssssssssssssssss11');
-    if (_decoration._id != 3 && _staticSurfaceWidth == null) {
-      // print('tessssssssssss10');
-      return Stack(children: [_measuringWidthContent]);
-    }
-
-    // print('tessssssssssssssssss11');
-
-    final layoutValues = _decoration._id != 4 ? _getLayoutValues : _getAdaptiveLayoutValues;
-
-    // print(layoutValues.surfaceMaxHeight);
+    final layoutValues = _isMeasuringContentWidth
+        ? _getMeasuringLayoutValues
+        : _decoration._id != 4
+        ? _getLayoutValues
+        : _getAdaptiveLayoutValues;
 
     return Stack(
       children: [
@@ -278,30 +269,49 @@ class _OverlayLayerState extends State<_OverlayLayer> {
             ),
           ),
         Positioned(
-          width: layoutValues.surfaceMaxWidth + (_elevationSurfaceX * 2),
+          left: _isMeasuringContentWidth ? 0 : null,
+          top: _isMeasuringContentWidth ? 0 : null,
+          width: _isMeasuringContentWidth
+              ? null
+              : layoutValues.surfaceMaxWidth + (_elevationSurfaceX * 2),
           child: CompositedTransformFollower(
             link: widget.link,
             showWhenUnlinked: false,
             offset: Offset(layoutValues.alignmentOffsetX, layoutValues.alignmentOffsetY),
             targetAnchor: layoutValues.anchorAlignment,
             followerAnchor: layoutValues.anchorAlignment,
-            child: Material(
-              type: .transparency,
-              // color: Colors.amber.withValues(alpha: .5),
-              child: _AnimationLayer(
-                isTopOverlay: _isTopOverlay,
-                elevationSurfaceY: _elevationSurfaceY,
-                elevationSurfaceX: _elevationSurfaceX,
-                slideTransition: _isInitial ? _decoration.slideTransition : false,
-                child: _OverlayContent(
+            child: Opacity(
+              opacity: _isMeasuringContentWidth ? 0 : 1,
+              // opacity: 1,
+              child: Material(
+                type: .transparency,
+                // color: Colors.amber.withValues(alpha: .5),
+                child: _AnimationLayer(
                   isTopOverlay: _isTopOverlay,
-                  maxHeight: layoutValues.surfaceMaxHeight,
-                  offsetY: _decoration.offsetY,
-                  closeOnTapOutside: widget.closeOnTapOutside,
-                  decoration: _decoration,
-                  onRemove: widget.onRemove,
-                  onHoverInside: widget.onHoverInside,
-                  child: widget.contentBuilder(context),
+                  elevationSurfaceY: _elevationSurfaceY,
+                  elevationSurfaceX: _elevationSurfaceX,
+                  slideTransition: _isMeasuringContentWidth
+                      ? false
+                      : _isInitial
+                      ? _decoration.slideTransition
+                      : false,
+                  child: SizedBox(
+                    key: _contentKey,
+                    child: _OverlayContent(
+                      isTopOverlay: _isTopOverlay,
+                      maxHeight: _isMeasuringContentWidth ? 100 : layoutValues.surfaceMaxHeight,
+                      maxWidth: _isMeasuringContentWidth ? _maxWidth : null,
+                      offsetY: _decoration.offsetY,
+                      closeOnTapOutside: widget.closeOnTapOutside,
+                      decoration: _decoration,
+                      onRemove: widget.onRemove,
+                      onHoverInside: widget.onHoverInside,
+                      child: widget.contentBuilder(
+                        context,
+                        isMeasuringWidth: _isMeasuringContentWidth,
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -311,49 +321,24 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     );
   }
 
-  Widget get _measuringWidthContent {
-    final decoration = widget.decoration;
-    final border = decoration.border;
-    final padding = decoration.padding;
-    return Positioned(
-      left: 0,
-      top: 0,
-      child: Opacity(
-        opacity: 0,
-        child: Material(
-          type: .transparency,
-          // color: Colors.red,
-          child: Padding(
-            padding: .only(
-              top: _elevationSurfaceY,
-              left: _elevationSurfaceX,
-              right: _elevationSurfaceX,
-              bottom: _elevationSurfaceY,
-            ),
-            child: ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: _maxWidth, maxHeight: 100),
-              child: SizedBox(
-                key: _contentKey,
-                width: decoration._width,
-                height: decoration.height,
-                child: Padding(
-                  padding: .only(
-                    top: border.top.width + padding.top,
-                    left: border.left.width + padding.left,
-                    right: border.right.width + padding.right,
-                    bottom: border.bottom.width + padding.bottom,
-                  ),
-                  child: widget.contentBuilder(context, isMeasuringWidth: true),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
+  double get _getMaxWidth => _screenSize.width - _decoration.marginX;
+
+  ({
+    double surfaceMaxWidth,
+    double surfaceMaxHeight,
+    double alignmentOffsetY,
+    double alignmentOffsetX,
+    Alignment anchorAlignment,
+  })
+  get _getMeasuringLayoutValues {
+    return (
+      surfaceMaxWidth: 0,
+      surfaceMaxHeight: 0,
+      alignmentOffsetY: 0,
+      alignmentOffsetX: 0,
+      anchorAlignment: .topCenter,
     );
   }
-
-  double get _getMaxWidth => _screenSize.width - _decoration.marginX;
 
   ({
     double surfaceMaxWidth,
@@ -556,13 +541,17 @@ class _AnimationLayerState extends State<_AnimationLayer> with SingleTickerProvi
       duration: const Duration(milliseconds: 400),
     );
     _animation = CurvedAnimation(parent: _animationController, curve: Curves.easeOutCubic);
+    _animationController.value = 1;
+  }
+
+  @override
+  void didUpdateWidget(covariant _AnimationLayer oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (widget.slideTransition) _animationController.value = 0;
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (widget.slideTransition) {
-        print(widget.slideTransition);
-        _animationController.forward();
-      } else {
-        _animationController.value = 1;
-      }
+      if (widget.slideTransition) _animationController.forward();
     });
   }
 
@@ -594,6 +583,7 @@ class _OverlayContent extends StatelessWidget {
   const _OverlayContent({
     required this.isTopOverlay,
     required this.maxHeight,
+    this.maxWidth,
     this.offsetY,
     required this.closeOnTapOutside,
     required this.decoration,
@@ -604,6 +594,7 @@ class _OverlayContent extends StatelessWidget {
 
   final bool isTopOverlay;
   final double maxHeight;
+  final double? maxWidth;
   final double? offsetY;
   final bool closeOnTapOutside;
   final OverlayDecoration decoration;
@@ -621,7 +612,7 @@ class _OverlayContent extends StatelessWidget {
         child: TapRegion(
           onTapOutside: closeOnTapOutside ? (_) => onRemove() : null,
           child: ConstrainedBox(
-            constraints: BoxConstraints(maxHeight: maxHeight),
+            constraints: BoxConstraints(maxHeight: maxHeight, maxWidth: maxWidth ?? .infinity),
             child: _DecoratedOverlay(
               decoration: _OverlayDecoration(
                 height: decoration.height,
