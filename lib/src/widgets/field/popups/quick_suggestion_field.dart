@@ -194,6 +194,7 @@ class _QuickSuggestionFieldState<T> extends State<QuickSuggestionField<T>> {
                 overlayPadding: widget.decoration.padding,
                 itemDecoration: widget.itemDecoration,
                 debouncer: widget.debouncer,
+                initialKeywords: widget.controller.text,
                 suggestions: widget.suggestions,
                 textStream: _textStreamController.stream,
                 itemBuilder: widget.itemBuilder,
@@ -244,6 +245,7 @@ class _Content<T> extends StatefulWidget {
     required this.overlayPadding,
     required this.itemDecoration,
     required this.debouncer,
+    required this.initialKeywords,
     required this.suggestions,
     required this.textStream,
     required this.itemBuilder,
@@ -255,6 +257,7 @@ class _Content<T> extends StatefulWidget {
   final EdgeInsets overlayPadding;
   final SuggestionItemDecoration itemDecoration;
   final Duration debouncer;
+  final String initialKeywords;
   final Stream<String> textStream;
   final Future<List<T>> Function({required String keywords}) suggestions;
   final Widget Function(BuildContext context, T value) itemBuilder;
@@ -297,7 +300,7 @@ class _ContentState<T> extends State<_Content<T>> {
 
     _debouncer = Debouncer(duration: widget.debouncer);
 
-    _setSuggestions('');
+    _setSuggestions(widget.initialKeywords);
     _textSubscription = widget.textStream.listen((keywords) => _setSuggestions(keywords));
   }
 
