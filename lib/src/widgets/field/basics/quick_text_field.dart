@@ -130,7 +130,7 @@ class _QuickTextFieldState extends State<QuickTextField> {
               inputFormatters: widget.inputFormatters,
               maxLines: widget.maxLines,
               maxLength: widget.maxLength,
-              expands: widget.maxLines == null ? true : false,
+              expands: widget.maxLines == null && widget.height != null ? true : false,
               obscureText: widget.decoration?.obscureText ?? false,
               obscuringCharacter: widget.decoration?.obscuringCharacter ?? '•',
               cursorHeight: (widget.style.fontSize ?? 16) + 10,

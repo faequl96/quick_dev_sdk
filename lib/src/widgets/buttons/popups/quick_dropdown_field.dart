@@ -202,15 +202,12 @@ class _QuickDropdownFieldState<T> extends State<QuickDropdownField<T>> {
           QuickTextField(
             controller: _textEditingController,
             height: widget.height,
-            width: widget.width,
+            width: widget.width ?? .maxFinite,
             readOnly: true,
             style: widget.fieldTextStyle,
             decoration: decoration,
           ),
-          MouseRegion(
-            cursor: SystemMouseCursors.click,
-            child: SizedBox(height: widget.height, width: widget.width),
-          ),
+          const Positioned.fill(child: MouseRegion(cursor: SystemMouseCursors.click)),
         ],
       ),
     );
