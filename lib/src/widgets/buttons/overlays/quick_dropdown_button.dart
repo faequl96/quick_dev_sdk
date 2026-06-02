@@ -15,7 +15,7 @@ class QuickDropdownButton<T> extends StatelessWidget {
       requestFocusOnHover: false,
       clipBehavior: .none,
     ),
-    this.overlaydecoration = const .fitToTargetWidth(
+    this.overlayConfiguration = const .fitToTargetWidth(
       offsetY: 6,
       marginY: 14,
       marginX: 14,
@@ -58,7 +58,7 @@ class QuickDropdownButton<T> extends StatelessWidget {
       requestFocusOnHover: false,
       clipBehavior: .none,
     ),
-    this.overlaydecoration = const .fitToTargetWidth(
+    this.overlayConfiguration = const .fitToTargetWidth(
       offsetY: 6,
       marginY: 14,
       marginX: 14,
@@ -108,7 +108,7 @@ class QuickDropdownButton<T> extends StatelessWidget {
   final bool _withItemsSearch;
   final void Function(T value) onSelected;
   final QuickButtonStyle buttonStyle;
-  final OverlayDecoration overlaydecoration;
+  final OverlayConfiguration overlayConfiguration;
   final DropdownItemDecoration itemDecoration;
   final bool disabled;
   final T? value;
@@ -127,12 +127,12 @@ class QuickDropdownButton<T> extends StatelessWidget {
         if (disabled) return;
         showOverlay(
           context,
-          decoration: overlaydecoration.copyWith(padding: .zero),
+          configuration: overlayConfiguration.copyWith(padding: .zero),
           contentBuilder: (_) {
             if (_withItemsSearch) {
               return _DropdownItemsSearch<T>(
                 onSelected: onSelected,
-                overlayPadding: overlaydecoration.padding,
+                overlayPadding: overlayConfiguration.padding,
                 decoration: itemDecoration,
                 value: value,
                 items: _itemsBuilder,
@@ -146,7 +146,7 @@ class QuickDropdownButton<T> extends StatelessWidget {
 
             return _Dropdowns(
               onSelected: onSelected,
-              overlayPadding: overlaydecoration.padding,
+              overlayPadding: overlayConfiguration.padding,
               decoration: itemDecoration,
               value: value,
               items: _items,

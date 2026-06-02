@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:quick_dev_sdk/quick_dev_sdk.dart';
 
+part 'models/overlay_configuration.dart';
 part 'models/overlay_decoration.dart';
 part 'wrapper/sticky_overlay_wrapper.dart';
 
@@ -13,8 +14,8 @@ enum OverlayAlignment { left, center, right }
 class StickyOverlay {
   StickyOverlay._();
 
+  factory StickyOverlay() => _instance;
   static final StickyOverlay _instance = StickyOverlay._();
-  static StickyOverlay get instance => _instance;
 
   void Function()? _onDispose;
   GlobalKey? _activeTargetKey;
@@ -27,7 +28,7 @@ class StickyOverlay {
     required LayerLink link,
     bool closeOnTapOutside = true,
     bool closeOnTapTarget = true,
-    OverlayDecoration decoration = const .dynamicWidth(
+    OverlayConfiguration configuration = const .dynamicWidth(
       offsetY: 6,
       offsetX: 8,
       marginY: 14,
@@ -62,7 +63,7 @@ class StickyOverlay {
         targetContext: targetContext,
         closeOnTapOutside: closeOnTapOutside,
         closeOnTapTarget: closeOnTapTarget,
-        decoration: decoration,
+        config: configuration,
         onHoverInside: onHoverInside,
         onRemove: _remove,
         contentBuilder: contentBuilder,
@@ -86,16 +87,7 @@ class StickyOverlay {
 
   void remove({required GlobalKey targetKey}) {
     if (targetKey != _activeTargetKey) return;
-
-    _overlayEntry?.remove();
-    _overlayEntry = null;
-
-    _activeTargetKey = null;
-    if (_onDispose != null) {
-      final callback = _onDispose;
-      _onDispose = null;
-      callback!();
-    }
+    _remove();
   }
 }
 
@@ -105,7 +97,7 @@ class _OverlayLayer extends StatefulWidget {
     required this.targetContext,
     required this.closeOnTapOutside,
     required this.closeOnTapTarget,
-    required this.decoration,
+    required this.config,
     this.onHoverInside,
     required this.onRemove,
     required this.contentBuilder,
@@ -115,7 +107,7 @@ class _OverlayLayer extends StatefulWidget {
   final BuildContext targetContext;
   final bool closeOnTapOutside;
   final bool closeOnTapTarget;
-  final OverlayDecoration decoration;
+  final OverlayConfiguration config;
   final void Function(bool value)? onHoverInside;
   final void Function() onRemove;
   final Widget Function(BuildContext context) contentBuilder;
@@ -134,7 +126,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
   GlobalKey? _contentKey;
   Widget? _content;
   double? _staticSurfaceWidth;
-  late OverlayDecoration _decoration;
+  late OverlayConfiguration _config;
 
   late final double _minTopOverlay;
   final double _elevationSurfaceY = 72;
@@ -162,15 +154,15 @@ class _OverlayLayerState extends State<_OverlayLayer> {
 
     if (_isInitial) {
       _contentKey = GlobalKey();
-      _decoration = widget.decoration;
-      _minTopOverlay = _decoration.flipOffset;
+      _config = widget.config;
+      _minTopOverlay = _config.flipOffset;
       _setInitialLayoutValues();
       _scrollObserver?.removeListener(_scrollNotification);
       _scrollObserver = null;
-      if (_decoration._id == 2 || _decoration._id == 3) {
+      if (_config._id == 2 || _config._id == 3) {
         _measuringContentWidth = false;
-        if (_decoration._id == 2) _staticSurfaceWidth = _decoration._width;
-        if (_decoration._id == 3) _staticSurfaceWidth = _targetSize.width;
+        if (_config._id == 2) _staticSurfaceWidth = _config._width;
+        if (_config._id == 3) _staticSurfaceWidth = _targetSize.width;
         WidgetsBinding.instance.addPostFrameCallback((_) async {
           _isInitial = false;
           await Future<void>.delayed(const Duration(milliseconds: 500));
@@ -247,12 +239,11 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     _screenSize = size;
     final paddingBottom = mediaQuery.padding.bottom;
     final bottomMaxHeight =
-        (size.height - (targetPosition.dy + _targetSize.height + _decoration.offsetY)) -
-        (_decoration.marginY + paddingBottom);
+        (size.height - (targetPosition.dy + _targetSize.height + _config.offsetY)) -
+        (_config.marginY + paddingBottom);
     _isTopOverlay = bottomMaxHeight < (_minTopOverlay - 10);
     final paddingTop = mediaQuery.padding.top;
-    final topMaxHeight =
-        (targetPosition.dy - _decoration.offsetY) - (_decoration.marginY + paddingTop);
+    final topMaxHeight = (targetPosition.dy - _config.offsetY) - (_config.marginY + paddingTop);
     _maxHeight = _isTopOverlay ? topMaxHeight : bottomMaxHeight;
 
     if (!_isInitial && mounted) {
@@ -260,7 +251,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
       return;
     }
 
-    final decorationMaxWidth = widget.decoration._maxWidth;
+    final decorationMaxWidth = widget.config._maxWidth;
     final maxWidth = _getMaxWidth;
     _maxWidth = min(maxWidth, decorationMaxWidth ?? maxWidth);
   }
@@ -269,7 +260,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
   Widget build(BuildContext context) {
     final layoutValues = _measuringContentWidth
         ? _getMeasuringLayoutValues
-        : _decoration._id != 4
+        : _config._id != 4
         ? _getLayoutValues
         : _getAdaptiveLayoutValues;
 
@@ -315,18 +306,18 @@ class _OverlayLayerState extends State<_OverlayLayer> {
                   slideTransition: _measuringContentWidth
                       ? false
                       : _isInitial
-                      ? _decoration.slideTransition
+                      ? _config.slideTransition
                       : false,
-                  transitionOnInitial: widget.decoration._id == 2 || widget.decoration._id == 3,
+                  transitionOnInitial: widget.config._id == 2 || widget.config._id == 3,
                   child: SizedBox(
                     key: _contentKey,
                     child: _OverlayContent(
                       isTopOverlay: _isTopOverlay,
                       maxHeight: _measuringContentWidth ? null : layoutValues.surfaceMaxHeight,
                       maxWidth: _measuringContentWidth ? _maxWidth : null,
-                      offsetY: _decoration.offsetY,
+                      offsetY: _config.offsetY,
                       closeOnTapOutside: widget.closeOnTapOutside,
-                      decoration: _decoration,
+                      config: _config,
                       onRemove: widget.onRemove,
                       onHoverInside: widget.onHoverInside,
                       child: _content,
@@ -341,7 +332,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     );
   }
 
-  double get _getMaxWidth => _screenSize.width - _decoration.marginX;
+  double get _getMaxWidth => _screenSize.width - _config.marginX;
 
   ({
     double surfaceMaxWidth,
@@ -368,7 +359,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     Alignment anchorAlignment,
   })
   get _getLayoutValues {
-    final decoration = widget.decoration;
+    final decoration = widget.config;
     final screenWidth = _screenSize.width;
     final targetWidth = _targetSize.width;
     final targetPositionX = _targetPosition.dx;
@@ -415,12 +406,12 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     final fitToTargetWidth = targetWidth;
 
     if (dynamicWidth < (decoration._width ?? decoration._widthCopy)) {
-      _decoration = decoration._convertTo(id: 1);
+      _config = decoration._convertTo(id: 1);
     } else {
-      _decoration = decoration;
+      _config = decoration;
     }
 
-    final surfaceMaxWidth = switch (_decoration._id) {
+    final surfaceMaxWidth = switch (_config._id) {
       1 => dynamicWidth,
       2 => staticWidth,
       3 => fitToTargetWidth,
@@ -431,21 +422,21 @@ class _OverlayLayerState extends State<_OverlayLayer> {
         ? -(_targetSize.height - _elevationSurfaceY)
         : _targetSize.height - _elevationSurfaceY;
 
-    final alignmentOffsetX = switch (_decoration._alignment) {
-      .left => -(_elevationSurfaceX + (_decoration._id == 1 ? leftOverhang : _decoration._offsetX)),
+    final alignmentOffsetX = switch (_config._alignment) {
+      .left => -(_elevationSurfaceX + (_config._id == 1 ? leftOverhang : _config._offsetX)),
       .center => .0,
-      .right => _elevationSurfaceX + (_decoration._id == 1 ? rightOverhang : _decoration._offsetX),
+      .right => _elevationSurfaceX + (_config._id == 1 ? rightOverhang : _config._offsetX),
     };
 
-    final Alignment anchorAlignment = switch (_decoration._alignment) {
+    final Alignment anchorAlignment = switch (_config._alignment) {
       .left => _isTopOverlay ? .bottomLeft : .topLeft,
       .center => _isTopOverlay ? .bottomCenter : .topCenter,
       .right => _isTopOverlay ? .bottomRight : .topRight,
     };
 
-    final decorationMaxHeight = _decoration.maxHeight?.clamp(
+    final decorationMaxHeight = _config.maxHeight?.clamp(
       _minTopOverlay,
-      _screenSize.height - (_minTopOverlay + _decoration.marginY),
+      _screenSize.height - (_minTopOverlay + _config.marginY),
     );
     final finalDecorationMaxHeight = decorationMaxHeight ?? _maxHeight;
     final surfaceMaxHeight = min(_maxHeight, finalDecorationMaxHeight);
@@ -469,7 +460,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
   get _getAdaptiveLayoutValues {
     final screenWidth = _screenSize.width;
     final targetWidth = _targetSize.width;
-    final marginX = _decoration.marginX;
+    final marginX = _config.marginX;
 
     final maxContentWidth = screenWidth - marginX;
 
@@ -512,9 +503,9 @@ class _OverlayLayerState extends State<_OverlayLayer> {
 
     final Alignment anchorAlignment = _isTopOverlay ? .bottomCenter : .topCenter;
 
-    final decorationMaxHeight = _decoration.maxHeight?.clamp(
+    final decorationMaxHeight = _config.maxHeight?.clamp(
       _minTopOverlay,
-      _screenSize.height - (_minTopOverlay + _decoration.marginY),
+      _screenSize.height - (_minTopOverlay + _config.marginY),
     );
     final finalDecorationMaxHeight = decorationMaxHeight ?? _maxHeight;
     final surfaceMaxHeight = min(_maxHeight, finalDecorationMaxHeight);
@@ -612,7 +603,7 @@ class _OverlayContent extends StatelessWidget {
     this.maxWidth,
     this.offsetY,
     required this.closeOnTapOutside,
-    required this.decoration,
+    required this.config,
     required this.onRemove,
     this.onHoverInside,
     required this.child,
@@ -623,7 +614,7 @@ class _OverlayContent extends StatelessWidget {
   final double? maxWidth;
   final double? offsetY;
   final bool closeOnTapOutside;
-  final OverlayDecoration decoration;
+  final OverlayConfiguration config;
   final void Function() onRemove;
   final void Function(bool value)? onHoverInside;
   final Widget? child;
@@ -644,14 +635,14 @@ class _OverlayContent extends StatelessWidget {
             ),
             child: _DecoratedOverlay(
               decoration: _OverlayDecoration(
-                height: decoration.height,
-                width: decoration._id == 2 ? decoration._width : null,
-                padding: decoration.padding,
-                color: decoration.color,
-                borderRadius: decoration.borderRadius,
-                border: decoration.border,
-                elevation: decoration.elevation,
-                elevationType: decoration.elevationType,
+                height: config.height,
+                width: config._id == 2 ? config._width : null,
+                padding: config.padding,
+                color: config.color,
+                borderRadius: config.borderRadius,
+                border: config.border,
+                elevation: config.elevation,
+                elevationType: config.elevationType,
               ),
               child: child,
             ),

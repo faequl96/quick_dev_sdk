@@ -24,7 +24,7 @@ class QuickStickyOverlayButton extends StatefulWidget {
   final void Function(
     void Function(
       BuildContext context, {
-      required OverlayDecoration decoration,
+      required OverlayConfiguration configuration,
       required Widget Function(BuildContext context) contentBuilder,
     })
     showOverlay,
@@ -34,7 +34,7 @@ class QuickStickyOverlayButton extends StatefulWidget {
   final void Function(
     void Function(
       BuildContext context, {
-      required OverlayDecoration decoration,
+      required OverlayConfiguration configuration,
       required Widget Function(BuildContext context) contentBuilder,
     })
     showOverlay,
@@ -53,7 +53,7 @@ class QuickStickyOverlayButton extends StatefulWidget {
 }
 
 class _QuickStickyOverlayButtonState extends State<QuickStickyOverlayButton> {
-  final _overlay = StickyOverlay.instance;
+  final _overlay = StickyOverlay();
   final _targetKey = GlobalKey();
   final _layerLink = LayerLink();
 
@@ -68,7 +68,7 @@ class _QuickStickyOverlayButtonState extends State<QuickStickyOverlayButton> {
   void _showOverlay(
     BuildContext context, {
     required bool closeOnTapTarget,
-    required OverlayDecoration decoration,
+    required OverlayConfiguration configuration,
     required Widget Function(BuildContext context) contentBuilder,
   }) {
     _overlay.create(
@@ -77,7 +77,7 @@ class _QuickStickyOverlayButtonState extends State<QuickStickyOverlayButton> {
       link: _layerLink,
       closeOnTapOutside: widget.closeOnTapOutside,
       closeOnTapTarget: closeOnTapTarget,
-      decoration: decoration,
+      configuration: configuration,
       onHoverInside: (value) {
         if (widget.closeOnUnHover) _onHoverContentInside(value);
       },
@@ -100,13 +100,13 @@ class _QuickStickyOverlayButtonState extends State<QuickStickyOverlayButton> {
         key: _targetKey,
         onTap: () => widget.onTap?.call((
           BuildContext context, {
-          required OverlayDecoration decoration,
+          required OverlayConfiguration configuration,
           required Widget Function(BuildContext context) contentBuilder,
         }) async {
           _showOverlay(
             context,
             closeOnTapTarget: true,
-            decoration: decoration,
+            configuration: configuration,
             contentBuilder: contentBuilder,
           );
         }, () => _overlay.remove(targetKey: _targetKey)),
@@ -114,13 +114,13 @@ class _QuickStickyOverlayButtonState extends State<QuickStickyOverlayButton> {
           if (value) {
             widget.onHover?.call((
               BuildContext context, {
-              required OverlayDecoration decoration,
+              required OverlayConfiguration configuration,
               required Widget Function(BuildContext context) contentBuilder,
             }) {
               _showOverlay(
                 context,
                 closeOnTapTarget: false,
-                decoration: decoration,
+                configuration: configuration,
                 contentBuilder: contentBuilder,
               );
             }, () => _overlay.remove(targetKey: _targetKey));

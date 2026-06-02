@@ -12,7 +12,7 @@ class QuickDropdownField<T> extends StatefulWidget {
     this.fieldTextStyle = const TextStyle(fontSize: 16),
     this.fieldSplashColor,
     required this.fieldDecoration,
-    this.overlaydecoration = const .fitToTargetWidth(
+    this.overlayConfiguration = const .fitToTargetWidth(
       offsetY: 6,
       marginY: 14,
       marginX: 14,
@@ -52,7 +52,7 @@ class QuickDropdownField<T> extends StatefulWidget {
     this.fieldTextStyle = const TextStyle(fontSize: 16),
     this.fieldSplashColor,
     required this.fieldDecoration,
-    this.overlaydecoration = const .fitToTargetWidth(
+    this.overlayConfiguration = const .fitToTargetWidth(
       offsetY: 6,
       marginY: 14,
       marginX: 14,
@@ -106,7 +106,7 @@ class QuickDropdownField<T> extends StatefulWidget {
   final TextStyle fieldTextStyle;
   final Color? fieldSplashColor;
   final FieldDecoration fieldDecoration;
-  final OverlayDecoration overlaydecoration;
+  final OverlayConfiguration overlayConfiguration;
   final DropdownItemDecoration itemDecoration;
   final bool disabled;
   final T value;
@@ -161,12 +161,12 @@ class _QuickDropdownFieldState<T> extends State<QuickDropdownField<T>> {
         if (widget.disabled) return;
         showOverlay(
           context,
-          decoration: widget.overlaydecoration.copyWith(padding: .zero),
+          configuration: widget.overlayConfiguration.copyWith(padding: .zero),
           contentBuilder: (_) {
             if (widget._withItemsSearch) {
               return _DropdownItemsSearch<T>(
                 onSelected: widget.onSelected,
-                overlayPadding: widget.overlaydecoration.padding,
+                overlayPadding: widget.overlayConfiguration.padding,
                 decoration: widget.itemDecoration,
                 value: widget.value,
                 items: widget._itemsBuilder,
@@ -180,7 +180,7 @@ class _QuickDropdownFieldState<T> extends State<QuickDropdownField<T>> {
 
             return _Dropdowns<T>(
               onSelected: widget.onSelected,
-              overlayPadding: widget.overlaydecoration.padding,
+              overlayPadding: widget.overlayConfiguration.padding,
               decoration: widget.itemDecoration,
               value: widget.value,
               items: widget._items,

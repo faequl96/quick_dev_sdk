@@ -12,7 +12,7 @@ class QuickPopupButton extends StatelessWidget {
       requestFocusOnHover: false,
       clipBehavior: .none,
     ),
-    this.overlaydecoration = const .dynamicWidth(
+    this.overlayConfiguration = const .dynamicWidth(
       offsetY: 6,
       offsetX: 8,
       marginY: 14,
@@ -36,7 +36,7 @@ class QuickPopupButton extends StatelessWidget {
   });
 
   final QuickButtonStyle buttonStyle;
-  final OverlayDecoration overlaydecoration;
+  final OverlayConfiguration overlayConfiguration;
   final bool disabled;
   final bool showOnHover;
   final bool closeOnUnHover;
@@ -50,13 +50,13 @@ class QuickPopupButton extends StatelessWidget {
     void Function(
       BuildContext, {
       required Widget Function(BuildContext context) contentBuilder,
-      required OverlayDecoration decoration,
+      required OverlayConfiguration configuration,
     })
     showOverlay,
     void Function() closeOverlay,
   ) => showOverlay(
     context,
-    decoration: overlaydecoration,
+    configuration: overlayConfiguration,
     contentBuilder: (context) => contentBuilder(context, closeOverlay: closeOverlay),
   );
 

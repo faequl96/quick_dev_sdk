@@ -8,7 +8,7 @@ class QuickSuggestionField<T> extends StatefulWidget {
   const QuickSuggestionField({
     required this.onSelected,
     super.key,
-    this.decoration = const .fitToTargetWidth(
+    this.configuration = const .fitToTargetWidth(
       offsetY: 6,
       marginY: 14,
       marginX: 14,
@@ -44,7 +44,7 @@ class QuickSuggestionField<T> extends StatefulWidget {
   const QuickSuggestionField.searchOnly({
     required this.onSelected,
     super.key,
-    this.decoration = const .fitToTargetWidth(
+    this.configuration = const .fitToTargetWidth(
       offsetY: 6,
       marginY: 14,
       marginX: 14,
@@ -79,7 +79,7 @@ class QuickSuggestionField<T> extends StatefulWidget {
 
   final bool _searchOnly;
   final void Function(T value) onSelected;
-  final OverlayDecoration decoration;
+  final OverlayConfiguration configuration;
   final SuggestionItemDecoration itemDecoration;
   final TextEditingController controller;
   final FocusNode? focusNode;
@@ -103,7 +103,7 @@ class _QuickSuggestionFieldState<T> extends State<QuickSuggestionField<T>> {
   bool _isPointerInsideOverlay = false;
   bool _isOverlayUseInteraction = false;
 
-  final _overlay = StickyOverlay.instance;
+  final _overlay = StickyOverlay();
   final _targetKey = GlobalKey();
   final _layerLink = LayerLink();
 
@@ -173,7 +173,7 @@ class _QuickSuggestionFieldState<T> extends State<QuickSuggestionField<T>> {
           link: _layerLink,
           closeOnTapOutside: false,
           closeOnTapTarget: false,
-          decoration: widget.decoration.copyWith(padding: .zero),
+          configuration: widget.configuration.copyWith(padding: .zero),
           contentBuilder: (_) {
             return Listener(
               onPointerDown: (_) {
@@ -193,7 +193,7 @@ class _QuickSuggestionFieldState<T> extends State<QuickSuggestionField<T>> {
                   _isOverlayUseInteraction = false;
                   widget.onSelected(value);
                 },
-                overlayPadding: widget.decoration.padding,
+                overlayPadding: widget.configuration.padding,
                 itemDecoration: widget.itemDecoration,
                 debouncer: widget.debouncer,
                 initialKeywords: widget.controller.text,

@@ -13,7 +13,7 @@ class QuickMenuButton<T> extends StatelessWidget {
       requestFocusOnHover: false,
       clipBehavior: .none,
     ),
-    this.overlaydecoration = const .dynamicWidth(
+    this.overlayConfiguration = const .dynamicWidth(
       offsetY: 6,
       offsetX: 8,
       marginY: 14,
@@ -45,7 +45,7 @@ class QuickMenuButton<T> extends StatelessWidget {
 
   final void Function(T value) onSelected;
   final QuickButtonStyle buttonStyle;
-  final OverlayDecoration overlaydecoration;
+  final OverlayConfiguration overlayConfiguration;
   final MenuItemDecoration itemDecoration;
   final bool disabled;
   final bool showOnHover;
@@ -60,16 +60,16 @@ class QuickMenuButton<T> extends StatelessWidget {
     void Function(
       BuildContext, {
       required Widget Function(BuildContext context) contentBuilder,
-      required OverlayDecoration decoration,
+      required OverlayConfiguration configuration,
     })
     showOverlay,
     void Function() closeOverlay,
   ) => showOverlay(
     context,
-    decoration: overlaydecoration.copyWith(padding: .zero),
+    configuration: overlayConfiguration.copyWith(padding: .zero),
     contentBuilder: (_) => _Menus(
       onSelected: onSelected,
-      overlayPadding: overlaydecoration.padding,
+      overlayPadding: overlayConfiguration.padding,
       decoration: itemDecoration,
       items: items,
       itemBuilder: itemBuilder,
