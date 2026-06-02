@@ -25,7 +25,7 @@ class QuickStickyOverlayButton extends StatefulWidget {
     void Function(
       BuildContext context, {
       required OverlayDecoration decoration,
-      required Widget Function(BuildContext context, {bool? measuringContentWidth}) contentBuilder,
+      required Widget Function(BuildContext context) contentBuilder,
     })
     showOverlay,
     void Function() closeOverlay,
@@ -35,7 +35,7 @@ class QuickStickyOverlayButton extends StatefulWidget {
     void Function(
       BuildContext context, {
       required OverlayDecoration decoration,
-      required Widget Function(BuildContext context, {bool? measuringContentWidth}) contentBuilder,
+      required Widget Function(BuildContext context) contentBuilder,
     })
     showOverlay,
     void Function() closeOverlay,
@@ -69,7 +69,7 @@ class _QuickStickyOverlayButtonState extends State<QuickStickyOverlayButton> {
     BuildContext context, {
     required bool closeOnTapTarget,
     required OverlayDecoration decoration,
-    required Widget Function(BuildContext context, {bool? measuringContentWidth}) contentBuilder,
+    required Widget Function(BuildContext context) contentBuilder,
   }) {
     _overlay.create(
       context,
@@ -101,7 +101,7 @@ class _QuickStickyOverlayButtonState extends State<QuickStickyOverlayButton> {
         onTap: () => widget.onTap?.call((
           BuildContext context, {
           required OverlayDecoration decoration,
-          required Widget Function(BuildContext, {bool? measuringContentWidth}) contentBuilder,
+          required Widget Function(BuildContext context) contentBuilder,
         }) async {
           _showOverlay(
             context,
@@ -115,7 +115,7 @@ class _QuickStickyOverlayButtonState extends State<QuickStickyOverlayButton> {
             widget.onHover?.call((
               BuildContext context, {
               required OverlayDecoration decoration,
-              required Widget Function(BuildContext, {bool? measuringContentWidth}) contentBuilder,
+              required Widget Function(BuildContext context) contentBuilder,
             }) {
               _showOverlay(
                 context,

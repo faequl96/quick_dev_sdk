@@ -58,7 +58,7 @@ class QuickMenuButton<T> extends StatelessWidget {
     BuildContext context,
     void Function(
       BuildContext, {
-      required Widget Function(BuildContext, {bool? measuringContentWidth}) contentBuilder,
+      required Widget Function(BuildContext context) contentBuilder,
       required OverlayDecoration decoration,
     })
     showOverlay,
@@ -66,9 +66,8 @@ class QuickMenuButton<T> extends StatelessWidget {
   ) => showOverlay(
     context,
     decoration: overlaydecoration.copyWith(padding: .zero),
-    contentBuilder: (_, {measuringContentWidth}) => _Menus(
+    contentBuilder: (_) => _Menus(
       onSelected: onSelected,
-      measuringContentWidth: measuringContentWidth,
       overlayPadding: overlaydecoration.padding,
       decoration: itemDecoration,
       items: items,
@@ -96,7 +95,6 @@ class QuickMenuButton<T> extends StatelessWidget {
 class _Menus<T> extends StatelessWidget {
   const _Menus({
     required this.onSelected,
-    this.measuringContentWidth,
     required this.overlayPadding,
     required this.decoration,
     required this.items,
@@ -105,7 +103,6 @@ class _Menus<T> extends StatelessWidget {
   });
 
   final void Function(T value) onSelected;
-  final bool? measuringContentWidth;
   final EdgeInsets overlayPadding;
   final MenuItemDecoration decoration;
   final List<T> items;
@@ -114,7 +111,7 @@ class _Menus<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final itemCount = measuringContentWidth == true ? 1 : items.length;
+    final itemCount = items.length;
 
     return ListView.builder(
       scrollCacheExtent: const .pixels(2),

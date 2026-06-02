@@ -42,7 +42,7 @@ class StickyOverlay {
       slideTransition: true,
     ),
     void Function(bool value)? onHoverInside,
-    required Widget Function(BuildContext context, {bool? measuringContentWidth}) contentBuilder,
+    required Widget Function(BuildContext context) contentBuilder,
     void Function()? onDispose,
   }) {
     _remove();
@@ -118,7 +118,7 @@ class _OverlayLayer extends StatefulWidget {
   final OverlayDecoration decoration;
   final void Function(bool value)? onHoverInside;
   final void Function() onRemove;
-  final Widget Function(BuildContext context, {bool? measuringContentWidth}) contentBuilder;
+  final Widget Function(BuildContext context) contentBuilder;
 
   @override
   State<_OverlayLayer> createState() => _OverlayLayerState();
@@ -132,10 +132,11 @@ class _OverlayLayerState extends State<_OverlayLayer> {
   final _scrollingDebouncer = Debouncer(duration: const Duration(milliseconds: 150));
 
   GlobalKey? _contentKey;
+  Widget? _content;
   double? _staticSurfaceWidth;
   late OverlayDecoration _decoration;
 
-  final double _minTopOverlay = 80;
+  late final double _minTopOverlay;
   final double _elevationSurfaceY = 72;
   final double _elevationSurfaceX = 48;
 
@@ -149,25 +150,44 @@ class _OverlayLayerState extends State<_OverlayLayer> {
   bool _isTopOverlay = false;
 
   @override
+  void initState() {
+    super.initState();
+
+    _content = widget.contentBuilder(context);
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
     if (_isInitial) {
       _contentKey = GlobalKey();
       _decoration = widget.decoration;
+      _minTopOverlay = _decoration.flipOffset;
       _setInitialLayoutValues();
       _scrollObserver?.removeListener(_scrollNotification);
       _scrollObserver = null;
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        // await Future.delayed(const Duration(seconds: 1));
+      if (_decoration._id == 2 || _decoration._id == 3) {
         _measuringContentWidth = false;
-        if (mounted) _setStaticSurfaceWidth();
+        if (_decoration._id == 2) _staticSurfaceWidth = _decoration._width;
+        if (_decoration._id == 3) _staticSurfaceWidth = _targetSize.width;
         WidgetsBinding.instance.addPostFrameCallback((_) async {
           _isInitial = false;
           await Future<void>.delayed(const Duration(milliseconds: 500));
           _initScrollObserver();
         });
-      });
+      } else {
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          // await Future.delayed(const Duration(seconds: 1));
+          _measuringContentWidth = false;
+          if (mounted) _setStaticSurfaceWidth();
+          WidgetsBinding.instance.addPostFrameCallback((_) async {
+            _isInitial = false;
+            await Future<void>.delayed(const Duration(milliseconds: 500));
+            _initScrollObserver();
+          });
+        });
+      }
     } else {
       _scrollObserver?.removeListener(_scrollNotification);
       _scrollObserver = null;
@@ -297,6 +317,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
                       : _isInitial
                       ? _decoration.slideTransition
                       : false,
+                  transitionOnInitial: widget.decoration._id == 2 || widget.decoration._id == 3,
                   child: SizedBox(
                     key: _contentKey,
                     child: _OverlayContent(
@@ -308,10 +329,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
                       decoration: _decoration,
                       onRemove: widget.onRemove,
                       onHoverInside: widget.onHoverInside,
-                      child: widget.contentBuilder(
-                        context,
-                        measuringContentWidth: _measuringContentWidth,
-                      ),
+                      child: _content,
                     ),
                   ),
                 ),
@@ -517,6 +535,7 @@ class _AnimationLayer extends StatefulWidget {
     required this.elevationSurfaceY,
     required this.elevationSurfaceX,
     required this.slideTransition,
+    required this.transitionOnInitial,
     required this.child,
   });
 
@@ -524,6 +543,7 @@ class _AnimationLayer extends StatefulWidget {
   final double elevationSurfaceY;
   final double elevationSurfaceX;
   final bool slideTransition;
+  final bool transitionOnInitial;
   final Widget child;
 
   @override
@@ -543,18 +563,22 @@ class _AnimationLayerState extends State<_AnimationLayer> with SingleTickerProvi
       duration: const Duration(milliseconds: 400),
     );
     _animation = CurvedAnimation(parent: _animationController, curve: Curves.easeOutCubic);
-    _animationController.value = 1;
+
+    if (widget.slideTransition && widget.transitionOnInitial) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _animationController.forward());
+    } else {
+      _animationController.value = 1;
+    }
   }
 
   @override
   void didUpdateWidget(covariant _AnimationLayer oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget.slideTransition) _animationController.value = 0;
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (widget.slideTransition) _animationController.forward();
-    });
+    if (widget.slideTransition && !widget.transitionOnInitial) {
+      _animationController.value = 0;
+      WidgetsBinding.instance.addPostFrameCallback((_) => _animationController.forward());
+    }
   }
 
   @override

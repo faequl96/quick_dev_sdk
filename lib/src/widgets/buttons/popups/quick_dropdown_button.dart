@@ -126,11 +126,10 @@ class QuickDropdownButton<T> extends StatelessWidget {
         showOverlay(
           context,
           decoration: overlaydecoration.copyWith(padding: .zero),
-          contentBuilder: (_, {measuringContentWidth}) {
+          contentBuilder: (_) {
             if (_withItemsSearch) {
               return _DropdownItemsSearch<T>(
                 onSelected: onSelected,
-                measuringContentWidth: measuringContentWidth,
                 overlayPadding: overlaydecoration.padding,
                 decoration: itemDecoration,
                 value: value,
@@ -145,7 +144,6 @@ class QuickDropdownButton<T> extends StatelessWidget {
 
             return _Dropdowns(
               onSelected: onSelected,
-              measuringContentWidth: measuringContentWidth,
               overlayPadding: overlaydecoration.padding,
               decoration: itemDecoration,
               value: value,
@@ -166,7 +164,6 @@ class QuickDropdownButton<T> extends StatelessWidget {
 class _Dropdowns<T> extends StatefulWidget {
   const _Dropdowns({
     required this.onSelected,
-    this.measuringContentWidth,
     required this.overlayPadding,
     required this.decoration,
     this.value,
@@ -176,7 +173,6 @@ class _Dropdowns<T> extends StatefulWidget {
   });
 
   final void Function(T value) onSelected;
-  final bool? measuringContentWidth;
   final EdgeInsets overlayPadding;
   final DropdownItemDecoration decoration;
   final T? value;
@@ -190,13 +186,9 @@ class _Dropdowns<T> extends StatefulWidget {
 
 class _DropdownsState<T> extends State<_Dropdowns<T>> {
   late final ScrollController _controller;
-  final _selectedScrollOffsetKey = GlobalKey();
+
   final _selectedItemKey = GlobalKey();
-
-  bool _isInitial = true;
-
   int? _selectedIndex;
-  double _selectedScrollOffset = 0;
 
   @override
   void initState() {
@@ -207,21 +199,9 @@ class _DropdownsState<T> extends State<_Dropdowns<T>> {
     _selectedIndex = widget.items.indexOf(widget.value as T);
     if ((_selectedIndex ?? 0) < 0) _selectedIndex = null;
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_selectedScrollOffsetKey.currentContext != null) {
-        final listViewHeight = _selectedScrollOffsetKey.currentContext!.size?.height ?? 0;
-        _selectedScrollOffset = _selectedIndex == null
-            ? 0
-            : listViewHeight - widget.overlayPadding.top;
-      }
-    });
-  }
-
-  @override
-  void didUpdateWidget(covariant _Dropdowns<T> oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    if (_isInitial && _selectedIndex != null) _autoScrollToSelectedItem();
+    if (_selectedIndex != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _autoScrollToSelectedItem());
+    }
   }
 
   @override
@@ -231,68 +211,62 @@ class _DropdownsState<T> extends State<_Dropdowns<T>> {
     super.dispose();
   }
 
-  void _autoScrollToSelectedItem() async {
-    _controller.jumpTo(_selectedScrollOffset - 50);
+  void _autoScrollToSelectedItem() {
+    if (!mounted) return;
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_selectedItemKey.currentContext != null) {
-        Scrollable.ensureVisible(_selectedItemKey.currentContext!, alignment: .2);
+    final currentContext = _selectedItemKey.currentContext;
+
+    if (currentContext != null) {
+      if (currentContext.findRenderObject()?.debugNeedsPaint != true) {
+        Scrollable.ensureVisible(currentContext, alignment: .2);
+        return;
       }
+    }
 
-      _isInitial = false;
-    });
+    final currentMaxScroll = _controller.position.maxScrollExtent;
+    final currentOffset = _controller.offset;
+    if (currentOffset >= currentMaxScroll) {
+      if (currentContext?.findRenderObject()?.debugNeedsPaint != true) return;
+    }
+
+    _controller.jumpTo(currentMaxScroll);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _autoScrollToSelectedItem());
   }
 
   @override
   Widget build(BuildContext context) {
-    final itemCount = widget.measuringContentWidth == true && _selectedIndex != null
-        ? (_selectedIndex ?? 0)
-        : widget.measuringContentWidth == true
-        ? 1
-        : widget.items.length;
+    return ListView.builder(
+      controller: _controller,
+      scrollCacheExtent: const .pixels(100),
+      padding: widget.overlayPadding,
+      shrinkWrap: true,
+      itemCount: widget.items.length,
+      itemBuilder: (_, index) {
+        if (widget.items.isEmpty) return const SizedBox.shrink();
 
-    return SizedBox(
-      height: widget.measuringContentWidth == true && _selectedIndex != null
-          ? null
-          : widget.measuringContentWidth == true
-          ? 50
-          : null,
-      child: ListView.builder(
-        key: _selectedScrollOffsetKey,
-        controller: _controller,
-        scrollCacheExtent: widget.measuringContentWidth == true && _selectedIndex != null
-            ? const .pixels(5000)
-            : const .pixels(200),
-        padding: widget.overlayPadding,
-        shrinkWrap: true,
-        itemCount: itemCount,
-        itemBuilder: (context, index) {
-          if (widget.items.isEmpty) return const SizedBox.shrink();
-
-          final item = widget.items[index];
-          return Padding(
-            key: _selectedIndex == index ? _selectedItemKey : null,
-            padding: widget.decoration.margin,
-            child: QuickButton(
-              onTap: () {
-                widget.closeOverlay();
-                widget.onSelected(item);
-              },
-              style: .lite(
-                padding: widget.decoration.padding,
-                borderRadius: .circular(widget.decoration.borderRadius),
-                color: item == widget.value
-                    ? widget.decoration.selectedColor
-                    : widget.decoration.color,
-                hoveredColor: widget.decoration.hoveredColor,
-                hoverDuration: const Duration(milliseconds: 100),
-                elevation: 0,
-              ),
-              child: widget.itemBuilder(context, item),
+        final item = widget.items[index];
+        return Padding(
+          key: _selectedIndex == index ? _selectedItemKey : null,
+          padding: widget.decoration.margin,
+          child: QuickButton(
+            onTap: () {
+              widget.closeOverlay();
+              widget.onSelected(item);
+            },
+            style: .lite(
+              padding: widget.decoration.padding,
+              borderRadius: .circular(widget.decoration.borderRadius),
+              color: item == widget.value
+                  ? widget.decoration.selectedColor
+                  : widget.decoration.color,
+              hoveredColor: widget.decoration.hoveredColor,
+              hoverDuration: const Duration(milliseconds: 100),
+              elevation: 0,
             ),
-          );
-        },
-      ),
+            child: widget.itemBuilder(context, item),
+          ),
+        );
+      },
     );
   }
 }
@@ -300,7 +274,6 @@ class _DropdownsState<T> extends State<_Dropdowns<T>> {
 class _DropdownItemsSearch<T> extends StatefulWidget {
   const _DropdownItemsSearch({
     required this.onSelected,
-    this.measuringContentWidth,
     required this.overlayPadding,
     required this.decoration,
     this.value,
@@ -313,7 +286,6 @@ class _DropdownItemsSearch<T> extends StatefulWidget {
   });
 
   final void Function(T value) onSelected;
-  final bool? measuringContentWidth;
   final EdgeInsets overlayPadding;
   final DropdownItemDecoration decoration;
   final T? value;
@@ -383,7 +355,6 @@ class _DropdownItemsSearchState<T> extends State<_DropdownItemsSearch<T>> {
         Flexible(
           child: _Dropdowns<T>(
             onSelected: widget.onSelected,
-            measuringContentWidth: widget.measuringContentWidth,
             overlayPadding: widget.overlayPadding,
             decoration: widget.decoration,
             value: widget.value,

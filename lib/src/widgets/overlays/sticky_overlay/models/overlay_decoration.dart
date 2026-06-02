@@ -10,6 +10,7 @@ class OverlayDecoration {
     this.marginY = 14,
     this.marginX = 14,
     this._alignment = .center,
+    this.flipOffset = 80,
     this.padding = const .symmetric(vertical: 8),
     this.color = Colors.white,
     this.borderRadius = 8,
@@ -30,6 +31,7 @@ class OverlayDecoration {
     this.marginY = 14,
     this.marginX = 14,
     this._alignment = .center,
+    this.flipOffset = 80,
     this.padding = const .symmetric(vertical: 8),
     this.color = Colors.white,
     this.borderRadius = 8,
@@ -48,6 +50,7 @@ class OverlayDecoration {
     this.offsetY = 6,
     this.marginY = 14,
     this.marginX = 14,
+    this.flipOffset = 80,
     this.padding = const .symmetric(vertical: 8),
     this.color = Colors.white,
     this.borderRadius = 8,
@@ -67,6 +70,7 @@ class OverlayDecoration {
     this.offsetY = 6,
     this.marginY = 14,
     this.marginX = 14,
+    this.flipOffset = 80,
     this.padding = const .symmetric(vertical: 8),
     this.color = Colors.white,
     this.borderRadius = 8,
@@ -90,9 +94,10 @@ class OverlayDecoration {
   final double? _maxWidth;
   final double offsetY;
   final double _offsetX;
-  final OverlayAlignment _alignment;
   final double marginY;
   final double marginX;
+  final OverlayAlignment _alignment;
+  final double flipOffset;
   final EdgeInsets padding;
   final Color color;
   final double borderRadius;
@@ -111,6 +116,7 @@ class OverlayDecoration {
     double? marginY,
     double? marginX,
     OverlayAlignment? alignment,
+    double? flipOffset,
     EdgeInsets? padding,
     Color? color,
     double? borderRadius,
@@ -125,6 +131,7 @@ class OverlayDecoration {
         offsetY: offsetY ?? this.offsetY,
         marginY: marginY ?? this.marginY,
         marginX: marginX ?? this.marginX,
+        flipOffset: flipOffset ?? this.flipOffset,
         padding: padding ?? this.padding,
         color: color ?? this.color,
         borderRadius: borderRadius ?? this.borderRadius,
@@ -142,6 +149,7 @@ class OverlayDecoration {
         offsetY: offsetY ?? this.offsetY,
         marginY: marginY ?? this.marginY,
         marginX: marginX ?? this.marginX,
+        flipOffset: flipOffset ?? this.flipOffset,
         padding: padding ?? this.padding,
         color: color ?? this.color,
         borderRadius: borderRadius ?? this.borderRadius,
@@ -162,6 +170,7 @@ class OverlayDecoration {
         marginY: marginY ?? this.marginY,
         marginX: marginX ?? this.marginX,
         alignment: alignment ?? _alignment,
+        flipOffset: flipOffset ?? this.flipOffset,
         padding: padding ?? this.padding,
         color: color ?? this.color,
         borderRadius: borderRadius ?? this.borderRadius,
@@ -181,6 +190,7 @@ class OverlayDecoration {
       marginY: marginY ?? this.marginY,
       marginX: marginX ?? this.marginX,
       alignment: alignment ?? _alignment,
+      flipOffset: flipOffset ?? this.flipOffset,
       padding: padding ?? this.padding,
       color: color ?? this.color,
       borderRadius: borderRadius ?? this.borderRadius,
@@ -202,6 +212,7 @@ class OverlayDecoration {
     double? marginY,
     double? marginX,
     OverlayAlignment? alignment,
+    double? flipOffset,
     EdgeInsets? padding,
     Color? color,
     double? borderRadius,
@@ -216,6 +227,7 @@ class OverlayDecoration {
         offsetY: offsetY ?? this.offsetY,
         marginY: marginY ?? this.marginY,
         marginX: marginX ?? this.marginX,
+        flipOffset: flipOffset ?? this.flipOffset,
         padding: padding ?? this.padding,
         color: color ?? this.color,
         borderRadius: borderRadius ?? this.borderRadius,
@@ -233,6 +245,7 @@ class OverlayDecoration {
         offsetY: offsetY ?? this.offsetY,
         marginY: marginY ?? this.marginY,
         marginX: marginX ?? this.marginX,
+        flipOffset: flipOffset ?? this.flipOffset,
         padding: padding ?? this.padding,
         color: color ?? this.color,
         borderRadius: borderRadius ?? this.borderRadius,
@@ -253,6 +266,7 @@ class OverlayDecoration {
         marginY: marginY ?? this.marginY,
         marginX: marginX ?? this.marginX,
         alignment: alignment ?? _alignment,
+        flipOffset: flipOffset ?? this.flipOffset,
         padding: padding ?? this.padding,
         color: color ?? this.color,
         borderRadius: borderRadius ?? this.borderRadius,
@@ -272,6 +286,7 @@ class OverlayDecoration {
       marginY: marginY ?? this.marginY,
       marginX: marginX ?? this.marginX,
       alignment: alignment ?? _alignment,
+      flipOffset: flipOffset ?? this.flipOffset,
       padding: padding ?? this.padding,
       color: color ?? this.color,
       borderRadius: borderRadius ?? this.borderRadius,
