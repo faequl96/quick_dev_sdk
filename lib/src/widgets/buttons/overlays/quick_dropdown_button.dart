@@ -3,19 +3,23 @@ import 'package:quick_dev_sdk/quick_dev_sdk.dart';
 
 List<T> _defaultItemsBuilder<T>({required String keywords}) => [];
 
-class QuickDropdownField<T> extends StatefulWidget {
-  const QuickDropdownField({
+class QuickDropdownButton<T> extends StatelessWidget {
+  const QuickDropdownButton({
     super.key,
     required this.onSelected,
-    this.height,
-    this.width,
-    this.fieldTextStyle = const TextStyle(fontSize: 16),
-    this.fieldSplashColor,
-    required this.fieldDecoration,
+    this.buttonStyle = const QuickButtonStyle(
+      splashFactory: InkSparkle.splashFactory,
+      hoverDuration: Duration(milliseconds: 250),
+      elevation: 1,
+      hoveredElevationScale: 1,
+      requestFocusOnHover: false,
+      clipBehavior: .none,
+    ),
     this.overlaydecoration = const .fitToTargetWidth(
       offsetY: 6,
       marginY: 14,
       marginX: 14,
+      flipOffset: 80,
       padding: .symmetric(vertical: 8),
       color: Color(0xFFFAFAFA),
       borderRadius: 8,
@@ -34,27 +38,31 @@ class QuickDropdownField<T> extends StatefulWidget {
     ),
     this.disabled = false,
     required this.value,
-    required this.fieldValueBuilder,
     required this._items,
     required this.itemBuilder,
+    required this.selectedValueBuilder,
   }) : _withItemsSearch = false,
        _itemsBuilder = _defaultItemsBuilder,
        _searchFieldHeight = 40,
        _searchFieldTextStyle = const TextStyle(),
        _searchFieldDecoration = const FieldDecoration();
 
-  const QuickDropdownField.withItemsSearch({
+  const QuickDropdownButton.withItemsSearch({
     super.key,
     required this.onSelected,
-    this.height,
-    this.width,
-    this.fieldTextStyle = const TextStyle(fontSize: 16),
-    this.fieldSplashColor,
-    required this.fieldDecoration,
+    this.buttonStyle = const QuickButtonStyle(
+      splashFactory: InkSparkle.splashFactory,
+      hoverDuration: Duration(milliseconds: 250),
+      elevation: 1,
+      hoveredElevationScale: 1,
+      requestFocusOnHover: false,
+      clipBehavior: .none,
+    ),
     this.overlaydecoration = const .fitToTargetWidth(
       offsetY: 6,
       marginY: 14,
       marginX: 14,
+      flipOffset: 80,
       padding: .symmetric(vertical: 8),
       color: Color(0xFFFAFAFA),
       borderRadius: 8,
@@ -73,9 +81,9 @@ class QuickDropdownField<T> extends StatefulWidget {
     ),
     this.disabled = false,
     required this.value,
-    required this.fieldValueBuilder,
     required List<T> Function({required String keywords}) items,
     required this.itemBuilder,
+    required this.selectedValueBuilder,
     this._searchFieldHeight = 40,
     this._searchFieldTextStyle = const TextStyle(fontSize: 14),
     this._searchFieldDecoration = const FieldDecoration(
@@ -99,115 +107,58 @@ class QuickDropdownField<T> extends StatefulWidget {
 
   final bool _withItemsSearch;
   final void Function(T value) onSelected;
-  final double? height;
-  final double? width;
-  final TextStyle fieldTextStyle;
-  final Color? fieldSplashColor;
-  final FieldDecoration fieldDecoration;
+  final QuickButtonStyle buttonStyle;
   final OverlayDecoration overlaydecoration;
   final DropdownItemDecoration itemDecoration;
   final bool disabled;
-  final T value;
-  final String Function(T value) fieldValueBuilder;
+  final T? value;
   final List<T> _items;
   final List<T> Function({required String keywords}) _itemsBuilder;
   final Widget Function(BuildContext context, T value) itemBuilder;
+  final Widget? Function(BuildContext context, T? value) selectedValueBuilder;
   final double _searchFieldHeight;
   final TextStyle _searchFieldTextStyle;
   final FieldDecoration _searchFieldDecoration;
 
   @override
-  State<QuickDropdownField<T>> createState() => _QuickDropdownFieldState<T>();
-}
-
-class _QuickDropdownFieldState<T> extends State<QuickDropdownField<T>> {
-  final _textEditingController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-
-    _textEditingController.text = _getDisplayValue();
-  }
-
-  @override
-  void didUpdateWidget(covariant QuickDropdownField<T> oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    _textEditingController.text = _getDisplayValue();
-  }
-
-  @override
-  void dispose() {
-    _textEditingController.dispose();
-
-    super.dispose();
-  }
-
-  String _getDisplayValue() {
-    final currentValue = widget.value;
-    if (currentValue == null) return '';
-    return widget.fieldValueBuilder(currentValue);
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final decoration = widget.fieldDecoration;
-
     return QuickStickyOverlayButton(
       onTap: (showOverlay, closeOverlay) {
-        if (widget.disabled) return;
+        if (disabled) return;
         showOverlay(
           context,
-          decoration: widget.overlaydecoration.copyWith(padding: .zero),
+          decoration: overlaydecoration.copyWith(padding: .zero),
           contentBuilder: (_) {
-            if (widget._withItemsSearch) {
+            if (_withItemsSearch) {
               return _DropdownItemsSearch<T>(
-                onSelected: widget.onSelected,
-                overlayPadding: widget.overlaydecoration.padding,
-                decoration: widget.itemDecoration,
-                value: widget.value,
-                items: widget._itemsBuilder,
-                itemBuilder: widget.itemBuilder,
-                searchFieldHeight: widget._searchFieldHeight,
-                searchFieldTextStyle: widget._searchFieldTextStyle,
-                searchFieldDecoration: widget._searchFieldDecoration,
+                onSelected: onSelected,
+                overlayPadding: overlaydecoration.padding,
+                decoration: itemDecoration,
+                value: value,
+                items: _itemsBuilder,
+                itemBuilder: itemBuilder,
+                searchFieldHeight: _searchFieldHeight,
+                searchFieldTextStyle: _searchFieldTextStyle,
+                searchFieldDecoration: _searchFieldDecoration,
                 closeOverlay: closeOverlay,
               );
             }
 
-            return _Dropdowns<T>(
-              onSelected: widget.onSelected,
-              overlayPadding: widget.overlaydecoration.padding,
-              decoration: widget.itemDecoration,
-              value: widget.value,
-              items: widget._items,
-              itemBuilder: widget.itemBuilder,
+            return _Dropdowns(
+              onSelected: onSelected,
+              overlayPadding: overlaydecoration.padding,
+              decoration: itemDecoration,
+              value: value,
+              items: _items,
+              itemBuilder: itemBuilder,
               closeOverlay: closeOverlay,
             );
           },
         );
       },
-      buttonStyle: QuickButtonStyle(
-        height: widget.height,
-        width: widget.width,
-        splashColor: widget.fieldSplashColor,
-        borderRadius: decoration.enabledBorder.borderRadius,
-        elevation: 0,
-      ),
-      child: Stack(
-        children: [
-          QuickTextField(
-            controller: _textEditingController,
-            height: widget.height,
-            width: widget.width ?? .maxFinite,
-            readOnly: true,
-            style: widget.fieldTextStyle,
-            decoration: decoration,
-          ),
-          const Positioned.fill(child: MouseRegion(cursor: SystemMouseCursors.click)),
-        ],
-      ),
+      buttonStyle: buttonStyle,
+      disabled: disabled,
+      child: selectedValueBuilder(context, value),
     );
   }
 }

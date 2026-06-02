@@ -18,6 +18,7 @@ class QuickMenuButton<T> extends StatelessWidget {
       offsetX: 8,
       marginY: 14,
       marginX: 14,
+      flipOffset: 80,
       padding: .symmetric(vertical: 8),
       color: Color(0xFFFAFAFA),
       borderRadius: 8,
