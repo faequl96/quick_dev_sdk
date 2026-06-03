@@ -26,6 +26,7 @@ class QuickMenuButton<T> extends StatelessWidget {
       elevation: 1,
       elevationType: .shadow,
       slideTransition: true,
+      useBarrier: false,
     ),
     this.itemDecoration = const MenuItemDecoration(
       padding: .symmetric(horizontal: 10, vertical: 8),

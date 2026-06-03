@@ -25,6 +25,7 @@ class QuickPopupButton extends StatelessWidget {
       elevation: 1,
       elevationType: .shadow,
       slideTransition: true,
+      useBarrier: false,
     ),
     this.disabled = false,
     this.showOnHover = false,

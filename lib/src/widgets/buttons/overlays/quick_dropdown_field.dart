@@ -24,6 +24,7 @@ class QuickDropdownField<T> extends StatefulWidget {
       elevation: 1,
       elevationType: .shadow,
       slideTransition: true,
+      useBarrier: false,
     ),
     this.itemDecoration = const DropdownItemDecoration(
       padding: .symmetric(horizontal: 10, vertical: 8),
@@ -64,6 +65,7 @@ class QuickDropdownField<T> extends StatefulWidget {
       elevation: 1,
       elevationType: .shadow,
       slideTransition: true,
+      useBarrier: false,
     ),
     this.itemDecoration = const DropdownItemDecoration(
       padding: .symmetric(horizontal: 10, vertical: 8),

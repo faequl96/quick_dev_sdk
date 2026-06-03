@@ -41,6 +41,7 @@ class StickyOverlay {
       elevation: 1,
       elevationType: .shadow,
       slideTransition: true,
+      useBarrier: false,
     ),
     void Function(bool value)? onHoverInside,
     required Widget Function(BuildContext context) contentBuilder,
@@ -266,6 +267,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
 
     return Stack(
       children: [
+        if (_config.useBarrier) const ModalBarrier(),
         if (widget.closeOnTapTarget)
           Positioned(
             width: _targetSize.width,

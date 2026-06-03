@@ -18,6 +18,7 @@ class OverlayConfiguration {
     this.elevation = 1,
     this.elevationType = .shadow,
     this.slideTransition = true,
+    this.useBarrier = false,
   }) : _id = 1,
        _width = null,
        _widthCopy = 0;
@@ -39,6 +40,7 @@ class OverlayConfiguration {
     this.elevation = 1,
     this.elevationType = .shadow,
     this.slideTransition = true,
+    this.useBarrier = false,
   }) : _id = 2,
        _width = width > 40 ? width : 40,
        _widthCopy = width > 40 ? width : 40,
@@ -58,6 +60,7 @@ class OverlayConfiguration {
     this.elevation = 1,
     this.elevationType = .shadow,
     this.slideTransition = true,
+    this.useBarrier = false,
   }) : _id = 3,
        _width = null,
        _widthCopy = 0,
@@ -78,6 +81,7 @@ class OverlayConfiguration {
     this.elevation = 1,
     this.elevationType = .shadow,
     this.slideTransition = true,
+    this.useBarrier = false,
   }) : _id = 4,
        height = null,
        maxHeight = null,
@@ -105,6 +109,7 @@ class OverlayConfiguration {
   final double elevation;
   final ElevationType elevationType;
   final bool slideTransition;
+  final bool useBarrier;
 
   OverlayConfiguration copyWith({
     double? height,
@@ -124,6 +129,7 @@ class OverlayConfiguration {
     double? elevation,
     ElevationType? elevationType,
     bool? slideTransition,
+    bool? useBarrier,
   }) {
     if (_id == 4) {
       return .adaptive(
@@ -139,6 +145,7 @@ class OverlayConfiguration {
         elevation: elevation ?? this.elevation,
         elevationType: elevationType ?? this.elevationType,
         slideTransition: slideTransition ?? this.slideTransition,
+        useBarrier: useBarrier ?? this.useBarrier,
       );
     }
 
@@ -157,6 +164,7 @@ class OverlayConfiguration {
         elevation: elevation ?? this.elevation,
         elevationType: elevationType ?? this.elevationType,
         slideTransition: slideTransition ?? this.slideTransition,
+        useBarrier: useBarrier ?? this.useBarrier,
       );
     }
 
@@ -178,6 +186,7 @@ class OverlayConfiguration {
         elevation: elevation ?? this.elevation,
         elevationType: elevationType ?? this.elevationType,
         slideTransition: slideTransition ?? this.slideTransition,
+        useBarrier: useBarrier ?? this.useBarrier,
       );
     }
 
@@ -198,6 +207,7 @@ class OverlayConfiguration {
       elevation: elevation ?? this.elevation,
       elevationType: elevationType ?? this.elevationType,
       slideTransition: slideTransition ?? this.slideTransition,
+      useBarrier: useBarrier ?? this.useBarrier,
     );
   }
 
@@ -220,6 +230,7 @@ class OverlayConfiguration {
     double? elevation,
     ElevationType? elevationType,
     bool? slideTransition,
+    bool? useBarrier,
   }) {
     if (_id == 4) {
       return .adaptive(
@@ -235,6 +246,7 @@ class OverlayConfiguration {
         elevation: elevation ?? this.elevation,
         elevationType: elevationType ?? this.elevationType,
         slideTransition: slideTransition ?? this.slideTransition,
+        useBarrier: useBarrier ?? this.useBarrier,
       );
     }
 
@@ -253,6 +265,7 @@ class OverlayConfiguration {
         elevation: elevation ?? this.elevation,
         elevationType: elevationType ?? this.elevationType,
         slideTransition: slideTransition ?? this.slideTransition,
+        useBarrier: useBarrier ?? this.useBarrier,
       );
     }
 
@@ -274,6 +287,7 @@ class OverlayConfiguration {
         elevation: elevation ?? this.elevation,
         elevationType: elevationType ?? this.elevationType,
         slideTransition: slideTransition ?? this.slideTransition,
+        useBarrier: useBarrier ?? this.useBarrier,
       );
     }
 
@@ -294,6 +308,7 @@ class OverlayConfiguration {
       elevation: elevation ?? this.elevation,
       elevationType: elevationType ?? this.elevationType,
       slideTransition: slideTransition ?? this.slideTransition,
+      useBarrier: useBarrier ?? this.useBarrier,
     );
   }
 }
