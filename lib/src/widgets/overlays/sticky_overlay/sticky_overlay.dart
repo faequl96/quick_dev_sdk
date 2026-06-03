@@ -54,7 +54,7 @@ class StickyOverlay {
       marginY: 14,
       marginX: 14,
       alignment: .center,
-      padding: .symmetric(vertical: 8),
+      padding: .zero,
       color: Colors.white,
       borderRadius: 8,
       border: .fromBorderSide(BorderSide(width: 1, color: Colors.black12)),
@@ -178,12 +178,12 @@ class _OverlayLayerState extends State<_OverlayLayer> {
   double _maxWidth = 0;
   bool _isTopOverlay = false;
 
-  // @override
-  // void initState() {
-  //   super.initState();
+  @override
+  void initState() {
+    super.initState();
 
-  //   _content = widget.contentBuilder(context);
-  // }
+    _content = widget.contentBuilder(context);
+  }
 
   @override
   void didChangeDependencies() {
@@ -295,8 +295,6 @@ class _OverlayLayerState extends State<_OverlayLayer> {
 
   @override
   Widget build(BuildContext context) {
-    _content = widget.contentBuilder(context);
-
     final layoutValues = _measuringContentWidth
         ? _getMeasuringLayoutValues
         : _config._id != 4
@@ -713,17 +711,31 @@ class _DecoratedOverlay extends SingleChildRenderObjectWidget {
 }
 
 class _RenderDecoratedOverlay extends RenderProxyBox {
-  _RenderDecoratedOverlay({required this._decoration});
+  _RenderDecoratedOverlay({required this._decoration}) {
+    _updatePaddingCaches();
+  }
 
   _OverlayDecoration _decoration;
   BoxPainter? _cachedPainter;
+
+  late EdgeInsets _borderPadding;
+  late EdgeInsets _totalPadding;
+  late Offset _childOffset;
 
   set decoration(_OverlayDecoration value) {
     if (_decoration == value) return;
     _decoration = value;
     _cachedPainter?.dispose();
     _cachedPainter = null;
+
+    _updatePaddingCaches();
     markNeedsLayout();
+  }
+
+  void _updatePaddingCaches() {
+    _borderPadding = _decoration.border.dimensions.resolve(.ltr);
+    _totalPadding = _borderPadding + _decoration.padding;
+    _childOffset = Offset(_totalPadding.left, _totalPadding.top);
   }
 
   @override
@@ -741,14 +753,11 @@ class _RenderDecoratedOverlay extends RenderProxyBox {
       return;
     }
 
-    final borderPadding = _decoration.border.dimensions.resolve(.ltr);
-    final totalPadding = borderPadding + _decoration.padding;
-
-    final deflated = constraints.deflate(totalPadding);
+    final deflated = constraints.deflate(_totalPadding);
 
     double? constrainDimension(double? target, double min, double max) {
       if (target == null) return null;
-      return (target - totalPadding.horizontal).clamp(min, max);
+      return (target - _totalPadding.horizontal).clamp(min, max);
     }
 
     final exactWidth = constrainDimension(_decoration.width, deflated.minWidth, deflated.maxWidth);
@@ -768,12 +777,12 @@ class _RenderDecoratedOverlay extends RenderProxyBox {
     child.layout(childConstraints, parentUsesSize: true);
 
     if (child.size.height == 0) {
-      final emptySize = Size(child.size.width + totalPadding.horizontal, 0.0);
+      final emptySize = Size(child.size.width + _totalPadding.horizontal, 0.0);
       size = constraints.constrain(emptySize);
     } else {
       final totalSize = Size(
-        _decoration.width ?? (child.size.width + totalPadding.horizontal),
-        _decoration.height ?? (child.size.height + totalPadding.vertical),
+        _decoration.width ?? (child.size.width + _totalPadding.horizontal),
+        _decoration.height ?? (child.size.height + _totalPadding.vertical),
       );
       size = constraints.constrain(totalSize);
     }
@@ -800,17 +809,15 @@ class _RenderDecoratedOverlay extends RenderProxyBox {
 
     _cachedPainter!.paint(context.canvas, offset, ImageConfiguration(size: size));
 
-    final borderPadding = _decoration.border.dimensions.resolve(.ltr);
-    final clipRect = borderPadding.deflateRect(offset & size);
+    final clipRect = _borderPadding.deflateRect(offset & size);
 
-    final innerRadius = (_decoration.borderRadius - borderPadding.left).clamp(.0, double.infinity);
+    final innerRadius = (_decoration.borderRadius - _borderPadding.left).clamp(.0, double.infinity);
     final innerRRect = RRect.fromRectAndRadius(clipRect, .circular(innerRadius));
 
-    final totalPadding = borderPadding + _decoration.padding;
-    final childOffset = offset + Offset(totalPadding.left, totalPadding.top);
+    final childVisualOffset = offset + _childOffset;
 
     context.pushClipRRect(needsCompositing, .zero, clipRect, innerRRect, (innerContext, _) {
-      innerContext.paintChild(child, childOffset);
+      innerContext.paintChild(child, childVisualOffset);
     });
   }
 
@@ -821,12 +828,8 @@ class _RenderDecoratedOverlay extends RenderProxyBox {
 
     if (child.size.height == 0) return child.hitTest(result, position: position);
 
-    final borderPadding = _decoration.border.dimensions.resolve(TextDirection.ltr);
-    final totalPadding = borderPadding + _decoration.padding;
-    final childOffset = Offset(totalPadding.left, totalPadding.top);
-
     return result.addWithPaintOffset(
-      offset: childOffset,
+      offset: _childOffset,
       position: position,
       hitTest: (BoxHitTestResult result, Offset transformed) {
         return child.hitTest(result, position: transformed);
@@ -837,10 +840,7 @@ class _RenderDecoratedOverlay extends RenderProxyBox {
   @override
   void applyPaintTransform(RenderBox child, Matrix4 transform) {
     if (child.size.height > 0) {
-      final borderPadding = _decoration.border.dimensions.resolve(TextDirection.ltr);
-      final totalPadding = borderPadding + _decoration.padding;
-      final childOffset = Offset(totalPadding.left, totalPadding.top);
-      transform.multiply(Matrix4.translationValues(childOffset.dx, childOffset.dy, 0.0));
+      transform.translateByDouble(_childOffset.dx, _childOffset.dy, .0, 1);
     }
     super.applyPaintTransform(child, transform);
   }

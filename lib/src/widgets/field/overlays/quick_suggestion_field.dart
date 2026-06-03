@@ -13,7 +13,7 @@ class QuickSuggestionField<T> extends StatefulWidget {
       marginY: 14,
       marginX: 14,
       flipOffset: 80,
-      padding: .symmetric(vertical: 8),
+      padding: .zero,
       color: Color(0xFFFAFAFA),
       borderRadius: 8,
       border: .fromBorderSide(BorderSide(width: 1, color: Colors.black12)),
