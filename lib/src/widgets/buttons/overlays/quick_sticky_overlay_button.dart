@@ -14,6 +14,7 @@ class QuickStickyOverlayButton extends StatefulWidget {
       requestFocusOnHover: false,
       clipBehavior: .none,
     ),
+    this.overlayInstanceType = .singleton,
     this.disabled = false,
     this.closeOnUnHover = false,
     this.closeOnTapOutside = true,
@@ -42,6 +43,7 @@ class QuickStickyOverlayButton extends StatefulWidget {
   )?
   onHover;
   final QuickButtonStyle buttonStyle;
+  final OverlayInstanceType overlayInstanceType;
   final bool disabled;
   final bool closeOnUnHover;
   final bool closeOnTapOutside;
@@ -57,12 +59,14 @@ class _QuickStickyOverlayButtonState extends State<QuickStickyOverlayButton> {
   final _targetKey = GlobalKey();
   final _layerLink = LayerLink();
 
+  late final OverlayRemoveType _removeType;
+
   bool _isOverlayContentHovered = false;
 
   void _onHoverContentInside(bool value) async {
     _isOverlayContentHovered = value;
     await Future<void>.delayed(.zero);
-    if (value == false) _overlay.remove(targetKey: _targetKey);
+    if (value == false) _overlay.remove(_removeType);
   }
 
   void _showOverlay(
@@ -75,6 +79,7 @@ class _QuickStickyOverlayButtonState extends State<QuickStickyOverlayButton> {
       context,
       targetKey: _targetKey,
       link: _layerLink,
+      instanceType: widget.overlayInstanceType,
       closeOnTapOutside: widget.closeOnTapOutside,
       closeOnTapTarget: closeOnTapTarget,
       configuration: configuration,
@@ -86,8 +91,17 @@ class _QuickStickyOverlayButtonState extends State<QuickStickyOverlayButton> {
   }
 
   @override
+  void initState() {
+    super.initState();
+
+    _removeType = widget.overlayInstanceType == .multiple
+        ? .multiple(targetKey: _targetKey)
+        : const .singleton();
+  }
+
+  @override
   void dispose() {
-    _overlay.remove(targetKey: _targetKey);
+    _overlay.remove(_removeType);
 
     super.dispose();
   }
@@ -109,7 +123,7 @@ class _QuickStickyOverlayButtonState extends State<QuickStickyOverlayButton> {
             configuration: configuration,
             contentBuilder: contentBuilder,
           );
-        }, () => _overlay.remove(targetKey: _targetKey)),
+        }, () => _overlay.remove(_removeType)),
         onHover: (value) async {
           if (value) {
             widget.onHover?.call((
@@ -123,11 +137,11 @@ class _QuickStickyOverlayButtonState extends State<QuickStickyOverlayButton> {
                 configuration: configuration,
                 contentBuilder: contentBuilder,
               );
-            }, () => _overlay.remove(targetKey: _targetKey));
+            }, () => _overlay.remove(_removeType));
           } else {
             if (widget.closeOnUnHover) {
               await Future<void>.delayed(.zero);
-              if (!_isOverlayContentHovered) _overlay.remove(targetKey: _targetKey);
+              if (!_isOverlayContentHovered) _overlay.remove(_removeType);
             }
           }
         },

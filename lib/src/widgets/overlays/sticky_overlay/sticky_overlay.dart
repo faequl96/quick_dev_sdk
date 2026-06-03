@@ -11,21 +11,41 @@ part 'wrapper/sticky_overlay_wrapper.dart';
 
 enum OverlayAlignment { left, center, right }
 
+enum OverlayInstanceType { singleton, multiple }
+
+sealed class OverlayRemoveType {
+  const OverlayRemoveType();
+
+  const factory OverlayRemoveType.singleton() = _SingletonRemove;
+  const factory OverlayRemoveType.multiple({required GlobalKey targetKey}) = _MultipleRemove;
+}
+
+class _SingletonRemove extends OverlayRemoveType {
+  const _SingletonRemove();
+}
+
+class _MultipleRemove extends OverlayRemoveType {
+  const _MultipleRemove({required this.targetKey});
+
+  final GlobalKey targetKey;
+}
+
 class StickyOverlay {
   StickyOverlay._();
 
   factory StickyOverlay() => _instance;
-  static final StickyOverlay _instance = StickyOverlay._();
+  static final _instance = StickyOverlay._();
 
-  void Function()? _onDispose;
-  GlobalKey? _activeTargetKey;
+  static final _singleOverlayKey = GlobalKey();
 
-  OverlayEntry? _overlayEntry;
+  final Map<GlobalKey, OverlayEntry> _overlayEntries = {};
+  final Map<GlobalKey, void Function()?> _onDisposeCallbacks = {};
 
   void create(
     BuildContext context, {
     required GlobalKey targetKey,
     required LayerLink link,
+    OverlayInstanceType instanceType = .singleton,
     bool closeOnTapOutside = true,
     bool closeOnTapTarget = true,
     OverlayConfiguration configuration = const .dynamicWidth(
@@ -47,10 +67,9 @@ class StickyOverlay {
     required Widget Function(BuildContext context) contentBuilder,
     void Function()? onDispose,
   }) {
-    _remove();
+    final idKey = instanceType == .multiple ? targetKey : _singleOverlayKey;
 
-    _onDispose = onDispose;
-    _activeTargetKey = targetKey;
+    _removeByKey(idKey);
 
     final targetContext = targetKey.currentContext;
     if (targetContext == null || !targetContext.mounted) {
@@ -58,37 +77,52 @@ class StickyOverlay {
       return;
     }
 
-    _overlayEntry = OverlayEntry(
+    _onDisposeCallbacks[idKey] = onDispose;
+
+    final entry = OverlayEntry(
       builder: (_) => _OverlayLayer(
         link: link,
         targetContext: targetContext,
         closeOnTapOutside: closeOnTapOutside,
         closeOnTapTarget: closeOnTapTarget,
         config: configuration,
+        instanceType: instanceType,
         onHoverInside: onHoverInside,
-        onRemove: _remove,
+        onRemove: () => _removeByKey(idKey),
         contentBuilder: contentBuilder,
       ),
     );
 
-    Overlay.of(context).insert(_overlayEntry!);
+    _overlayEntries[idKey] = entry;
+    Overlay.of(context).insert(entry);
   }
 
-  void _remove() {
-    _overlayEntry?.remove();
-    _overlayEntry = null;
-
-    _activeTargetKey = null;
-    if (_onDispose != null) {
-      final callback = _onDispose;
-      _onDispose = null;
-      callback!();
+  void remove(OverlayRemoveType type) {
+    if (type is _MultipleRemove) {
+      _removeByKey(type.targetKey);
+    } else {
+      _removeByKey(_singleOverlayKey);
     }
   }
 
-  void remove({required GlobalKey targetKey}) {
-    if (targetKey != _activeTargetKey) return;
-    _remove();
+  void clear() {
+    final keys = _overlayEntries.keys.toList();
+    for (final key in keys) {
+      _removeByKey(key);
+    }
+  }
+
+  void _removeByKey(GlobalKey key) {
+    if (_overlayEntries.containsKey(key)) {
+      _overlayEntries[key]?.remove();
+      _overlayEntries.remove(key);
+    }
+
+    if (_onDisposeCallbacks.containsKey(key)) {
+      final callback = _onDisposeCallbacks[key];
+      _onDisposeCallbacks.remove(key);
+      callback?.call();
+    }
   }
 }
 
@@ -99,6 +133,7 @@ class _OverlayLayer extends StatefulWidget {
     required this.closeOnTapOutside,
     required this.closeOnTapTarget,
     required this.config,
+    required this.instanceType,
     this.onHoverInside,
     required this.onRemove,
     required this.contentBuilder,
@@ -109,6 +144,7 @@ class _OverlayLayer extends StatefulWidget {
   final bool closeOnTapOutside;
   final bool closeOnTapTarget;
   final OverlayConfiguration config;
+  final OverlayInstanceType instanceType;
   final void Function(bool value)? onHoverInside;
   final void Function() onRemove;
   final Widget Function(BuildContext context) contentBuilder;
@@ -142,12 +178,12 @@ class _OverlayLayerState extends State<_OverlayLayer> {
   double _maxWidth = 0;
   bool _isTopOverlay = false;
 
-  @override
-  void initState() {
-    super.initState();
+  // @override
+  // void initState() {
+  //   super.initState();
 
-    _content = widget.contentBuilder(context);
-  }
+  //   _content = widget.contentBuilder(context);
+  // }
 
   @override
   void didChangeDependencies() {
@@ -259,6 +295,8 @@ class _OverlayLayerState extends State<_OverlayLayer> {
 
   @override
   Widget build(BuildContext context) {
+    _content = widget.contentBuilder(context);
+
     final layoutValues = _measuringContentWidth
         ? _getMeasuringLayoutValues
         : _config._id != 4
@@ -268,7 +306,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     return Stack(
       children: [
         if (_config.useBarrier) const ModalBarrier(),
-        if (widget.closeOnTapTarget)
+        if (widget.closeOnTapTarget && !_config.useBarrier)
           Positioned(
             width: _targetSize.width,
             child: CompositedTransformFollower(
@@ -320,6 +358,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
                       offsetY: _config.offsetY,
                       closeOnTapOutside: widget.closeOnTapOutside,
                       config: _config,
+                      instanceType: widget.instanceType,
                       onRemove: widget.onRemove,
                       onHoverInside: widget.onHoverInside,
                       child: _content,
@@ -606,6 +645,7 @@ class _OverlayContent extends StatelessWidget {
     this.offsetY,
     required this.closeOnTapOutside,
     required this.config,
+    required this.instanceType,
     required this.onRemove,
     this.onHoverInside,
     required this.child,
@@ -617,6 +657,7 @@ class _OverlayContent extends StatelessWidget {
   final double? offsetY;
   final bool closeOnTapOutside;
   final OverlayConfiguration config;
+  final OverlayInstanceType instanceType;
   final void Function() onRemove;
   final void Function(bool value)? onHoverInside;
   final Widget? child;
@@ -629,7 +670,7 @@ class _OverlayContent extends StatelessWidget {
       child: Padding(
         padding: isTopOverlay ? .only(bottom: (offsetY ?? 0)) : .only(top: (offsetY ?? 0)),
         child: TapRegion(
-          onTapOutside: closeOnTapOutside ? (_) => onRemove() : null,
+          onTapOutside: closeOnTapOutside && instanceType == .singleton ? (_) => onRemove() : null,
           child: ConstrainedBox(
             constraints: BoxConstraints(
               maxHeight: maxHeight ?? .infinity,
@@ -771,5 +812,36 @@ class _RenderDecoratedOverlay extends RenderProxyBox {
     context.pushClipRRect(needsCompositing, .zero, clipRect, innerRRect, (innerContext, _) {
       innerContext.paintChild(child, childOffset);
     });
+  }
+
+  @override
+  bool hitTestChildren(BoxHitTestResult result, {required Offset position}) {
+    final child = this.child;
+    if (child == null) return false;
+
+    if (child.size.height == 0) return child.hitTest(result, position: position);
+
+    final borderPadding = _decoration.border.dimensions.resolve(TextDirection.ltr);
+    final totalPadding = borderPadding + _decoration.padding;
+    final childOffset = Offset(totalPadding.left, totalPadding.top);
+
+    return result.addWithPaintOffset(
+      offset: childOffset,
+      position: position,
+      hitTest: (BoxHitTestResult result, Offset transformed) {
+        return child.hitTest(result, position: transformed);
+      },
+    );
+  }
+
+  @override
+  void applyPaintTransform(RenderBox child, Matrix4 transform) {
+    if (child.size.height > 0) {
+      final borderPadding = _decoration.border.dimensions.resolve(TextDirection.ltr);
+      final totalPadding = borderPadding + _decoration.padding;
+      final childOffset = Offset(totalPadding.left, totalPadding.top);
+      transform.multiply(Matrix4.translationValues(childOffset.dx, childOffset.dy, 0.0));
+    }
+    super.applyPaintTransform(child, transform);
   }
 }

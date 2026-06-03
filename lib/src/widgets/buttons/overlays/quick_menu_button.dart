@@ -28,6 +28,7 @@ class QuickMenuButton<T> extends StatelessWidget {
       slideTransition: true,
       useBarrier: false,
     ),
+    // this.overlayInstanceType = .singleton,
     this.itemDecoration = const MenuItemDecoration(
       padding: .symmetric(horizontal: 10, vertical: 8),
       margin: .symmetric(vertical: 2),
@@ -47,6 +48,7 @@ class QuickMenuButton<T> extends StatelessWidget {
   final void Function(T value) onSelected;
   final QuickButtonStyle buttonStyle;
   final OverlayConfiguration overlayConfiguration;
+  // final OverlayInstanceType overlayInstanceType;
   final MenuItemDecoration itemDecoration;
   final bool disabled;
   final bool showOnHover;
@@ -60,8 +62,8 @@ class QuickMenuButton<T> extends StatelessWidget {
     BuildContext context,
     void Function(
       BuildContext, {
-      required Widget Function(BuildContext context) contentBuilder,
       required OverlayConfiguration configuration,
+      required Widget Function(BuildContext context) contentBuilder,
     })
     showOverlay,
     void Function() closeOverlay,
@@ -86,6 +88,7 @@ class QuickMenuButton<T> extends StatelessWidget {
           ? (showOverlay, closeOverlay) => _overlay(context, showOverlay, closeOverlay)
           : null,
       buttonStyle: buttonStyle,
+      // overlayInstanceType: overlayInstanceType,
       disabled: disabled,
       closeOnUnHover: closeOnUnHover,
       onHoverChildBuilder: onHoverChildBuilder,

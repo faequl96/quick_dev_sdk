@@ -27,6 +27,7 @@ class QuickPopupButton extends StatelessWidget {
       slideTransition: true,
       useBarrier: false,
     ),
+    this.overlayInstanceType = .singleton,
     this.disabled = false,
     this.showOnHover = false,
     this.closeOnUnHover = false,
@@ -38,6 +39,7 @@ class QuickPopupButton extends StatelessWidget {
 
   final QuickButtonStyle buttonStyle;
   final OverlayConfiguration overlayConfiguration;
+  final OverlayInstanceType overlayInstanceType;
   final bool disabled;
   final bool showOnHover;
   final bool closeOnUnHover;
@@ -50,8 +52,8 @@ class QuickPopupButton extends StatelessWidget {
     BuildContext context,
     void Function(
       BuildContext, {
-      required Widget Function(BuildContext context) contentBuilder,
       required OverlayConfiguration configuration,
+      required Widget Function(BuildContext context) contentBuilder,
     })
     showOverlay,
     void Function() closeOverlay,
@@ -69,6 +71,7 @@ class QuickPopupButton extends StatelessWidget {
           ? (showOverlay, closeOverlay) => _overlay(context, showOverlay, closeOverlay)
           : null,
       buttonStyle: buttonStyle,
+      overlayInstanceType: overlayInstanceType,
       disabled: disabled,
       closeOnUnHover: closeOnUnHover,
       closeOnTapOutside: closeOnTapOutside,

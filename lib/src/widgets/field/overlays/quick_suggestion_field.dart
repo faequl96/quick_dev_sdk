@@ -149,7 +149,7 @@ class _QuickSuggestionFieldState<T> extends State<QuickSuggestionField<T>> {
 
     if (!_isFocusNodeExternal) _focusNode.dispose();
 
-    _overlay.remove(targetKey: _targetKey);
+    _overlay.remove(const .singleton());
 
     super.dispose();
   }
@@ -190,7 +190,7 @@ class _QuickSuggestionFieldState<T> extends State<QuickSuggestionField<T>> {
               },
               child: _Content<T>(
                 onSelected: (value) {
-                  _overlay.remove(targetKey: _targetKey);
+                  _overlay.remove(const .singleton());
                   _isPointerInsideOverlay = false;
                   _isOverlayUseInteraction = false;
                   widget.onSelected(value);
@@ -220,7 +220,7 @@ class _QuickSuggestionFieldState<T> extends State<QuickSuggestionField<T>> {
       }
     } else {
       if (!_isPointerInsideOverlay) {
-        _overlay.remove(targetKey: _targetKey);
+        _overlay.remove(const .singleton());
         _isOverlayUseInteraction = false;
       }
     }
