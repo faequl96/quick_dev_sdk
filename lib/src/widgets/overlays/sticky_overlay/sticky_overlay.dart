@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:quick_dev_sdk/quick_dev_sdk.dart';
 
+part 'models/layout_values.dart';
 part 'models/overlay_decoration.dart';
 part 'wrapper/sticky_overlay_wrapper.dart';
 
@@ -347,7 +348,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
                     key: _contentKey,
                     child: _OverlayContent(
                       isTopOverlay: _isTopOverlay,
-                      maxHeight: _measuringContentWidth ? null : layoutValues.surfaceMaxHeight,
+                      maxHeight: layoutValues.surfaceMaxHeight,
                       maxWidth: _measuringContentWidth ? _maxWidth : null,
                       offsetY: _decoration.offsetY,
                       removeOnTapOutside: widget.removeOnTapOutside,
@@ -368,31 +369,18 @@ class _OverlayLayerState extends State<_OverlayLayer> {
 
   double get _getMaxWidth => _screenSize.width - _decoration.marginX;
 
-  ({
-    double surfaceMaxWidth,
-    double surfaceMaxHeight,
-    double alignmentOffsetY,
-    double alignmentOffsetX,
-    Alignment anchorAlignment,
-  })
-  get _getMeasuringLayoutValues {
-    return (
-      surfaceMaxWidth: 0,
-      surfaceMaxHeight: 0,
-      alignmentOffsetY: 0,
-      alignmentOffsetX: 0,
-      anchorAlignment: .topCenter,
+  _LayoutValues get _getMeasuringLayoutValues {
+    final decorationMaxHeight = _decoration.maxHeight?.clamp(
+      _minTopOverlay,
+      _screenSize.height - (_minTopOverlay + _decoration.marginY),
     );
+    final finalDecorationMaxHeight = decorationMaxHeight ?? _maxHeight;
+    final surfaceMaxHeight = min(_maxHeight, finalDecorationMaxHeight);
+
+    return _LayoutValues(surfaceMaxHeight: surfaceMaxHeight);
   }
 
-  ({
-    double surfaceMaxWidth,
-    double surfaceMaxHeight,
-    double alignmentOffsetY,
-    double alignmentOffsetX,
-    Alignment anchorAlignment,
-  })
-  get _getLayoutValues {
+  _LayoutValues get _getLayoutValues {
     final decoration = widget.decoration;
     final screenWidth = _screenSize.width;
     final targetWidth = _targetSize.width;
@@ -475,7 +463,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     final finalDecorationMaxHeight = decorationMaxHeight ?? _maxHeight;
     final surfaceMaxHeight = min(_maxHeight, finalDecorationMaxHeight);
 
-    return (
+    return _LayoutValues(
       surfaceMaxWidth: surfaceMaxWidth,
       surfaceMaxHeight: surfaceMaxHeight,
       alignmentOffsetY: alignmentOffsetY,
@@ -484,14 +472,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     );
   }
 
-  ({
-    double surfaceMaxWidth,
-    double surfaceMaxHeight,
-    double alignmentOffsetY,
-    double alignmentOffsetX,
-    Alignment anchorAlignment,
-  })
-  get _getAdaptiveLayoutValues {
+  _LayoutValues get _getAdaptiveLayoutValues {
     final screenWidth = _screenSize.width;
     final targetWidth = _targetSize.width;
     final marginX = _decoration.marginX;
@@ -544,7 +525,7 @@ class _OverlayLayerState extends State<_OverlayLayer> {
     final finalDecorationMaxHeight = decorationMaxHeight ?? _maxHeight;
     final surfaceMaxHeight = min(_maxHeight, finalDecorationMaxHeight);
 
-    return (
+    return _LayoutValues(
       surfaceMaxWidth: surfaceMaxWidth,
       surfaceMaxHeight: surfaceMaxHeight,
       alignmentOffsetY: alignmentOffsetY,

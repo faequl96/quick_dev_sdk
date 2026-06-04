@@ -195,6 +195,10 @@ class _DropdownsState<T> extends State<_Dropdowns<T>> {
   final _selectedItemKey = GlobalKey();
   int? _selectedIndex;
 
+  double _listViewHeight = 0;
+  double _maxScrollExtent = 0;
+  double _currentMaxScroll = 0;
+
   @override
   void initState() {
     super.initState();
@@ -205,7 +209,11 @@ class _DropdownsState<T> extends State<_Dropdowns<T>> {
     if ((_selectedIndex ?? 0) < 0) _selectedIndex = null;
 
     if (_selectedIndex != null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => _autoScrollToSelectedItem());
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _listViewHeight = _controller.position.viewportDimension;
+        _maxScrollExtent = _controller.position.maxScrollExtent;
+        _autoScrollToSelectedItem();
+      });
     }
   }
 
@@ -220,21 +228,16 @@ class _DropdownsState<T> extends State<_Dropdowns<T>> {
     if (!mounted) return;
 
     final currentContext = _selectedItemKey.currentContext;
-
     if (currentContext != null) {
-      if (currentContext.findRenderObject()?.debugNeedsPaint != true) {
-        Scrollable.ensureVisible(currentContext, alignment: .2);
-        return;
-      }
+      Scrollable.ensureVisible(currentContext, alignment: .2);
+      return;
     }
 
-    final currentMaxScroll = _controller.position.maxScrollExtent;
+    _currentMaxScroll = (_currentMaxScroll + _listViewHeight).clamp(.0, _maxScrollExtent);
     final currentOffset = _controller.offset;
-    if (currentOffset >= currentMaxScroll) {
-      if (currentContext?.findRenderObject()?.debugNeedsPaint != true) return;
-    }
+    if (currentOffset >= _currentMaxScroll) return;
 
-    _controller.jumpTo(currentMaxScroll);
+    _controller.jumpTo(_currentMaxScroll);
     WidgetsBinding.instance.addPostFrameCallback((_) => _autoScrollToSelectedItem());
   }
 
