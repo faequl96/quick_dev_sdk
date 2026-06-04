@@ -15,7 +15,7 @@ class QuickDropdownButton<T> extends StatelessWidget {
       requestFocusOnHover: false,
       clipBehavior: .none,
     ),
-    this.overlayConfiguration = const .fitToTargetWidth(
+    this.overlayDecoration = const .fitToTargetWidth(
       offsetY: 6,
       marginY: 14,
       marginX: 14,
@@ -59,7 +59,7 @@ class QuickDropdownButton<T> extends StatelessWidget {
       requestFocusOnHover: false,
       clipBehavior: .none,
     ),
-    this.overlayConfiguration = const .fitToTargetWidth(
+    this.overlayDecoration = const .fitToTargetWidth(
       offsetY: 6,
       marginY: 14,
       marginX: 14,
@@ -110,7 +110,7 @@ class QuickDropdownButton<T> extends StatelessWidget {
   final bool _withItemsSearch;
   final void Function(T value) onSelected;
   final QuickButtonStyle buttonStyle;
-  final OverlayConfiguration overlayConfiguration;
+  final OverlayDecoration overlayDecoration;
   final DropdownItemDecoration itemDecoration;
   final bool disabled;
   final T? value;
@@ -129,12 +129,12 @@ class QuickDropdownButton<T> extends StatelessWidget {
         if (disabled) return;
         showOverlay(
           context,
-          configuration: overlayConfiguration.copyWith(padding: .zero),
+          decoration: overlayDecoration.copyWith(padding: .zero),
           contentBuilder: (_) {
             if (_withItemsSearch) {
               return _DropdownItemsSearch<T>(
                 onSelected: onSelected,
-                overlayPadding: overlayConfiguration.padding,
+                overlayPadding: overlayDecoration.padding,
                 decoration: itemDecoration,
                 value: value,
                 items: _itemsBuilder,
@@ -148,7 +148,7 @@ class QuickDropdownButton<T> extends StatelessWidget {
 
             return _Dropdowns(
               onSelected: onSelected,
-              overlayPadding: overlayConfiguration.padding,
+              overlayPadding: overlayDecoration.padding,
               decoration: itemDecoration,
               value: value,
               items: _items,
@@ -159,6 +159,7 @@ class QuickDropdownButton<T> extends StatelessWidget {
         );
       },
       buttonStyle: buttonStyle,
+      overlayInstanceOptionBuilder: (_) => const .singleton(),
       disabled: disabled,
       child: selectedValueBuilder(context, value),
     );

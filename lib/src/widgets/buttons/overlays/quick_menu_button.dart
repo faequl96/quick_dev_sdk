@@ -13,7 +13,7 @@ class QuickMenuButton<T> extends StatelessWidget {
       requestFocusOnHover: false,
       clipBehavior: .none,
     ),
-    this.overlayConfiguration = const .dynamicWidth(
+    this.overlayDecoration = const .dynamicWidth(
       offsetY: 6,
       offsetX: 8,
       marginY: 14,
@@ -47,7 +47,7 @@ class QuickMenuButton<T> extends StatelessWidget {
 
   final void Function(T value) onSelected;
   final QuickButtonStyle buttonStyle;
-  final OverlayConfiguration overlayConfiguration;
+  final OverlayDecoration overlayDecoration;
   // final OverlayInstanceType overlayInstanceType;
   final MenuItemDecoration itemDecoration;
   final bool disabled;
@@ -62,17 +62,17 @@ class QuickMenuButton<T> extends StatelessWidget {
     BuildContext context,
     void Function(
       BuildContext, {
-      required OverlayConfiguration configuration,
+      required OverlayDecoration decoration,
       required Widget Function(BuildContext context) contentBuilder,
     })
     showOverlay,
     void Function() closeOverlay,
   ) => showOverlay(
     context,
-    configuration: overlayConfiguration.copyWith(padding: .zero),
+    decoration: overlayDecoration.copyWith(padding: .zero),
     contentBuilder: (_) => _Menus(
       onSelected: onSelected,
-      overlayPadding: overlayConfiguration.padding,
+      overlayPadding: overlayDecoration.padding,
       decoration: itemDecoration,
       items: items,
       itemBuilder: itemBuilder,
@@ -88,7 +88,7 @@ class QuickMenuButton<T> extends StatelessWidget {
           ? (showOverlay, closeOverlay) => _overlay(context, showOverlay, closeOverlay)
           : null,
       buttonStyle: buttonStyle,
-      // overlayInstanceType: overlayInstanceType,
+      overlayInstanceOptionBuilder: (_) => const .singleton(),
       disabled: disabled,
       closeOnUnHover: closeOnUnHover,
       onHoverChildBuilder: onHoverChildBuilder,

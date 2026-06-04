@@ -8,7 +8,7 @@ class QuickSuggestionField<T> extends StatefulWidget {
   const QuickSuggestionField({
     required this.onSelected,
     super.key,
-    this.configuration = const .fitToTargetWidth(
+    this.decoration = const .fitToTargetWidth(
       offsetY: 6,
       marginY: 14,
       marginX: 14,
@@ -45,7 +45,7 @@ class QuickSuggestionField<T> extends StatefulWidget {
   const QuickSuggestionField.searchOnly({
     required this.onSelected,
     super.key,
-    this.configuration = const .fitToTargetWidth(
+    this.decoration = const .fitToTargetWidth(
       offsetY: 6,
       marginY: 14,
       marginX: 14,
@@ -81,7 +81,7 @@ class QuickSuggestionField<T> extends StatefulWidget {
 
   final bool _searchOnly;
   final void Function(T value) onSelected;
-  final OverlayConfiguration configuration;
+  final OverlayDecoration decoration;
   final SuggestionItemDecoration itemDecoration;
   final TextEditingController controller;
   final FocusNode? focusNode;
@@ -173,9 +173,9 @@ class _QuickSuggestionFieldState<T> extends State<QuickSuggestionField<T>> {
           context,
           targetKey: _targetKey,
           link: _layerLink,
-          closeOnTapOutside: false,
-          closeOnTapTarget: false,
-          configuration: widget.configuration.copyWith(padding: .zero),
+          removeOnTapOutside: false,
+          removeOnTapTarget: false,
+          decoration: widget.decoration.copyWith(padding: .zero),
           contentBuilder: (_) {
             return Listener(
               onPointerDown: (_) {
@@ -195,7 +195,7 @@ class _QuickSuggestionFieldState<T> extends State<QuickSuggestionField<T>> {
                   _isOverlayUseInteraction = false;
                   widget.onSelected(value);
                 },
-                overlayPadding: widget.configuration.padding,
+                overlayPadding: widget.decoration.padding,
                 itemDecoration: widget.itemDecoration,
                 debouncer: widget.debouncer,
                 initialKeywords: widget.controller.text,

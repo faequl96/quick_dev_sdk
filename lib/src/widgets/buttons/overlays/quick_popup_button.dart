@@ -12,7 +12,7 @@ class QuickPopupButton extends StatelessWidget {
       requestFocusOnHover: false,
       clipBehavior: .none,
     ),
-    this.overlayConfiguration = const .dynamicWidth(
+    this.overlayDecoration = const .dynamicWidth(
       offsetY: 6,
       offsetX: 8,
       marginY: 14,
@@ -27,7 +27,7 @@ class QuickPopupButton extends StatelessWidget {
       slideTransition: true,
       useBarrier: false,
     ),
-    this.overlayInstanceType = .singleton,
+    required this.overlayInstanceOptionBuilder,
     this.disabled = false,
     this.showOnHover = false,
     this.closeOnUnHover = false,
@@ -38,8 +38,8 @@ class QuickPopupButton extends StatelessWidget {
   });
 
   final QuickButtonStyle buttonStyle;
-  final OverlayConfiguration overlayConfiguration;
-  final OverlayInstanceType overlayInstanceType;
+  final OverlayDecoration overlayDecoration;
+  final OverlayInstanceOption Function(GlobalKey targetKey) overlayInstanceOptionBuilder;
   final bool disabled;
   final bool showOnHover;
   final bool closeOnUnHover;
@@ -52,14 +52,14 @@ class QuickPopupButton extends StatelessWidget {
     BuildContext context,
     void Function(
       BuildContext, {
-      required OverlayConfiguration configuration,
+      required OverlayDecoration decoration,
       required Widget Function(BuildContext context) contentBuilder,
     })
     showOverlay,
     void Function() closeOverlay,
   ) => showOverlay(
     context,
-    configuration: overlayConfiguration,
+    decoration: overlayDecoration,
     contentBuilder: (context) => contentBuilder(context, closeOverlay: closeOverlay),
   );
 
@@ -71,7 +71,7 @@ class QuickPopupButton extends StatelessWidget {
           ? (showOverlay, closeOverlay) => _overlay(context, showOverlay, closeOverlay)
           : null,
       buttonStyle: buttonStyle,
-      overlayInstanceType: overlayInstanceType,
+      overlayInstanceOptionBuilder: overlayInstanceOptionBuilder,
       disabled: disabled,
       closeOnUnHover: closeOnUnHover,
       closeOnTapOutside: closeOnTapOutside,

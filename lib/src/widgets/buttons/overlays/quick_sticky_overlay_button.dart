@@ -14,7 +14,7 @@ class QuickStickyOverlayButton extends StatefulWidget {
       requestFocusOnHover: false,
       clipBehavior: .none,
     ),
-    this.overlayInstanceType = .singleton,
+    required this.overlayInstanceOptionBuilder,
     this.disabled = false,
     this.closeOnUnHover = false,
     this.closeOnTapOutside = true,
@@ -25,7 +25,7 @@ class QuickStickyOverlayButton extends StatefulWidget {
   final void Function(
     void Function(
       BuildContext context, {
-      required OverlayConfiguration configuration,
+      required OverlayDecoration decoration,
       required Widget Function(BuildContext context) contentBuilder,
     })
     showOverlay,
@@ -35,7 +35,7 @@ class QuickStickyOverlayButton extends StatefulWidget {
   final void Function(
     void Function(
       BuildContext context, {
-      required OverlayConfiguration configuration,
+      required OverlayDecoration decoration,
       required Widget Function(BuildContext context) contentBuilder,
     })
     showOverlay,
@@ -43,7 +43,7 @@ class QuickStickyOverlayButton extends StatefulWidget {
   )?
   onHover;
   final QuickButtonStyle buttonStyle;
-  final OverlayInstanceType overlayInstanceType;
+  final OverlayInstanceOption Function(GlobalKey targetKey) overlayInstanceOptionBuilder;
   final bool disabled;
   final bool closeOnUnHover;
   final bool closeOnTapOutside;
@@ -59,30 +59,30 @@ class _QuickStickyOverlayButtonState extends State<QuickStickyOverlayButton> {
   final _targetKey = GlobalKey();
   final _layerLink = LayerLink();
 
-  late final OverlayRemoveType _removeType;
+  late final OverlayInstanceOption _instanceOption;
 
   bool _isOverlayContentHovered = false;
 
   void _onHoverContentInside(bool value) async {
     _isOverlayContentHovered = value;
     await Future<void>.delayed(.zero);
-    if (value == false) _overlay.remove(_removeType);
+    if (value == false) _overlay.remove(_instanceOption);
   }
 
   void _showOverlay(
     BuildContext context, {
     required bool closeOnTapTarget,
-    required OverlayConfiguration configuration,
+    required OverlayDecoration decoration,
     required Widget Function(BuildContext context) contentBuilder,
   }) {
     _overlay.create(
       context,
       targetKey: _targetKey,
       link: _layerLink,
-      instanceType: widget.overlayInstanceType,
-      closeOnTapOutside: widget.closeOnTapOutside,
-      closeOnTapTarget: closeOnTapTarget,
-      configuration: configuration,
+      instanceOption: _instanceOption,
+      removeOnTapOutside: widget.closeOnTapOutside,
+      removeOnTapTarget: closeOnTapTarget,
+      decoration: decoration,
       onHoverInside: (value) {
         if (widget.closeOnUnHover) _onHoverContentInside(value);
       },
@@ -94,14 +94,12 @@ class _QuickStickyOverlayButtonState extends State<QuickStickyOverlayButton> {
   void initState() {
     super.initState();
 
-    _removeType = widget.overlayInstanceType == .multiple
-        ? .multiple(targetKey: _targetKey)
-        : const .singleton();
+    _instanceOption = widget.overlayInstanceOptionBuilder(_targetKey);
   }
 
   @override
   void dispose() {
-    _overlay.remove(_removeType);
+    _overlay.remove(_instanceOption);
 
     super.dispose();
   }
@@ -114,34 +112,34 @@ class _QuickStickyOverlayButtonState extends State<QuickStickyOverlayButton> {
         key: _targetKey,
         onTap: () => widget.onTap?.call((
           BuildContext context, {
-          required OverlayConfiguration configuration,
+          required OverlayDecoration decoration,
           required Widget Function(BuildContext context) contentBuilder,
         }) async {
           _showOverlay(
             context,
             closeOnTapTarget: true,
-            configuration: configuration,
+            decoration: decoration,
             contentBuilder: contentBuilder,
           );
-        }, () => _overlay.remove(_removeType)),
+        }, () => _overlay.remove(_instanceOption)),
         onHover: (value) async {
           if (value) {
             widget.onHover?.call((
               BuildContext context, {
-              required OverlayConfiguration configuration,
+              required OverlayDecoration decoration,
               required Widget Function(BuildContext context) contentBuilder,
             }) {
               _showOverlay(
                 context,
                 closeOnTapTarget: false,
-                configuration: configuration,
+                decoration: decoration,
                 contentBuilder: contentBuilder,
               );
-            }, () => _overlay.remove(_removeType));
+            }, () => _overlay.remove(_instanceOption));
           } else {
             if (widget.closeOnUnHover) {
               await Future<void>.delayed(.zero);
-              if (!_isOverlayContentHovered) _overlay.remove(_removeType);
+              if (!_isOverlayContentHovered) _overlay.remove(_instanceOption);
             }
           }
         },
