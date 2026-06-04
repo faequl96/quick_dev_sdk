@@ -105,7 +105,7 @@ class _QuickSuggestionFieldState<T> extends State<QuickSuggestionField<T>> {
   bool _isPointerInsideOverlay = false;
   bool _isOverlayUseInteraction = false;
 
-  final _overlay = StickyOverlay();
+  final _overlay = StickyOverlay.instance;
   final _targetKey = GlobalKey();
   final _layerLink = LayerLink();
 

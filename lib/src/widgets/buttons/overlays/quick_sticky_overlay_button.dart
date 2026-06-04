@@ -55,7 +55,7 @@ class QuickStickyOverlayButton extends StatefulWidget {
 }
 
 class _QuickStickyOverlayButtonState extends State<QuickStickyOverlayButton> {
-  final _overlay = StickyOverlay();
+  final _overlay = StickyOverlay.instance;
   final _targetKey = GlobalKey();
   final _layerLink = LayerLink();
 

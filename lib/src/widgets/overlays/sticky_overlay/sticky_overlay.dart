@@ -31,8 +31,8 @@ class _MultipleInstance extends OverlayInstanceOption {
 class StickyOverlay {
   StickyOverlay._();
 
-  factory StickyOverlay() => _instance;
   static final _instance = StickyOverlay._();
+  static StickyOverlay get instance => _instance;
 
   static final _singleOverlayKey = GlobalKey();
 
@@ -64,7 +64,7 @@ class StickyOverlay {
     required Widget Function(BuildContext context) contentBuilder,
     void Function()? onDispose,
   }) {
-    final idKey = instanceOption is _SingletonInstance ? targetKey : _singleOverlayKey;
+    final idKey = instanceOption is _MultipleInstance ? targetKey : _singleOverlayKey;
 
     _removeByKey(idKey);
 
@@ -109,16 +109,13 @@ class StickyOverlay {
 
   void _removeByKey(GlobalKey key) {
     if (_overlays.containsKey(key)) {
-      final onDisposeCallback = _overlays[key]?.onDispose;
-      _overlays[key]?.remove();
+      final overlay = _overlays[key];
+      overlay?.entry.remove();
+      final onDisposeCallback = overlay?.onDispose;
       _overlays.remove(key);
       onDisposeCallback?.call();
     }
   }
-}
-
-extension on ({OverlayEntry entry, void Function()? onDispose})? {
-  void remove() {}
 }
 
 class _OverlayLayer extends StatefulWidget {
