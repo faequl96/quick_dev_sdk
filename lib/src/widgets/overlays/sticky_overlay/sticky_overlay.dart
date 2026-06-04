@@ -7,27 +7,10 @@ import 'package:quick_dev_sdk/quick_dev_sdk.dart';
 
 part 'models/layout_values.dart';
 part 'models/overlay_decoration.dart';
+part 'models/overlay_instance_option.dart';
 part 'wrapper/sticky_overlay_wrapper.dart';
 
 enum OverlayAlignment { left, center, right }
-
-sealed class OverlayInstanceOption {
-  const OverlayInstanceOption();
-
-  const factory OverlayInstanceOption.singleton() = _SingletonInstance;
-
-  const factory OverlayInstanceOption.multiple({required GlobalKey targetKey}) = _MultipleInstance;
-}
-
-class _SingletonInstance extends OverlayInstanceOption {
-  const _SingletonInstance();
-}
-
-class _MultipleInstance extends OverlayInstanceOption {
-  const _MultipleInstance({required this.targetKey});
-
-  final GlobalKey targetKey;
-}
 
 class StickyOverlay {
   StickyOverlay._();
