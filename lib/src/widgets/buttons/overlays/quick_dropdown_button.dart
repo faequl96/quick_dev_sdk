@@ -338,7 +338,7 @@ class _DropdownItemsSearchState<T> extends State<_DropdownItemsSearch<T>> {
       mainAxisSize: .min,
       children: [
         Padding(
-          padding: const .only(top: 5, left: 5, right: 5, bottom: 2),
+          padding: const .only(top: 5, left: 5, right: 5, bottom: 5),
           child: QuickTextField(
             controller: _textEditingController,
             height: 40,
