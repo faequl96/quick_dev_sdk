@@ -205,7 +205,7 @@ class _QuickDropdownFieldState<T> extends State<QuickDropdownField<T>> {
           QuickTextField(
             controller: _textEditingController,
             height: widget.height,
-            width: widget.width ?? .maxFinite,
+            width: widget.width ?? .infinity,
             readOnly: true,
             style: widget.fieldTextStyle,
             decoration: decoration,
@@ -393,7 +393,7 @@ class _DropdownItemsSearchState<T> extends State<_DropdownItemsSearch<T>> {
           child: QuickTextField(
             controller: _textEditingController,
             height: 40,
-            width: .maxFinite,
+            width: .infinity,
             style: widget.searchFieldTextStyle,
             autofocus: true,
             decoration: widget.searchFieldDecoration.copyWith(

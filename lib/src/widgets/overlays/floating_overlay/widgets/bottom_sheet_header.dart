@@ -11,7 +11,7 @@ class BottomSheetHeader extends StatelessWidget {
     return Stack(
       alignment: .centerRight,
       children: [
-        title ?? const SizedBox(width: .maxFinite),
+        title ?? const SizedBox(width: .infinity),
         if (action != null)
           Padding(padding: const .symmetric(vertical: 8, horizontal: 16), child: action!),
       ],

@@ -813,7 +813,7 @@ class _DayPickerState extends State<_DayPicker> {
               alignment: .bottomCenter,
               children: [
                 SizedBox(
-                  height: .maxFinite,
+                  height: .infinity,
                   child: Center(
                     child: Text(
                       localizations.formatDecimal(day),
@@ -842,7 +842,7 @@ class _DayPickerState extends State<_DayPicker> {
               alignment: .bottomCenter,
               children: [
                 SizedBox(
-                  height: .maxFinite,
+                  height: .infinity,
                   child: Center(
                     child: Text(
                       localizations.formatDecimal(day),

@@ -32,7 +32,7 @@ class BottomSheetContent extends StatelessWidget {
               constraints: BoxConstraints(maxHeight: usableHeight),
               child: SizedBox(
                 height: decoration?.height,
-                width: .maxFinite,
+                width: .infinity,
                 child: Column(
                   mainAxisSize: .min,
                   children: [

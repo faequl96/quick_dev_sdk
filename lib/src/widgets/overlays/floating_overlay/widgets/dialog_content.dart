@@ -50,7 +50,7 @@ class _DialogContentState extends State<DialogContent> {
             if (widget.header != null && childWidth != 0)
               SizedBox(width: childWidth, child: widget.header),
           ] else ...[
-            if (widget.header != null) SizedBox(width: .maxFinite, child: widget.header!),
+            if (widget.header != null) SizedBox(width: .infinity, child: widget.header!),
           ],
           Flexible(
             child: ConstrainedBox(

@@ -125,7 +125,7 @@ class _QuickUnderlineTextFieldState extends State<QuickUnderlineTextField> {
         ),
         if (_validateMessage != null)
           SizedBox(
-            width: .maxFinite,
+            width: .infinity,
             child: Row(
               children: [
                 const SizedBox(width: 1),

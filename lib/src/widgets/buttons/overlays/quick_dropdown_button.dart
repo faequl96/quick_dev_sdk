@@ -342,7 +342,7 @@ class _DropdownItemsSearchState<T> extends State<_DropdownItemsSearch<T>> {
           child: QuickTextField(
             controller: _textEditingController,
             height: 40,
-            width: .maxFinite,
+            width: .infinity,
             style: widget.searchFieldTextStyle,
             autofocus: true,
             decoration: widget.searchFieldDecoration.copyWith(

@@ -35,7 +35,7 @@ class HeaderTitle extends StatelessWidget {
     if (isHandleBar) {
       return SizedBox(
         height: 32,
-        width: .maxFinite,
+        width: .infinity,
         child: Row(
           crossAxisAlignment: .center,
           mainAxisAlignment: .center,
@@ -56,7 +56,7 @@ class HeaderTitle extends StatelessWidget {
     }
 
     return SizedBox(
-      width: .maxFinite,
+      width: .infinity,
       child: Row(
         crossAxisAlignment: .center,
         mainAxisAlignment: .start,
