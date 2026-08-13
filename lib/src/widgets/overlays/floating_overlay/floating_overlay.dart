@@ -85,6 +85,7 @@ class FloatingOverlay {
             height: decoration?.height,
             padding: decoration?.padding ?? .zero,
             header: header,
+            constraints: decoration?.constraints,
             child: contentBuilder(context),
           ),
         ],

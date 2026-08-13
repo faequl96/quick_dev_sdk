@@ -24,3 +24,12 @@ linter:
     # Naming Convention
     constant_identifier_names: true # Menggunakan format UPPER_CASE untuk konstanta
     non_constant_identifier_names: false # Tidak mengizinkan penamaan variabel yang tidak sesuai standar
+analyzer:
+  exclude:
+    - build/**
+    - android/**
+    - ios/**
+    - web/**
+    - windows/**
+    - macos/**
+    - linux/**
