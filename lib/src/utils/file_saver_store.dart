@@ -1,6 +1,6 @@
 import 'package:flutter/services.dart';
 
-class FileSaverStore {
+class FileSaverStore() {
   static const MethodChannel _channel = MethodChannel('media_store_channel');
 
   static Future<String?> saveFileToDownloads(Uint8List bytes, String fileName) async {

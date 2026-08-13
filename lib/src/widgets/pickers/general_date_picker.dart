@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -19,33 +20,22 @@ const double _yearPickerRowSpacing = 8.0;
 const double _subHeaderHeight = 52.0;
 const double _monthNavButtonsWidth = 108.0;
 
-class GeneralDatePicker extends StatefulWidget {
-  const GeneralDatePicker({
-    super.key,
-    this.initialDate,
-    required this.firstDate,
-    required this.lastDate,
-    this.currentDate,
-    this.holidays = const [],
-    required this.onDateChanged,
-    this.initialCalendarMode = .day,
-    this.selectableDayPredicate,
-  });
-
-  final DateTime? initialDate;
-  final DateTime firstDate;
-  final DateTime lastDate;
-  final DateTime? currentDate;
-  final List<Holiday> holidays;
-  final ValueChanged<DateTime> onDateChanged;
-  final DatePickerMode initialCalendarMode;
-  final SelectableDayPredicate? selectableDayPredicate;
-
+class const GeneralDatePicker({
+  super.key,
+  final DateTime? initialDate,
+  required final DateTime firstDate,
+  required final DateTime lastDate,
+  final DateTime? currentDate,
+  final List<Holiday> holidays = const [],
+  required final ValueChanged<DateTime> onDateChanged,
+  final DatePickerMode initialCalendarMode = .day,
+  final SelectableDayPredicate? selectableDayPredicate,
+}) extends StatefulWidget {
   @override
   State<GeneralDatePicker> createState() => _GeneralDatePickerState();
 }
 
-class _GeneralDatePickerState extends State<GeneralDatePicker> {
+class _GeneralDatePickerState() extends State<GeneralDatePicker> {
   late DatePickerMode _mode;
   late DateTime _currentDisplayedMonthDate;
   late DateTime? _selectedDate;
@@ -219,22 +209,17 @@ class _GeneralDatePickerState extends State<GeneralDatePicker> {
   }
 }
 
-class _DatePickerModeToggleButton extends StatefulWidget {
-  const _DatePickerModeToggleButton({
-    required this.mode,
-    required this.title,
-    required this.onTitlePressed,
-  });
-
-  final DatePickerMode mode;
-  final String title;
-  final VoidCallback onTitlePressed;
-
+class const _DatePickerModeToggleButton({
+  required final DatePickerMode mode,
+  required final String title,
+  required final VoidCallback onTitlePressed,
+}) extends StatefulWidget {
   @override
   _DatePickerModeToggleButtonState createState() => _DatePickerModeToggleButtonState();
 }
 
-class _DatePickerModeToggleButtonState extends State<_DatePickerModeToggleButton>
+class _DatePickerModeToggleButtonState()
+    extends State<_DatePickerModeToggleButton>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
@@ -315,35 +300,23 @@ class _DatePickerModeToggleButtonState extends State<_DatePickerModeToggleButton
   }
 }
 
-class _MonthPicker extends StatefulWidget {
-  const _MonthPicker({
-    super.key,
-    required this.initialMonth,
-    required this.currentDate,
-    required this.firstDate,
-    required this.lastDate,
-    this.selectedDate,
-    required this.holidays,
-    required this.onChanged,
-    required this.onDisplayedMonthChanged,
-    this.selectableDayPredicate,
-  });
-
-  final DateTime initialMonth;
-  final DateTime currentDate;
-  final DateTime firstDate;
-  final DateTime lastDate;
-  final DateTime? selectedDate;
-  final List<Holiday> holidays;
-  final ValueChanged<DateTime> onChanged;
-  final ValueChanged<DateTime> onDisplayedMonthChanged;
-  final SelectableDayPredicate? selectableDayPredicate;
-
+class const _MonthPicker({
+  super.key,
+  required final DateTime initialMonth,
+  required final DateTime currentDate,
+  required final DateTime firstDate,
+  required final DateTime lastDate,
+  final DateTime? selectedDate,
+  required final List<Holiday> holidays,
+  required final ValueChanged<DateTime> onChanged,
+  required final ValueChanged<DateTime> onDisplayedMonthChanged,
+  final SelectableDayPredicate? selectableDayPredicate,
+}) extends StatefulWidget {
   @override
   _MonthPickerState createState() => _MonthPickerState();
 }
 
-class _MonthPickerState extends State<_MonthPicker> {
+class _MonthPickerState() extends State<_MonthPicker> {
   final GlobalKey _pageViewKey = GlobalKey();
   late DateTime _currentMonth;
   late PageController _pageController;
@@ -605,11 +578,7 @@ class _MonthPickerState extends State<_MonthPicker> {
   }
 }
 
-class _FocusedDate extends InheritedWidget {
-  const _FocusedDate({required super.child, this.date});
-
-  final DateTime? date;
-
+class const _FocusedDate({required super.child, final DateTime? date}) extends InheritedWidget {
   @override
   bool updateShouldNotify(_FocusedDate oldWidget) {
     return !DateUtils.isSameDay(date, oldWidget.date);
@@ -621,33 +590,22 @@ class _FocusedDate extends InheritedWidget {
   }
 }
 
-class _DayPicker extends StatefulWidget {
-  const _DayPicker({
-    super.key,
-    required this.currentDate,
-    required this.displayedMonth,
-    required this.firstDate,
-    required this.lastDate,
-    this.selectedDate,
-    required this.holidays,
-    required this.onChanged,
-    this.selectableDayPredicate,
-  });
-
-  final DateTime? selectedDate;
-  final DateTime currentDate;
-  final ValueChanged<DateTime> onChanged;
-  final DateTime firstDate;
-  final DateTime lastDate;
-  final List<Holiday> holidays;
-  final DateTime displayedMonth;
-  final SelectableDayPredicate? selectableDayPredicate;
-
+class const _DayPicker({
+  super.key,
+  required final DateTime currentDate,
+  required final DateTime displayedMonth,
+  required final DateTime firstDate,
+  required final DateTime lastDate,
+  final DateTime? selectedDate,
+  required final List<Holiday> holidays,
+  required final ValueChanged<DateTime> onChanged,
+  final SelectableDayPredicate? selectableDayPredicate,
+}) extends StatefulWidget {
   @override
   _DayPickerState createState() => _DayPickerState();
 }
 
-class _DayPickerState extends State<_DayPicker> {
+class _DayPickerState() extends State<_DayPicker> {
   late List<FocusNode> _dayFocusNodes;
 
   @override
@@ -917,9 +875,7 @@ class _DayPickerState extends State<_DayPicker> {
   }
 }
 
-class _DayPickerGridDelegate extends SliverGridDelegate {
-  const _DayPickerGridDelegate();
-
+class const _DayPickerGridDelegate() extends SliverGridDelegate {
   @override
   SliverGridLayout getLayout(SliverConstraints constraints) {
     const int columnCount = DateTime.daysPerWeek;
@@ -944,31 +900,21 @@ class _DayPickerGridDelegate extends SliverGridDelegate {
 
 const _DayPickerGridDelegate _dayPickerGridDelegate = _DayPickerGridDelegate();
 
-class YearPicker extends StatefulWidget {
-  const YearPicker({
-    super.key,
-    required this.currentDate,
-    required this.firstDate,
-    required this.lastDate,
-    required this.initialDate,
-    this.selectedDate,
-    required this.onChanged,
-    this.dragStartBehavior = DragStartBehavior.start,
-  });
-
-  final DateTime currentDate;
-  final DateTime firstDate;
-  final DateTime lastDate;
-  final DateTime initialDate;
-  final DateTime? selectedDate;
-  final ValueChanged<DateTime> onChanged;
-  final DragStartBehavior dragStartBehavior;
-
+class const YearPicker({
+  super.key,
+  required final DateTime currentDate,
+  required final DateTime firstDate,
+  required final DateTime lastDate,
+  required final DateTime initialDate,
+  final DateTime? selectedDate,
+  required final ValueChanged<DateTime> onChanged,
+  final DragStartBehavior dragStartBehavior = DragStartBehavior.start,
+}) extends StatefulWidget {
   @override
   State<YearPicker> createState() => _YearPickerState();
 }
 
-class _YearPickerState extends State<YearPicker> {
+class _YearPickerState() extends State<YearPicker> {
   late ScrollController _scrollController;
   static const int minYears = 18;
 
@@ -1103,9 +1049,7 @@ class _YearPickerState extends State<YearPicker> {
   }
 }
 
-class _YearPickerGridDelegate extends SliverGridDelegate {
-  const _YearPickerGridDelegate();
-
+class const _YearPickerGridDelegate() extends SliverGridDelegate {
   @override
   SliverGridLayout getLayout(SliverConstraints constraints) {
     final double tileWidth =
@@ -1127,9 +1071,4 @@ class _YearPickerGridDelegate extends SliverGridDelegate {
 
 const _YearPickerGridDelegate _yearPickerGridDelegate = _YearPickerGridDelegate();
 
-class Holiday {
-  const Holiday({required this.date, required this.description});
-
-  final DateTime date;
-  final String description;
-}
+class const Holiday({required final DateTime date, required final String description}) {}

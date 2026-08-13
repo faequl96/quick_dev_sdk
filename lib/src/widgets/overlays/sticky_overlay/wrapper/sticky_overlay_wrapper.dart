@@ -1,15 +1,11 @@
 part of '../sticky_overlay.dart';
 
-class StickyOverlayWrapper extends StatefulWidget {
-  const StickyOverlayWrapper({super.key, required this.child});
-
-  final Widget child;
-
+class const StickyOverlayWrapper({super.key, required final Widget child}) extends StatefulWidget {
   @override
   State<StickyOverlayWrapper> createState() => _StickyOverlayWrapperState();
 }
 
-class _StickyOverlayWrapperState extends State<StickyOverlayWrapper> {
+class _StickyOverlayWrapperState() extends State<StickyOverlayWrapper> {
   late final _entry = OverlayEntry(
     canSizeOverlay: true,
     opaque: true,

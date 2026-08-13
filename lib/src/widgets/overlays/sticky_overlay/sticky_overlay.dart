@@ -10,11 +10,13 @@ part 'models/overlay_decoration.dart';
 part 'models/overlay_instance_option.dart';
 part 'wrapper/sticky_overlay_wrapper.dart';
 
-enum OverlayAlignment { left, center, right }
+enum OverlayAlignment() {
+  left,
+  center,
+  right
+}
 
-class StickyOverlay {
-  StickyOverlay._();
-
+class StickyOverlay._() {
   static final _instance = StickyOverlay._();
   static StickyOverlay get instance => _instance;
 
@@ -102,32 +104,21 @@ class StickyOverlay {
   }
 }
 
-class _OverlayLayer extends StatefulWidget {
-  const _OverlayLayer({
-    required this.link,
-    required this.targetContext,
-    required this.removeOnTapOutside,
-    required this.removeOnTapTarget,
-    required this.decoration,
-    this.onHoverInside,
-    required this.onTapOutside,
-    required this.contentBuilder,
-  });
-
-  final LayerLink link;
-  final BuildContext targetContext;
-  final bool removeOnTapOutside;
-  final bool removeOnTapTarget;
-  final OverlayDecoration decoration;
-  final void Function(bool value)? onHoverInside;
-  final void Function() onTapOutside;
-  final Widget Function(BuildContext context) contentBuilder;
-
+class const _OverlayLayer({
+  required final LayerLink link,
+  required final BuildContext targetContext,
+  required final bool removeOnTapOutside,
+  required final bool removeOnTapTarget,
+  required final OverlayDecoration decoration,
+  final void Function(bool value)? onHoverInside,
+  required final void Function() onTapOutside,
+  required final Widget Function(BuildContext context) contentBuilder,
+}) extends StatefulWidget {
   @override
   State<_OverlayLayer> createState() => _OverlayLayerState();
 }
 
-class _OverlayLayerState extends State<_OverlayLayer> {
+class _OverlayLayerState() extends State<_OverlayLayer> {
   bool _isInitial = true;
   bool _measuringContentWidth = true;
 
@@ -518,28 +509,19 @@ class _OverlayLayerState extends State<_OverlayLayer> {
   }
 }
 
-class _AnimationLayer extends StatefulWidget {
-  const _AnimationLayer({
-    required this.isTopOverlay,
-    required this.elevationSurfaceY,
-    required this.elevationSurfaceX,
-    required this.slideTransition,
-    required this.transitionOnInitial,
-    required this.child,
-  });
-
-  final bool isTopOverlay;
-  final double elevationSurfaceY;
-  final double elevationSurfaceX;
-  final bool slideTransition;
-  final bool transitionOnInitial;
-  final Widget child;
-
+class const _AnimationLayer({
+  required final bool isTopOverlay,
+  required final double elevationSurfaceY,
+  required final double elevationSurfaceX,
+  required final bool slideTransition,
+  required final bool transitionOnInitial,
+  required final Widget child,
+}) extends StatefulWidget {
   @override
   State<_AnimationLayer> createState() => _AnimationLayerState();
 }
 
-class _AnimationLayerState extends State<_AnimationLayer> with SingleTickerProviderStateMixin {
+class _AnimationLayerState() extends State<_AnimationLayer> with SingleTickerProviderStateMixin {
   late final AnimationController _animationController;
   late final Animation<double> _animation;
 
@@ -595,29 +577,17 @@ class _AnimationLayerState extends State<_AnimationLayer> with SingleTickerProvi
   }
 }
 
-class _OverlayContent extends StatelessWidget {
-  const _OverlayContent({
-    required this.isTopOverlay,
-    this.maxHeight,
-    this.maxWidth,
-    this.offsetY,
-    required this.removeOnTapOutside,
-    required this.decoration,
-    required this.onTapOutside,
-    this.onHoverInside,
-    required this.child,
-  });
-
-  final bool isTopOverlay;
-  final double? maxHeight;
-  final double? maxWidth;
-  final double? offsetY;
-  final bool removeOnTapOutside;
-  final OverlayDecoration decoration;
-  final void Function() onTapOutside;
-  final void Function(bool value)? onHoverInside;
-  final Widget? child;
-
+class const _OverlayContent({
+  required final bool isTopOverlay,
+  final double? maxHeight,
+  final double? maxWidth,
+  final double? offsetY,
+  required final bool removeOnTapOutside,
+  required final OverlayDecoration decoration,
+  required final void Function() onTapOutside,
+  final void Function(bool value)? onHoverInside,
+  required final Widget? child,
+}) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
@@ -652,11 +622,8 @@ class _OverlayContent extends StatelessWidget {
   }
 }
 
-class _DecoratedOverlay extends SingleChildRenderObjectWidget {
-  const _DecoratedOverlay({required this.decoration, required super.child});
-
-  final _OverlayDecoration decoration;
-
+class const _DecoratedOverlay({required final _OverlayDecoration decoration, required super.child})
+    extends SingleChildRenderObjectWidget {
   @override
   _RenderDecoratedOverlay createRenderObject(BuildContext context) {
     return _RenderDecoratedOverlay(decoration: decoration);
@@ -668,12 +635,12 @@ class _DecoratedOverlay extends SingleChildRenderObjectWidget {
   }
 }
 
-class _RenderDecoratedOverlay extends RenderProxyBox {
-  _RenderDecoratedOverlay({required this._decoration}) {
+class _RenderDecoratedOverlay({required var _OverlayDecoration _decoration})
+    extends RenderProxyBox {
+  this {
     _updatePaddingCaches();
   }
 
-  _OverlayDecoration _decoration;
   BoxPainter? _cachedPainter;
 
   late EdgeInsets _borderPadding;

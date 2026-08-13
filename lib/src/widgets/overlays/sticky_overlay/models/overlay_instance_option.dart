@@ -1,19 +1,11 @@
 part of '../sticky_overlay.dart';
 
-sealed class OverlayInstanceOption {
-  const OverlayInstanceOption();
+sealed class const OverlayInstanceOption() {
+  const factory singleton() = _SingletonInstance;
 
-  const factory OverlayInstanceOption.singleton() = _SingletonInstance;
-
-  const factory OverlayInstanceOption.multiple({required GlobalKey targetKey}) = _MultipleInstance;
+  const factory multiple({required GlobalKey targetKey}) = _MultipleInstance;
 }
 
-class _SingletonInstance extends OverlayInstanceOption {
-  const _SingletonInstance();
-}
+class const _SingletonInstance() extends OverlayInstanceOption;
 
-class _MultipleInstance extends OverlayInstanceOption {
-  const _MultipleInstance({required this.targetKey});
-
-  final GlobalKey targetKey;
-}
+class const _MultipleInstance({required final GlobalKey targetKey}) extends OverlayInstanceOption;

@@ -15,9 +15,7 @@ part 'widgets/dialog_header.dart';
 part 'widgets/header_action.dart';
 part 'widgets/header_title.dart';
 
-class FloatingOverlay {
-  FloatingOverlay._();
-
+class FloatingOverlay._() {
   static Future<T?> showBottomSheet<T>(
     BuildContext context, {
     bool dismissible = true,

@@ -1,27 +1,8 @@
 import 'package:quick_dev_sdk/quick_dev_sdk.dart';
 import 'package:flutter/material.dart';
 
-class QuickStickyOverlayButton extends StatefulWidget {
-  const QuickStickyOverlayButton({
-    super.key,
-    this.onTap,
-    this.onHover,
-    this.buttonStyle = const QuickButtonStyle(
-      splashFactory: InkSparkle.splashFactory,
-      hoverDuration: Duration(milliseconds: 250),
-      elevation: 1,
-      hoveredElevationScale: 1,
-      requestFocusOnHover: false,
-      clipBehavior: .none,
-    ),
-    required this.overlayInstanceOptionBuilder,
-    this.disabled = false,
-    this.closeOnUnHover = false,
-    this.closeOnTapOutside = true,
-    this.onHoverChildBuilder,
-    this.child,
-  });
-
+class const QuickStickyOverlayButton({
+  super.key,
   final void Function(
     void Function(
       BuildContext context, {
@@ -31,7 +12,7 @@ class QuickStickyOverlayButton extends StatefulWidget {
     showOverlay,
     void Function() closeOverlay,
   )?
-  onTap;
+  onTap,
   final void Function(
     void Function(
       BuildContext context, {
@@ -41,20 +22,27 @@ class QuickStickyOverlayButton extends StatefulWidget {
     showOverlay,
     void Function() closeOverlay,
   )?
-  onHover;
-  final QuickButtonStyle buttonStyle;
-  final OverlayInstanceOption Function(GlobalKey targetKey) overlayInstanceOptionBuilder;
-  final bool disabled;
-  final bool closeOnUnHover;
-  final bool closeOnTapOutside;
-  final Widget Function(BuildContext context, bool value)? onHoverChildBuilder;
-  final Widget? child;
-
+  onHover,
+  final QuickButtonStyle buttonStyle = const QuickButtonStyle(
+    splashFactory: InkSparkle.splashFactory,
+    hoverDuration: Duration(milliseconds: 250),
+    elevation: 1,
+    hoveredElevationScale: 1,
+    requestFocusOnHover: false,
+    clipBehavior: .none,
+  ),
+  required final OverlayInstanceOption Function(GlobalKey targetKey) overlayInstanceOptionBuilder,
+  final bool disabled = false,
+  final bool closeOnUnHover = false,
+  final bool closeOnTapOutside = true,
+  final Widget Function(BuildContext context, bool value)? onHoverChildBuilder,
+  final Widget? child,
+}) extends StatefulWidget {
   @override
   State<QuickStickyOverlayButton> createState() => _QuickStickyOverlayButtonState();
 }
 
-class _QuickStickyOverlayButtonState extends State<QuickStickyOverlayButton> {
+class _QuickStickyOverlayButtonState() extends State<QuickStickyOverlayButton> {
   final _overlay = StickyOverlay.instance;
   final _targetKey = GlobalKey();
   final _layerLink = LayerLink();

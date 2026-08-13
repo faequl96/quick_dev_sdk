@@ -1,11 +1,7 @@
 part of '../floating_overlay.dart';
 
-class BottomSheetHeader extends StatelessWidget {
-  const BottomSheetHeader({super.key, this.title, this.action});
-
-  final HeaderTitle? title;
-  final HeaderAction? action;
-
+class const BottomSheetHeader({super.key, final HeaderTitle? title, final HeaderAction? action})
+    extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Stack(

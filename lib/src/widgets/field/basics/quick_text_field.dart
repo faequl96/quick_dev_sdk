@@ -2,50 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:quick_dev_sdk/quick_dev_sdk.dart';
 
-class QuickTextField extends StatefulWidget {
-  const QuickTextField({
-    super.key,
-    this.height,
-    this.width,
-    required this.controller,
-    this.focusNode,
-    this.autofocus = false,
-    this.enabled,
-    this.readOnly = false,
-    this.style = const TextStyle(fontSize: 16),
-    this.decoration,
-    this.maxLines,
-    this.maxLength,
-    this.keyboardType,
-    this.inputFormatters,
-    this.onChanged,
-    this.validator,
-    this.onEditingComplete,
-  });
-
-  final double? height;
-  final double? width;
-  final TextEditingController controller;
-  final FocusNode? focusNode;
-  final bool autofocus;
-  final bool? enabled;
-  final bool readOnly;
-  final TextStyle style;
-  final FieldDecoration? decoration;
-
-  final int? maxLines;
-  final int? maxLength;
-  final TextInputType? keyboardType;
-  final List<TextInputFormatter>? inputFormatters;
-  final void Function(String value)? onChanged;
-  final TextFieldValidator Function(String value)? validator;
-  final void Function()? onEditingComplete;
-
+class const QuickTextField({
+  super.key,
+  final double? height,
+  final double? width,
+  required final TextEditingController controller,
+  final FocusNode? focusNode,
+  final bool autofocus = false,
+  final bool? enabled,
+  final bool readOnly = false,
+  final TextStyle style = const TextStyle(fontSize: 16),
+  final FieldDecoration? decoration,
+  final int? maxLines,
+  final int? maxLength,
+  final TextInputType? keyboardType,
+  final List<TextInputFormatter>? inputFormatters,
+  final void Function(String value)? onChanged,
+  final TextFieldValidator Function(String value)? validator,
+  final void Function()? onEditingComplete,
+}) extends StatefulWidget {
   @override
   State<QuickTextField> createState() => _QuickTextFieldState();
 }
 
-class _QuickTextFieldState extends State<QuickTextField> {
+class _QuickTextFieldState() extends State<QuickTextField> {
   late final FocusNode _focusNode;
   bool _isLocalFocusNode = false;
 
@@ -209,54 +189,34 @@ class _QuickTextFieldState extends State<QuickTextField> {
   }
 }
 
-class FieldDecoration {
-  const FieldDecoration({
-    this.contentVerticalPadding = 0,
-    this.contentHorizontalPadding = 12,
-    this.prefixIcons,
-    this.suffixIcons,
-    this.hideSuffixIconOnEmpty = false,
-    this.enabledBorder = const OutlineInputBorder(
-      borderSide: BorderSide(color: Colors.black26, width: 1),
-      borderRadius: .all(.circular(8)),
-    ),
-    this.disabledBorder = const OutlineInputBorder(
-      borderSide: BorderSide(color: Colors.black26, width: 1),
-      borderRadius: .all(.circular(8)),
-    ),
-    this.focusedBorder = const OutlineInputBorder(
-      borderSide: BorderSide(color: Colors.black26, width: 1),
-      borderRadius: .all(.circular(8)),
-    ),
-    this.labelText,
-    this.labelStyle,
-    this.floatingLabelBehavior = .auto,
-    this.hintText,
-    this.hintStyle,
-    this.filled = false,
-    this.fillColor,
-    this.obscuringCharacter = '•',
-    this.obscureText = false,
-  });
-
-  final double contentVerticalPadding;
-  final double contentHorizontalPadding;
-  final List<PreSufFixIcon> Function(TextEditingController controller)? prefixIcons;
-  final List<PreSufFixIcon> Function(TextEditingController controller)? suffixIcons;
-  final bool hideSuffixIconOnEmpty;
-  final OutlineInputBorder enabledBorder;
-  final OutlineInputBorder disabledBorder;
-  final OutlineInputBorder focusedBorder;
-  final String? labelText;
-  final TextStyle? labelStyle;
-  final FloatingLabelBehavior floatingLabelBehavior;
-  final String? hintText;
-  final TextStyle? hintStyle;
-  final bool filled;
-  final Color? fillColor;
-  final String obscuringCharacter;
-  final bool obscureText;
-
+class const FieldDecoration({
+  final double contentVerticalPadding = 0,
+  final double contentHorizontalPadding = 12,
+  final List<PreSufFixIcon> Function(TextEditingController controller)? prefixIcons,
+  final List<PreSufFixIcon> Function(TextEditingController controller)? suffixIcons,
+  final bool hideSuffixIconOnEmpty = false,
+  final OutlineInputBorder enabledBorder = const OutlineInputBorder(
+    borderSide: BorderSide(color: Colors.black26, width: 1),
+    borderRadius: .all(.circular(8)),
+  ),
+  final OutlineInputBorder disabledBorder = const OutlineInputBorder(
+    borderSide: BorderSide(color: Colors.black26, width: 1),
+    borderRadius: .all(.circular(8)),
+  ),
+  final OutlineInputBorder focusedBorder = const OutlineInputBorder(
+    borderSide: BorderSide(color: Colors.black26, width: 1),
+    borderRadius: .all(.circular(8)),
+  ),
+  final String? labelText,
+  final TextStyle? labelStyle,
+  final FloatingLabelBehavior floatingLabelBehavior = .auto,
+  final String? hintText,
+  final TextStyle? hintStyle,
+  final bool filled = false,
+  final Color? fillColor,
+  final String obscuringCharacter = '•',
+  final bool obscureText = false,
+}) {
   FieldDecoration copyWith({
     double? contentVerticalPadding,
     double? contentHorizontalPadding,

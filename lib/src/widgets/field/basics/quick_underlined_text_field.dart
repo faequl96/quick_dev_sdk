@@ -2,43 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:quick_dev_sdk/quick_dev_sdk.dart';
 
-class QuickUnderlineTextField extends StatefulWidget {
-  const QuickUnderlineTextField({
-    super.key,
-    required this.controller,
-    this.focusNode,
-    this.autofocus = false,
-    this.enabled,
-    this.style = const TextStyle(fontSize: 16),
-    this.useBuiltInFont = true,
-    this.decoration,
-    this.maxLength,
-    this.keyboardType,
-    this.inputFormatters,
-    this.onChanged,
-    this.validator,
-    this.onEditingComplete,
-  });
-
-  final TextEditingController controller;
-  final FocusNode? focusNode;
-  final bool autofocus;
-  final bool? enabled;
-  final TextStyle style;
-  final bool useBuiltInFont;
-  final UnderlineFieldDecoration? decoration;
-  final int? maxLength;
-  final TextInputType? keyboardType;
-  final List<TextInputFormatter>? inputFormatters;
-  final void Function(String value)? onChanged;
-  final TextFieldValidator Function(String value)? validator;
-  final void Function()? onEditingComplete;
-
+class const QuickUnderlineTextField({
+  super.key,
+  required final TextEditingController controller,
+  final FocusNode? focusNode,
+  final bool autofocus = false,
+  final bool? enabled,
+  final TextStyle style = const TextStyle(fontSize: 16),
+  final bool useBuiltInFont = true,
+  final UnderlineFieldDecoration? decoration,
+  final int? maxLength,
+  final TextInputType? keyboardType,
+  final List<TextInputFormatter>? inputFormatters,
+  final void Function(String value)? onChanged,
+  final TextFieldValidator Function(String value)? validator,
+  final void Function()? onEditingComplete,
+}) extends StatefulWidget {
   @override
   State<QuickUnderlineTextField> createState() => _QuickUnderlineTextFieldState();
 }
 
-class _QuickUnderlineTextFieldState extends State<QuickUnderlineTextField> {
+class _QuickUnderlineTextFieldState() extends State<QuickUnderlineTextField> {
   late final FocusNode _focusNode;
   bool _isLocalFocusNode = false;
 
@@ -154,36 +138,19 @@ class _QuickUnderlineTextFieldState extends State<QuickUnderlineTextField> {
   }
 }
 
-class UnderlineFieldDecoration {
-  UnderlineFieldDecoration({
-    this.contentPadding,
-    this.prefixIcon,
-    this.suffixIcon,
-    this.hideSuffixIconOnEmpty = false,
-    this.enabledBorder,
-    this.disabledBorder,
-    this.focusedBorder,
-    this.labelText,
-    this.labelStyle,
-    this.floatingLabelBehavior = .auto,
-    this.hintText,
-    this.hintStyle,
-    this.obscuringCharacter = '•',
-    this.obscureText = false,
-  });
-
-  final EdgeInsets? contentPadding;
-  final PreSufFixIcon? prefixIcon;
-  final PreSufFixIcon? suffixIcon;
-  final bool hideSuffixIconOnEmpty;
-  final UnderlineInputBorder? enabledBorder;
-  final UnderlineInputBorder? disabledBorder;
-  final UnderlineInputBorder? focusedBorder;
-  final String? labelText;
-  final TextStyle? labelStyle;
-  final FloatingLabelBehavior floatingLabelBehavior;
-  final String? hintText;
-  final TextStyle? hintStyle;
-  final String obscuringCharacter;
-  final bool obscureText;
-}
+class UnderlineFieldDecoration({
+  final EdgeInsets? contentPadding,
+  final PreSufFixIcon? prefixIcon,
+  final PreSufFixIcon? suffixIcon,
+  final bool hideSuffixIconOnEmpty = false,
+  final UnderlineInputBorder? enabledBorder,
+  final UnderlineInputBorder? disabledBorder,
+  final UnderlineInputBorder? focusedBorder,
+  final String? labelText,
+  final TextStyle? labelStyle,
+  final FloatingLabelBehavior floatingLabelBehavior = .auto,
+  final String? hintText,
+  final TextStyle? hintStyle,
+  final String obscuringCharacter = '•',
+  final bool obscureText = false,
+}) {}

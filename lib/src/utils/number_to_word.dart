@@ -1,8 +1,6 @@
 import 'dart:math';
 
-class NumberToWord {
-  NumberToWord._();
-
+class NumberToWord._() {
   static String _langEN(double number) {
     if (number == 0) return 'zero';
 

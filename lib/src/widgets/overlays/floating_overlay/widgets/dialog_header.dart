@@ -1,25 +1,15 @@
 part of '../floating_overlay.dart';
 
-class DialogHeader extends StatelessWidget {
-  const DialogHeader({
-    super.key,
-    this.icon,
-    this.iconSize = 26,
-    this.iconColor,
-    this.title,
-    this.titleSize = 16,
-    this.titleFontWeight = .w600,
-    this.action,
-  });
-
-  final IconData? icon;
-  final double iconSize;
-  final Color? iconColor;
-  final String? title;
-  final double titleSize;
-  final FontWeight titleFontWeight;
-  final HeaderAction? action;
-
+class const DialogHeader({
+  super.key,
+  final IconData? icon,
+  final double iconSize = 26,
+  final Color? iconColor,
+  final String? title,
+  final double titleSize = 16,
+  final FontWeight titleFontWeight = .w600,
+  final HeaderAction? action,
+}) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Stack(

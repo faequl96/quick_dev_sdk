@@ -1,46 +1,28 @@
 import 'package:flutter/material.dart';
 
-class HoveredBackground extends StatefulWidget {
-  const HoveredBackground({
-    super.key,
-    this.width,
-    this.height,
-    this.padding,
-    this.hoveredColor,
-    this.unhoveredColor,
-    this.useInitialBoxShadow = false,
-    this.hoveredBoxShadow,
-    this.borderRadius,
-    this.border,
-    this.boxShape,
-    this.clipBehavior = .none,
-    this.cursor = SystemMouseCursors.basic,
-    this.onHover,
-    this.onHoverChildBuilder,
-    this.child,
-  });
-
-  final double? width;
-  final double? height;
-  final EdgeInsets? padding;
-  final Color? hoveredColor;
-  final Color? unhoveredColor;
-  final bool useInitialBoxShadow;
-  final BoxShadow? hoveredBoxShadow;
-  final BorderRadius? borderRadius;
-  final BoxBorder? border;
-  final BoxShape? boxShape;
-  final Clip clipBehavior;
-  final MouseCursor cursor;
-  final void Function(bool value)? onHover;
-  final Widget Function(bool value)? onHoverChildBuilder;
-  final Widget? child;
-
+class const HoveredBackground({
+  super.key,
+  final double? width,
+  final double? height,
+  final EdgeInsets? padding,
+  final Color? hoveredColor,
+  final Color? unhoveredColor,
+  final bool useInitialBoxShadow = false,
+  final BoxShadow? hoveredBoxShadow,
+  final BorderRadius? borderRadius,
+  final BoxBorder? border,
+  final BoxShape? boxShape,
+  final Clip clipBehavior = .none,
+  final MouseCursor cursor = SystemMouseCursors.basic,
+  final void Function(bool value)? onHover,
+  final Widget Function(bool value)? onHoverChildBuilder,
+  final Widget? child,
+}) extends StatefulWidget {
   @override
   State<HoveredBackground> createState() => _HoveredBackgroundState();
 }
 
-class _HoveredBackgroundState extends State<HoveredBackground> {
+class _HoveredBackgroundState() extends State<HoveredBackground> {
   bool _isHovered = false;
   Widget? _childHovered;
 

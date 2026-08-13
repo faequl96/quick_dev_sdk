@@ -2,7 +2,7 @@ import 'package:quick_dev_sdk/quick_dev_sdk.dart';
 import 'package:flutter/material.dart';
 
 class QuickButtonStyle {
-  const QuickButtonStyle({
+  const new({
     this.width,
     this.height,
     this.padding,
@@ -20,7 +20,7 @@ class QuickButtonStyle {
   }) : isLite = false,
        elevationType = .elevation;
 
-  const QuickButtonStyle.lite({
+  const new lite({
     this.width,
     this.height,
     this.padding,
@@ -56,34 +56,25 @@ class QuickButtonStyle {
   final Clip clipBehavior;
 }
 
-class QuickButton extends StatefulWidget {
-  const QuickButton({
-    super.key,
-    required this.onTap,
-    this.onHover,
-    this.style = const QuickButtonStyle(
-      hoverDuration: Duration(milliseconds: 250),
-      elevation: 1,
-      hoveredElevationScale: 3,
-      requestFocusOnHover: false,
-    ),
-    this.disabled = false,
-    this.onHoverChildBuilder,
-    this.child,
-  });
-
-  final void Function() onTap;
-  final void Function(bool value)? onHover;
-  final QuickButtonStyle style;
-  final bool disabled;
-  final Widget Function(BuildContext context, bool value)? onHoverChildBuilder;
-  final Widget? child;
-
+class const QuickButton({
+  super.key,
+  required final void Function() onTap,
+  final void Function(bool value)? onHover,
+  final QuickButtonStyle style = const QuickButtonStyle(
+    hoverDuration: Duration(milliseconds: 250),
+    elevation: 1,
+    hoveredElevationScale: 3,
+    requestFocusOnHover: false,
+  ),
+  final bool disabled = false,
+  final Widget Function(BuildContext context, bool value)? onHoverChildBuilder,
+  final Widget? child,
+}) extends StatefulWidget {
   @override
   State<QuickButton> createState() => _QuickButtonState();
 }
 
-class _QuickButtonState extends State<QuickButton> {
+class _QuickButtonState() extends State<QuickButton> {
   FocusNode? _internalFocusNode;
   FocusNode? get _focusNode => _internalFocusNode ??= FocusNode();
 

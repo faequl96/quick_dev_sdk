@@ -1,7 +1,7 @@
 part of '../sticky_overlay.dart';
 
 class OverlayDecoration {
-  const OverlayDecoration.dynamicWidth({
+  const new dynamicWidth({
     this.height,
     this.maxHeight,
     this._maxWidth,
@@ -23,7 +23,7 @@ class OverlayDecoration {
        _width = null,
        _widthCopy = 0;
 
-  const OverlayDecoration.staticWidth({
+  const new staticWidth({
     this.height,
     this.maxHeight,
     required double width,
@@ -46,7 +46,7 @@ class OverlayDecoration {
        _widthCopy = width > 40 ? width : 40,
        _maxWidth = null;
 
-  const OverlayDecoration.fitToTargetWidth({
+  const new fitToTargetWidth({
     this.height,
     this.maxHeight,
     this.offsetY = 6,
@@ -68,7 +68,7 @@ class OverlayDecoration {
        _offsetX = 0,
        _alignment = .center;
 
-  const OverlayDecoration.adaptive({
+  const new adaptive({
     this._maxWidth,
     this.offsetY = 6,
     this.marginY = 14,
@@ -313,24 +313,13 @@ class OverlayDecoration {
   }
 }
 
-class _OverlayDecoration {
-  const _OverlayDecoration({
-    this.height,
-    this.width,
-    required this.padding,
-    required this.color,
-    required this.borderRadius,
-    required this.border,
-    required this.elevation,
-    required this.elevationType,
-  });
-
-  final double? height;
-  final double? width;
-  final EdgeInsets padding;
-  final Color color;
-  final double borderRadius;
-  final BoxBorder border;
-  final double elevation;
-  final ElevationType elevationType;
-}
+class const _OverlayDecoration({
+  final double? height,
+  final double? width,
+  required final EdgeInsets padding,
+  required final Color color,
+  required final double borderRadius,
+  required final BoxBorder border,
+  required final double elevation,
+  required final ElevationType elevationType,
+}) {}

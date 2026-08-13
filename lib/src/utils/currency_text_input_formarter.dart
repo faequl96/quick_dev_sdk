@@ -1,26 +1,17 @@
 import 'dart:math';
+
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
-class CurrencyTextInputFormatter extends TextInputFormatter {
-  CurrencyTextInputFormatter({
-    this.locale,
-    this.name,
-    this.symbol,
-    this.decimalDigits,
-    this.customPattern,
-    this.turnOffGrouping = false,
-    this.enableNegative = true,
-  });
-
-  final String? locale;
-  final String? name;
-  final String? symbol;
-  final int? decimalDigits;
-  final String? customPattern;
-  final bool turnOffGrouping;
-  final bool enableNegative;
-
+class CurrencyTextInputFormatter({
+  final String? locale,
+  final String? name,
+  final String? symbol,
+  final int? decimalDigits,
+  final String? customPattern,
+  final bool turnOffGrouping = false,
+  final bool enableNegative = true,
+}) extends TextInputFormatter {
   num _newNum = 0;
   String _newString = '';
   bool _isNegative = false;

@@ -1,19 +1,12 @@
 part of '../floating_overlay.dart';
 
-class BottomSheetContent extends StatelessWidget {
-  const BottomSheetContent({
-    super.key,
-    this.decoration,
-    this.wallpapers,
-    this.header,
-    required this.contentBuilder,
-  });
-
-  final BottomSheetDecoration? decoration;
-  final List<Wallpaper>? wallpapers;
-  final BottomSheetHeader? header;
-  final Widget Function(BuildContext context) contentBuilder;
-
+class const BottomSheetContent({
+  super.key,
+  final BottomSheetDecoration? decoration,
+  final List<Wallpaper>? wallpapers,
+  final BottomSheetHeader? header,
+  required final Widget Function(BuildContext context) contentBuilder,
+}) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);

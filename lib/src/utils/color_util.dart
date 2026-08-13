@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
-class ColorUtil {
-  ColorUtil._();
-
+class ColorUtil._() {
   static Color lighten(Color color, [int percent = 20]) {
     assert(percent >= 1 && percent <= 100);
     final p = percent / 100;

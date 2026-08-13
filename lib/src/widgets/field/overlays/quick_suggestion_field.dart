@@ -1,11 +1,12 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:quick_dev_sdk/quick_dev_sdk.dart';
 
 String _defaultFieldValueBuilder<T>(T value) => value.toString();
 
 class QuickSuggestionField<T> extends StatefulWidget {
-  const QuickSuggestionField({
+  const new({
     required this.onSelected,
     super.key,
     this.decoration = const .fitToTargetWidth(
@@ -42,7 +43,7 @@ class QuickSuggestionField<T> extends StatefulWidget {
     this.loadingBuilder,
   }) : _searchOnly = false;
 
-  const QuickSuggestionField.searchOnly({
+  const new searchOnly({
     required this.onSelected,
     super.key,
     this.decoration = const .fitToTargetWidth(
@@ -99,7 +100,7 @@ class QuickSuggestionField<T> extends StatefulWidget {
   State<QuickSuggestionField<T>> createState() => _QuickSuggestionFieldState<T>();
 }
 
-class _QuickSuggestionFieldState<T> extends State<QuickSuggestionField<T>> {
+class _QuickSuggestionFieldState<T>() extends State<QuickSuggestionField<T>> {
   late FocusNode _focusNode;
   bool _isFocusNodeExternal = false;
   bool _isPointerInsideOverlay = false;
@@ -242,37 +243,24 @@ class _QuickSuggestionFieldState<T> extends State<QuickSuggestionField<T>> {
   }
 }
 
-class _Content<T> extends StatefulWidget {
-  const _Content({
-    // super.key,
-    required this.onSelected,
-    required this.overlayPadding,
-    required this.itemDecoration,
-    required this.debouncer,
-    required this.initialKeywords,
-    required this.suggestions,
-    required this.textStream,
-    required this.itemBuilder,
-    this.emptyBuilder,
-    this.loadingBuilder,
-  });
-
-  final void Function(T value) onSelected;
-  final EdgeInsets overlayPadding;
-  final SuggestionItemDecoration itemDecoration;
-  final Duration debouncer;
-  final String initialKeywords;
-  final Stream<String> textStream;
-  final Future<List<T>> Function({required String keywords}) suggestions;
-  final Widget Function(BuildContext context, T value) itemBuilder;
-  final Widget Function(BuildContext context)? emptyBuilder;
-  final Widget Function(BuildContext context)? loadingBuilder;
-
+class const _Content<T>({
+  // super.key,
+  required final void Function(T value) onSelected,
+  required final EdgeInsets overlayPadding,
+  required final SuggestionItemDecoration itemDecoration,
+  required final Duration debouncer,
+  required final String initialKeywords,
+  required final Future<List<T>> Function({required String keywords}) suggestions,
+  required final Stream<String> textStream,
+  required final Widget Function(BuildContext context, T value) itemBuilder,
+  final Widget Function(BuildContext context)? emptyBuilder,
+  final Widget Function(BuildContext context)? loadingBuilder,
+}) extends StatefulWidget {
   @override
   State<_Content<T>> createState() => _ContentState<T>();
 }
 
-class _ContentState<T> extends State<_Content<T>> {
+class _ContentState<T>() extends State<_Content<T>> {
   late final Debouncer _debouncer;
 
   StreamSubscription<String>? _textSubscription;
@@ -342,21 +330,13 @@ class _ContentState<T> extends State<_Content<T>> {
   }
 }
 
-class _Suggestions<T> extends StatelessWidget {
-  const _Suggestions({
-    required this.onSelected,
-    required this.overlayPadding,
-    required this.itemDecoration,
-    required this.suggestions,
-    required this.itemBuilder,
-  });
-
-  final void Function(T value) onSelected;
-  final EdgeInsets overlayPadding;
-  final SuggestionItemDecoration itemDecoration;
-  final List<T> suggestions;
-  final Widget Function(BuildContext context, T value) itemBuilder;
-
+class const _Suggestions<T>({
+  required final void Function(T value) onSelected,
+  required final EdgeInsets overlayPadding,
+  required final SuggestionItemDecoration itemDecoration,
+  required final List<T> suggestions,
+  required final Widget Function(BuildContext context, T value) itemBuilder,
+}) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(

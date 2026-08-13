@@ -1,7 +1,7 @@
 part of '../floating_overlay.dart';
 
 class HeaderTitle extends StatelessWidget {
-  const HeaderTitle({
+  const new({
     super.key,
     required this.icon,
     this.iconSize = 28,
@@ -12,7 +12,7 @@ class HeaderTitle extends StatelessWidget {
   }) : isHandleBar = false,
        color = null;
 
-  const HeaderTitle.handleBar({super.key, this.color})
+  const new handleBar({super.key, this.color})
     : isHandleBar = true,
       icon = Icons.check,
       iconSize = 28,

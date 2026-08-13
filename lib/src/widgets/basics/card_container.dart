@@ -1,35 +1,20 @@
 import 'package:flutter/material.dart';
 
-class CardContainer extends StatelessWidget {
-  const CardContainer({
-    super.key,
-    this.width,
-    this.height,
-    this.constraints,
-    this.margin,
-    this.padding = .zero,
-    this.color,
-    this.gradientColor,
-    this.borderRadius = 8,
-    this.border,
-    this.boxShadow,
-    this.clipBehavior = .none,
-    required this.child,
-  });
-
-  final double? width;
-  final double? height;
-  final BoxConstraints? constraints;
-  final EdgeInsets? margin;
-  final EdgeInsets padding;
-  final Color? color;
-  final LinearGradient? gradientColor;
-  final double borderRadius;
-  final BoxBorder? border;
-  final BoxShadow? boxShadow;
-  final Clip clipBehavior;
-  final Widget child;
-
+class const CardContainer({
+  super.key,
+  final double? width,
+  final double? height,
+  final BoxConstraints? constraints,
+  final EdgeInsets? margin,
+  final EdgeInsets padding = .zero,
+  final Color? color,
+  final LinearGradient? gradientColor,
+  final double borderRadius = 8,
+  final BoxBorder? border,
+  final BoxShadow? boxShadow,
+  final Clip clipBehavior = .none,
+  required final Widget child,
+}) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(

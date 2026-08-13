@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
-enum ElevationType { elevation, shadow }
+enum ElevationType() {
+  elevation,
+  shadow
+}
 
-class DecorationUtils {
-  const DecorationUtils._();
-
+class const DecorationUtils._() {
   static List<BoxShadow> elevation(
     double value, {
     required ElevationType elevationType,

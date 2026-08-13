@@ -1,63 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:quick_dev_sdk/quick_dev_sdk.dart';
 
-class QuickMenuButton<T> extends StatelessWidget {
-  const QuickMenuButton({
-    super.key,
-    required this.onSelected,
-    this.buttonStyle = const QuickButtonStyle(
-      splashFactory: InkSparkle.splashFactory,
-      hoverDuration: Duration(milliseconds: 250),
-      elevation: 1,
-      hoveredElevationScale: 1,
-      requestFocusOnHover: false,
-      clipBehavior: .none,
-    ),
-    this.overlayDecoration = const .dynamicWidth(
-      offsetY: 6,
-      offsetX: 8,
-      marginY: 14,
-      marginX: 14,
-      flipOffset: 80,
-      padding: .symmetric(vertical: 8),
-      color: Color(0xFFFAFAFA),
-      borderRadius: 8,
-      border: .fromBorderSide(BorderSide(width: 1, color: Colors.black12)),
-      elevation: 1,
-      elevationType: .shadow,
-      slideTransition: true,
-      useBarrier: false,
-    ),
-    // this.overlayInstanceType = .singleton,
-    this.itemDecoration = const MenuItemDecoration(
-      padding: .symmetric(horizontal: 10, vertical: 8),
-      margin: .symmetric(vertical: 2),
-      color: Colors.white,
-      hoveredColor: Color(0xFFF5F5F5),
-      borderRadius: 0,
-    ),
-    this.disabled = false,
-    this.showOnHover = false,
-    this.closeOnUnHover = false,
-    required this.items,
-    required this.itemBuilder,
-    this.onHoverChildBuilder,
-    this.child,
-  });
-
-  final void Function(T value) onSelected;
-  final QuickButtonStyle buttonStyle;
-  final OverlayDecoration overlayDecoration;
+class const QuickMenuButton<T>({
+  super.key,
+  required final void Function(T value) onSelected,
+  final QuickButtonStyle buttonStyle = const QuickButtonStyle(
+    splashFactory: InkSparkle.splashFactory,
+    hoverDuration: Duration(milliseconds: 250),
+    elevation: 1,
+    hoveredElevationScale: 1,
+    requestFocusOnHover: false,
+    clipBehavior: .none,
+  ),
+  final OverlayDecoration overlayDecoration = const .dynamicWidth(
+    offsetY: 6,
+    offsetX: 8,
+    marginY: 14,
+    marginX: 14,
+    flipOffset: 80,
+    padding: .symmetric(vertical: 8),
+    color: Color(0xFFFAFAFA),
+    borderRadius: 8,
+    border: .fromBorderSide(BorderSide(width: 1, color: Colors.black12)),
+    elevation: 1,
+    elevationType: .shadow,
+    slideTransition: true,
+    useBarrier: false,
+  ),
+  // this.overlayInstanceType = .singleton,
+  final MenuItemDecoration itemDecoration = const MenuItemDecoration(
+    padding: .symmetric(horizontal: 10, vertical: 8),
+    margin: .symmetric(vertical: 2),
+    color: Colors.white,
+    hoveredColor: Color(0xFFF5F5F5),
+    borderRadius: 0,
+  ),
+  final bool disabled = false,
+  final bool showOnHover = false,
+  final bool closeOnUnHover = false,
+  required final List<T> items,
+  required final Widget Function(BuildContext context, T value) itemBuilder,
+  final Widget Function(BuildContext context, bool value)? onHoverChildBuilder,
+  final Widget? child,
+}) extends StatelessWidget {
   // final OverlayInstanceType overlayInstanceType;
-  final MenuItemDecoration itemDecoration;
-  final bool disabled;
-  final bool showOnHover;
-  final bool closeOnUnHover;
-  final List<T> items;
-  final Widget Function(BuildContext context, T value) itemBuilder;
-  final Widget Function(BuildContext context, bool value)? onHoverChildBuilder;
-  final Widget? child;
-
   void _overlay(
     BuildContext context,
     void Function(
@@ -97,23 +83,14 @@ class QuickMenuButton<T> extends StatelessWidget {
   }
 }
 
-class _Menus<T> extends StatelessWidget {
-  const _Menus({
-    required this.onSelected,
-    required this.overlayPadding,
-    required this.decoration,
-    required this.items,
-    required this.itemBuilder,
-    required this.closeOverlay,
-  });
-
-  final void Function(T value) onSelected;
-  final EdgeInsets overlayPadding;
-  final MenuItemDecoration decoration;
-  final List<T> items;
-  final Widget Function(BuildContext context, T value) itemBuilder;
-  final void Function() closeOverlay;
-
+class const _Menus<T>({
+  required final void Function(T value) onSelected,
+  required final EdgeInsets overlayPadding,
+  required final MenuItemDecoration decoration,
+  required final List<T> items,
+  required final Widget Function(BuildContext context, T value) itemBuilder,
+  required final void Function() closeOverlay,
+}) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final itemCount = items.length;

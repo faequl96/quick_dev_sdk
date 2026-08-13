@@ -6,6 +6,11 @@ formatter:
 linter:
   rules:
     # Code Style
+    use_primary_constructors: true
+    use_declaring_parameters: true
+    unnecessary_type_name_in_constructor: true
+    # initialize_in_field_declaration: true
+    unnecessary_primary_constructor_body: true
     prefer_const_constructors: true # Menggunakan const pada konstruktor jika memungkinkan
     prefer_const_literals_to_create_immutables: true # Menggunakan const untuk koleksi yang tidak berubah
     sort_constructors_first: true # Menyusun konstruktor sebelum metode lainnya

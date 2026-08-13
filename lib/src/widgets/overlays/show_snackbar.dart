@@ -2,9 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 
-class ShowSnackbar {
-  ShowSnackbar._();
-
+class ShowSnackbar._() {
   static final ShowSnackbar _instance = ShowSnackbar._();
   static ShowSnackbar get instance => _instance;
 
@@ -42,22 +40,12 @@ class ShowSnackbar {
   void remove() => ScaffoldMessenger.of(_context).hideCurrentSnackBar();
 }
 
-class SnackBarDecoration {
-  SnackBarDecoration({
-    this.width,
-    this.padding = .zero,
-    this.margin,
-    this.color,
-    this.shape,
-    this.elevation,
-    this.clipBehavior = .none,
-  });
-
-  final double? width;
-  final EdgeInsets padding;
-  final EdgeInsets? margin;
-  final Color? color;
-  final ShapeBorder? shape;
-  final double? elevation;
-  final Clip clipBehavior;
-}
+class SnackBarDecoration({
+  final double? width,
+  final EdgeInsets padding = .zero,
+  final EdgeInsets? margin,
+  final Color? color,
+  final ShapeBorder? shape,
+  final double? elevation,
+  final Clip clipBehavior = .none,
+}) {}

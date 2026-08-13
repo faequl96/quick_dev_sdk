@@ -4,7 +4,7 @@ import 'package:quick_dev_sdk/quick_dev_sdk.dart';
 List<T> _defaultItemsBuilder<T>({required String keywords}) => [];
 
 class QuickDropdownButton<T> extends StatelessWidget {
-  const QuickDropdownButton({
+  const new({
     super.key,
     required this.onSelected,
     this.buttonStyle = const QuickButtonStyle(
@@ -48,7 +48,7 @@ class QuickDropdownButton<T> extends StatelessWidget {
        _searchFieldTextStyle = const TextStyle(),
        _searchFieldDecoration = const FieldDecoration();
 
-  const QuickDropdownButton.withItemsSearch({
+  const new withItemsSearch({
     super.key,
     required this.onSelected,
     this.buttonStyle = const QuickButtonStyle(
@@ -166,30 +166,20 @@ class QuickDropdownButton<T> extends StatelessWidget {
   }
 }
 
-class _Dropdowns<T> extends StatefulWidget {
-  const _Dropdowns({
-    required this.onSelected,
-    required this.overlayPadding,
-    required this.decoration,
-    this.value,
-    required this.items,
-    required this.itemBuilder,
-    required this.closeOverlay,
-  });
-
-  final void Function(T value) onSelected;
-  final EdgeInsets overlayPadding;
-  final DropdownItemDecoration decoration;
-  final T? value;
-  final List<T> items;
-  final Widget Function(BuildContext context, T value) itemBuilder;
-  final void Function() closeOverlay;
-
+class const _Dropdowns<T>({
+  required final void Function(T value) onSelected,
+  required final EdgeInsets overlayPadding,
+  required final DropdownItemDecoration decoration,
+  final T? value,
+  required final List<T> items,
+  required final Widget Function(BuildContext context, T value) itemBuilder,
+  required final void Function() closeOverlay,
+}) extends StatefulWidget {
   @override
   State<_Dropdowns<T>> createState() => _DropdownsState<T>();
 }
 
-class _DropdownsState<T> extends State<_Dropdowns<T>> {
+class _DropdownsState<T>() extends State<_Dropdowns<T>> {
   late final ScrollController _controller;
 
   final _selectedItemKey = GlobalKey();
@@ -279,36 +269,23 @@ class _DropdownsState<T> extends State<_Dropdowns<T>> {
   }
 }
 
-class _DropdownItemsSearch<T> extends StatefulWidget {
-  const _DropdownItemsSearch({
-    required this.onSelected,
-    required this.overlayPadding,
-    required this.decoration,
-    this.value,
-    required this.items,
-    required this.itemBuilder,
-    required this.searchFieldHeight,
-    required this.searchFieldTextStyle,
-    required this.searchFieldDecoration,
-    required this.closeOverlay,
-  });
-
-  final void Function(T value) onSelected;
-  final EdgeInsets overlayPadding;
-  final DropdownItemDecoration decoration;
-  final T? value;
-  final List<T> Function({required String keywords}) items;
-  final Widget Function(BuildContext context, T value) itemBuilder;
-  final double searchFieldHeight;
-  final TextStyle searchFieldTextStyle;
-  final FieldDecoration searchFieldDecoration;
-  final void Function() closeOverlay;
-
+class const _DropdownItemsSearch<T>({
+  required final void Function(T value) onSelected,
+  required final EdgeInsets overlayPadding,
+  required final DropdownItemDecoration decoration,
+  final T? value,
+  required final List<T> Function({required String keywords}) items,
+  required final Widget Function(BuildContext context, T value) itemBuilder,
+  required final double searchFieldHeight,
+  required final TextStyle searchFieldTextStyle,
+  required final FieldDecoration searchFieldDecoration,
+  required final void Function() closeOverlay,
+}) extends StatefulWidget {
   @override
   State<_DropdownItemsSearch<T>> createState() => _DropdownItemsSearchState<T>();
 }
 
-class _DropdownItemsSearchState<T> extends State<_DropdownItemsSearch<T>> {
+class _DropdownItemsSearchState<T>() extends State<_DropdownItemsSearch<T>> {
   final _textEditingController = TextEditingController();
 
   List<T> _filteredItems = [];

@@ -1,28 +1,19 @@
 part of '../floating_overlay.dart';
 
-class DialogContent extends StatefulWidget {
-  const DialogContent({
-    super.key,
-    this.width,
-    this.height,
-    this.constraints,
-    this.padding = .zero,
-    this.header,
-    required this.child,
-  });
-
-  final double? width;
-  final double? height;
-  final BoxConstraints? constraints;
-  final EdgeInsets padding;
-  final Widget? header;
-  final Widget child;
-
+class const DialogContent({
+  super.key,
+  final double? width,
+  final double? height,
+  final BoxConstraints? constraints,
+  final EdgeInsets padding = .zero,
+  final Widget? header,
+  required final Widget child,
+}) extends StatefulWidget {
   @override
   State<DialogContent> createState() => _DialogContentState();
 }
 
-class _DialogContentState extends State<DialogContent> {
+class _DialogContentState() extends State<DialogContent> {
   final _childKey = GlobalKey();
 
   double childWidth = 0;
