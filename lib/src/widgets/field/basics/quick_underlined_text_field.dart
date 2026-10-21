@@ -153,4 +153,4 @@ class UnderlineFieldDecoration({
   final TextStyle? hintStyle,
   final String obscuringCharacter = '•',
   final bool obscureText = false,
-}) {}
+});

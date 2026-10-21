@@ -8,6 +8,7 @@ linter:
     # Code Style
     use_primary_constructors: true
     use_declaring_parameters: true
+    empty_container_bodies: true
     unnecessary_type_name_in_constructor: true
     # initialize_in_field_declaration: true
     unnecessary_primary_constructor_body: true

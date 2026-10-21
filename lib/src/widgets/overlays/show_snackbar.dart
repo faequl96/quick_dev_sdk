@@ -48,4 +48,4 @@ class SnackBarDecoration({
   final ShapeBorder? shape,
   final double? elevation,
   final Clip clipBehavior = .none,
-}) {}
+});

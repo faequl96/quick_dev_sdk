@@ -322,4 +322,4 @@ class const _OverlayDecoration({
   required final BoxBorder border,
   required final double elevation,
   required final ElevationType elevationType,
-}) {}
+});

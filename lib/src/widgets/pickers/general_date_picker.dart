@@ -1071,4 +1071,4 @@ class const _YearPickerGridDelegate() extends SliverGridDelegate {
 
 const _YearPickerGridDelegate _yearPickerGridDelegate = _YearPickerGridDelegate();
 
-class const Holiday({required final DateTime date, required final String description}) {}
+class const Holiday({required final DateTime date, required final String description});
